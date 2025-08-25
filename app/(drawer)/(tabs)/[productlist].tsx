@@ -89,7 +89,7 @@ const ProductListScreen = () => {
             setSelectedCategory('all');
             setNoMatch(false);
           } else {
-            setNoMatch(true); // ✅ No match found
+            setNoMatch(true);
           }
         }
       } else {
