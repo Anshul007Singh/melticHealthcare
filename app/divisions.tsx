@@ -6,9 +6,10 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { fetchProducts } from '@/data/productList';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 const OurDivisions = () => {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<any[]>([]);
@@ -28,11 +29,23 @@ const OurDivisions = () => {
     };
     loadProducts();
   }, [query]);
+
+  const onClickHandler = (query: string) => {
+    router.push({
+      pathname: '../productlist',
+      params: { query: query },
+    });
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: '#f9f9f9' }}>
       <ScrollView contentContainerStyle={styles.container}>
         {products.map((item, index) => (
-          <View key={index} style={styles.card}>
+          <TouchableOpacity
+            key={index}
+            style={styles.card}
+            onPress={() => onClickHandler(item.name)}
+          >
             <View style={styles.logoContainer}>
               <Image
                 source={{ uri: item.image?.src }}
@@ -41,7 +54,7 @@ const OurDivisions = () => {
               />
             </View>
             <Text style={styles.label}>{item.name}</Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>

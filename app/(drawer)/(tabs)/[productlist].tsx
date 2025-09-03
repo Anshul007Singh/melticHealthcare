@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import {
   FlatList,
   Image,
@@ -8,22 +8,59 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  Animated,
+  Easing,
 } from 'react-native';
-import { ActivityIndicator, Text } from 'react-native-paper';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Text } from 'react-native-paper';
+import { useLocalSearchParams } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { fetchProducts } from '@/data/productList';
+import { useRouter } from 'expo-router';
+
+const ShimmerPlaceholder = ({ style }: { style?: any }) => {
+  const shimmerAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(shimmerAnim, {
+        toValue: 1,
+        duration: 1200,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ).start();
+  }, []);
+
+  const translateX = shimmerAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-150, 150],
+  });
+
+  return (
+    <View style={[styles.shimmerContainer, style]}>
+      <Animated.View
+        style={[
+          styles.shimmer,
+          {
+            transform: [{ translateX }],
+          },
+        ]}
+      />
+    </View>
+  );
+};
 
 const ProductListScreen = () => {
   const { query } = useLocalSearchParams<{ query?: string }>();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const [featuredFilter, setFeaturedFilter] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedBrand, setSelectedBrand] = useState('all');
   const [noMatch, setNoMatch] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     return () => {
@@ -71,8 +108,15 @@ const ProductListScreen = () => {
         if (query.toLowerCase() === 'productlist') {
           setSelectedCategory('all');
           setSelectedBrand('all');
+          setFeaturedFilter(false);
+          setNoMatch(false);
+        } else if (query.toLowerCase() === 'featured') {
+          setSelectedCategory('all');
+          setSelectedBrand('all');
+          setFeaturedFilter(true);
           setNoMatch(false);
         } else {
+          setFeaturedFilter(false);
           const matchedCategory = categories.find(
             (cat) => cat.toLowerCase() === query.toLowerCase(),
           );
@@ -89,17 +133,34 @@ const ProductListScreen = () => {
             setSelectedCategory('all');
             setNoMatch(false);
           } else {
-            setNoMatch(true); // ✅ No match found
+            setNoMatch(true);
           }
         }
       } else {
+        setFeaturedFilter(false);
         setNoMatch(false);
       }
     }
   }, [loading, products, query, categories, brands]);
 
   if (loading) {
-    return <ActivityIndicator size='large' style={styles.loader} />;
+    return (
+      <FlatList
+        data={[1, 2, 3, 4, 5, 6]}
+        keyExtractor={(item) => item.toString()}
+        numColumns={2}
+        contentContainerStyle={styles.listContainer}
+        renderItem={() => (
+          <View style={styles.itemContainer}>
+            <ShimmerPlaceholder style={styles.image} />
+            <ShimmerPlaceholder style={{ height: 16, marginTop: 8 }} />
+            <ShimmerPlaceholder
+              style={{ height: 16, marginTop: 6, width: '50%' }}
+            />
+          </View>
+        )}
+      />
+    );
   }
 
   if (noMatch) {
@@ -113,6 +174,9 @@ const ProductListScreen = () => {
   }
 
   const filteredProducts = products.filter((item) => {
+    if (featuredFilter) {
+      return item.featured === true;
+    }
     const matchCategory =
       selectedCategory === 'all' ||
       item.categories.some((cat: any) => cat.name === selectedCategory);
@@ -126,6 +190,16 @@ const ProductListScreen = () => {
   });
 
   const imageHandler = (item: any) => {
+    const data = item.meta_data[0];
+    const indications =
+      data.value.filter(
+        (content: { id: string }) => content.id === 'indications',
+      )[0]?.content || '';
+    const sideEffects =
+      data.value.filter(
+        (content: { id: string }) => content.id === 'side-effects',
+      )[0]?.content || '';
+
     router.push({
       pathname: '/productDetail',
       params: {
@@ -136,8 +210,9 @@ const ProductListScreen = () => {
         description: item.description,
         price: item.price,
         sku: item.sku,
-        salePrice: item.sale_price,
         shortDescription: item.short_description,
+        sideEffects: sideEffects,
+        indications: indications,
       },
     });
   };
@@ -163,7 +238,13 @@ const ProductListScreen = () => {
           resizeMode='contain'
         />
       </TouchableOpacity>
-      <Text style={styles.title}>{item.name}</Text>
+      <Text style={styles.title}>{item.name} </Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Text style={styles.title}>
+          {item.categories?.[0]?.name || 'No Category'}
+        </Text>
+        <Text style={styles.title}>₹ {item.price}</Text>
+      </View>
     </View>
   );
 
@@ -184,7 +265,6 @@ const ProductListScreen = () => {
           <Feather name='filter' size={24} color='#59AFFF' />
         </TouchableOpacity>
       </View>
-
       <FlatList
         data={filteredProducts}
         renderItem={renderItem}
@@ -195,7 +275,6 @@ const ProductListScreen = () => {
           <Text style={styles.emptyText}>No products found.</Text>
         }
       />
-
       <Modal
         animationType='fade'
         transparent={true}
@@ -265,6 +344,17 @@ const ProductListScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  shimmerContainer: {
+    backgroundColor: '#E1E9EE',
+    overflow: 'hidden',
+    borderRadius: 8,
+  },
+  shimmer: {
+    width: '50%',
+    height: '100%',
+    backgroundColor: '#F2F8FC',
+    opacity: 0.6,
+  },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -276,11 +366,6 @@ const styles = StyleSheet.create({
   iconWrapper: {
     marginRight: 12,
   },
-  loader: {
-    flex: 1,
-    justifyContent: 'center',
-    color: '#59AFFF',
-  },
   headerText: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -290,7 +375,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   itemContainer: {
-    flex: 1,
+    width: '45%',
     margin: 8,
     backgroundColor: '#fff',
     borderRadius: 8,
@@ -301,11 +386,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 150,
     marginBottom: 8,
+    borderRadius: 8,
   },
   title: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#000',
+    color: '#59AFFF',
   },
   modalOverlay: {
     flex: 1,

@@ -17,14 +17,23 @@ export default function CustomDrawerContent(props: any) {
   };
 
   const kycHandler = () => {
-    router.push('/kycDetails');
+    router.push('/contact');
   };
+
+  // ✅ Function to open links safely
+  const openLink = (url: string) => {
+    Linking.openURL(url).catch((err) =>
+      console.error('Failed to open URL:', err),
+    );
+  };
+
   return (
     <DrawerContentScrollView
       {...props}
       style={styles.container}
       contentContainerStyle={styles.scrollContent}
     >
+      {/* Profile Section */}
       <View style={styles.profileSection}>
         <Ionicons name='person-circle-outline' size={48} color='#0060AA' />
         <View style={styles.profileText}>
@@ -38,6 +47,7 @@ export default function CustomDrawerContent(props: any) {
 
       <Divider style={styles.divider} />
 
+      {/* Menu Items */}
       <MenuItem icon='home-outline' label='Home' href='/home' />
       <MenuItem icon='account-outline' label='My Account' href='/account' />
       <MenuItem
@@ -50,13 +60,7 @@ export default function CustomDrawerContent(props: any) {
         label='My Digital Visual Aid'
         href='/visual-aid'
       />
-      <MenuItem icon='percent' label='Offers' href='/offers' />
-      <MenuItem
-        icon='calculator-variant-outline'
-        label='PTR & PTS Calculator'
-        href='/calculator'
-      />
-      <MenuItem icon='chart-bar' label='My Incentive' href='/incentive' />
+      <MenuItem icon='percent' label='Kyc Details' href='/kycDetails' />
 
       <MenuItem
         icon='bell-outline'
@@ -65,16 +69,25 @@ export default function CustomDrawerContent(props: any) {
         onPress={notificationHandler}
       />
 
-      <MenuItem icon='headset' label='Customer Support' href='/kycDetails' />
+      <MenuItem
+        icon='headset'
+        label='Customer Support'
+        href='/contact'
+        onPress={kycHandler}
+      />
       <MenuItem icon='power' label='Logout' href='/logout' />
 
       <View style={styles.footer}>
-        <TouchableOpacity onPress={() => Linking.openURL('#')}>
+        <TouchableOpacity
+          onPress={() => openLink('https://yourwebsite.com/privacy-policy')}
+        >
           <Text style={styles.footerLink}>Privacy Policy</Text>
         </TouchableOpacity>
         <Text style={styles.footerSeparator}>|</Text>
-        <TouchableOpacity onPress={() => Linking.openURL('#')}>
-          <Text style={styles.footerLink}>Terms and Condition</Text>
+        <TouchableOpacity
+          onPress={() => openLink('https://www.melticgroup.com/about')}
+        >
+          <Text style={styles.footerLink}>Terms and Conditions</Text>
         </TouchableOpacity>
       </View>
     </DrawerContentScrollView>

@@ -56,17 +56,11 @@ export default function MainLayout() {
     headerTitle: () => (
       <View
         style={{
-          flex: 1,
           alignItems: 'center',
-          marginLeft: 100,
-          marginTop: 15,
+          marginLeft: 80,
         }}
       >
-        <Image
-          source={require('../../assets/images/logo.png')}
-          style={{ width: 100, height: 40 }}
-          resizeMode='contain'
-        />
+        <Text style={styles.brandName}>Meltic Group</Text>
       </View>
     ),
     headerRight: () => (
@@ -188,6 +182,12 @@ const styles = StyleSheet.create({
   badgeText: {
     color: 'white',
     fontSize: 10,
+    fontWeight: 'bold',
+  },
+  brandName: {
+    color: 'white',
+    fontSize: 24,
+    fontStyle: 'italic',
     fontWeight: 'bold',
   },
 });

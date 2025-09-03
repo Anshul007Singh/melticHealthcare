@@ -22,6 +22,7 @@ const DynamicListScreen = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
+      console.log('DynamicListScreen query--- ', query);
       try {
         const data = await fetchProducts(query);
         if (data && Array.isArray(data)) {
@@ -42,7 +43,6 @@ const DynamicListScreen = () => {
       params: { query: item },
     });
   };
-
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

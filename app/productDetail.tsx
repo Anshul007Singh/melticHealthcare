@@ -10,16 +10,18 @@ export default function ProductDetailScreen() {
     title,
     img,
     category,
-    salePrice,
     sku,
     price,
     description,
     shortDescription,
+    sideEffects,
+    indications,
   } = useLocalSearchParams();
   const { addToCart } = useCart();
 
   const [expandedDesc, setExpandedDesc] = useState(false);
   const [expandedSideEffects, setExpandedSideEffects] = useState(false);
+  const [expandedIndication, setExpendedIndication] = useState(false);
   const [showRibbon, setShowRibbon] = useState(false);
 
   function parseDescription(description: string) {
@@ -67,12 +69,10 @@ export default function ProductDetailScreen() {
   const descriptionData = parseDescription(description as string);
 
   const handleAddToCart = () => {
-    const numericPrice =
-      parseFloat(descriptionData.mrp.replace(/[^\d.]/g, '')) || 0;
     const item = {
       id: id as string,
       name: title as string,
-      price: numericPrice,
+      price: price as any,
       quantity: 1,
       image: img as string,
     };
@@ -109,38 +109,12 @@ export default function ProductDetailScreen() {
           </Text>
           <Text style={styles.packInfo}>{sku}</Text>
         </View>
-
-        <View style={styles.priceRow}>
-          <Text style={styles.priceText}>MRP - {descriptionData.mrp}</Text>
-          <Text style={styles.priceText}>PTR ₹{salePrice}</Text>
-        </View>
-
-        <Text style={styles.minOrder}>
-          Packaging: {descriptionData.packaging}
-        </Text>
-
-        <Text style={styles.sectionTitle}>Bulk Order</Text>
-        <View style={styles.bulkOrderRow}>
-          <Button mode='outlined' style={styles.bulkBtn}>
-            1 Unit {descriptionData.mrp}
-          </Button>
-          <Button mode='outlined' style={styles.bulkBtn}>
-            5 Units ₹1900
-          </Button>
-        </View>
-        <View style={styles.bulkOrderRow}>
-          <Button mode='outlined' style={styles.bulkBtn}>
-            10 Units ₹3800
-          </Button>
-          <Button mode='outlined' style={styles.bulkBtn}>
-            15 Units ₹5700
-          </Button>
-        </View>
-
-        <Divider style={{ marginVertical: 10 }} />
-
-        <Text style={styles.sectionTitle}>Composition</Text>
         <Text style={styles.composition}>{descriptionData.composition}</Text>
+        <View style={styles.priceRow}>
+          <Text style={styles.priceText}>MRP - {price}</Text>
+        </View>
+        <Text style={styles.minOrder}>Packaging: {descriptionData.type}</Text>
+        <Divider style={{ marginVertical: 10 }} />
 
         <View style={styles.iconsRow}>
           <Text>✅ 100% genuine products</Text>
@@ -154,9 +128,7 @@ export default function ProductDetailScreen() {
             onPress={() => setExpandedDesc(!expandedDesc)}
           >
             <ScrollView style={{ maxHeight: 200, paddingHorizontal: 16 }}>
-              <Text style={{ fontSize: 14 }}>
-                {descriptionData.description}
-              </Text>
+              <Text style={{ fontSize: 14 }}>{descriptionData.name}</Text>
             </ScrollView>
           </List.Accordion>
           <List.Accordion
@@ -165,9 +137,16 @@ export default function ProductDetailScreen() {
             onPress={() => setExpandedSideEffects(!expandedSideEffects)}
           >
             <ScrollView style={{ maxHeight: 200, paddingHorizontal: 16 }}>
-              <Text style={{ fontSize: 14 }}>
-                {descriptionData.sideEffects}
-              </Text>
+              <Text style={{ fontSize: 14 }}>{sideEffects}</Text>
+            </ScrollView>
+          </List.Accordion>
+          <List.Accordion
+            title='Indications'
+            expanded={expandedIndication}
+            onPress={() => setExpendedIndication(!expandedIndication)}
+          >
+            <ScrollView style={{ maxHeight: 200, paddingHorizontal: 16 }}>
+              <Text style={{ fontSize: 14 }}>{indications}</Text>
             </ScrollView>
           </List.Accordion>
         </List.Section>
@@ -236,15 +215,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginVertical: 10,
-  },
-  bulkOrderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 5,
-  },
-  bulkBtn: {
-    flex: 1,
-    marginHorizontal: 5,
   },
   composition: {
     fontSize: 14,

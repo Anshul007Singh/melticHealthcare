@@ -1,5 +1,12 @@
-import React, { useState, useRef } from 'react';
-import { StyleSheet, View, ScrollView, Dimensions, Image } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  StyleSheet,
+  View,
+  ScrollView,
+  Dimensions,
+  Image,
+  Animated,
+} from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -7,7 +14,7 @@ const data = [
   {
     title: 'First Slide',
     description: 'This is the first slide description.',
-    image: 'https://picsum.photos/600/400?random=2',
+    image: 'https://picsum.photos/600/400?random=1',
   },
   {
     title: 'Second Slide',
@@ -17,19 +24,33 @@ const data = [
   {
     title: 'Third Slide',
     description: 'This is the third slide description.',
-    image: 'https://picsum.photos/600/400?random=3',
+    image: 'https://picsum.photos/600/300?random=3',
   },
 ];
 
 const Home = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const scrollViewRef = useRef(null);
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const handleScroll = (event: any) => {
     const xOffset = event.nativeEvent.contentOffset.x;
     const slideIndex = Math.round(xOffset / screenWidth);
     setActiveIndex(slideIndex);
   };
+
+  // Auto-slide effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const nextIndex = (activeIndex + 1) % data.length;
+      setActiveIndex(nextIndex);
+      scrollViewRef.current?.scrollTo({
+        x: nextIndex * screenWidth,
+        animated: true,
+      });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [activeIndex]);
 
   return (
     <View style={styles.container}>
@@ -69,21 +90,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     margin: 15,
     borderRadius: 10,
-  },
-  dotsContainer: {
-    flexDirection: 'row',
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginHorizontal: 5,
-  },
-  activeDot: {
-    backgroundColor: '#000',
-  },
-  inactiveDot: {
-    backgroundColor: '#ccc',
   },
 });
 

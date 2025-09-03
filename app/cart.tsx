@@ -26,7 +26,7 @@ export default function CartScreen() {
       />
       <View style={styles.itemDetails}>
         <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemPrice}>₹{item.price.toFixed(2)}</Text>
+        <Text style={styles.itemPrice}>₹{item.price}</Text>
         <View style={styles.quantityContainer}>
           <TouchableOpacity
             style={styles.qtyButton}

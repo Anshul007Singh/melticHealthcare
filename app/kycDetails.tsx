@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native';
-import { Text, TextInput, RadioButton, Button } from 'react-native-paper';
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function KYCForm() {
   const [companyName, setCompanyName] = useState('');
@@ -11,186 +19,274 @@ export default function KYCForm() {
   const [drugLicense, setDrugLicense] = useState('Yes');
   const [license20B, setLicense20B] = useState('');
   const [license21B, setLicense21B] = useState('');
-  const [license20BFile, setLicense20BFile] = useState<string | null>(null);
-  const [license21BFile, setLicense21BFile] = useState<string | null>(null);
+  const [license20BFile, setLicense20BFile] = useState<any>(null);
+  const [license21BFile, setLicense21BFile] = useState<any>(null);
 
   const [gstAvailable, setGstAvailable] = useState('Yes');
   const [gstNumber, setGstNumber] = useState('');
-  const [gstFile, setGstFile] = useState<string | null>(null);
+  const [gstFile, setGstFile] = useState<any>(null);
 
   const [aadhaarNumber, setAadhaarNumber] = useState('');
-  const [aadhaarFile, setAadhaarFile] = useState<string | null>(null);
+  const [aadhaarFile, setAadhaarFile] = useState<any>(null);
   const [panNumber, setPanNumber] = useState('');
-  const [panFile, setPanFile] = useState<string | null>(null);
+  const [panFile, setPanFile] = useState<any>(null);
 
-  const [dob, setDob] = useState(new Date());
+  const [dob, setDob] = useState<Date | null>(null);
+  const [anniversary, setAnniversary] = useState<Date | null>(null);
   const [showDobPicker, setShowDobPicker] = useState(false);
-
-  const pickDocument = async (setter: (value: string) => void) => {
+  const [showAnniversaryPicker, setShowAnniversaryPicker] = useState(false);
+  const pickDocument = async (setter: (file: any) => void) => {
     try {
-      const result = await DocumentPicker.getDocumentAsync();
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/pdf', 'image/jpeg'],
+      });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const file = result.assets[0];
-        setter(file.name);
-        console.log('Picked file:', file);
+        const allowedTypes = ['application/pdf', 'image/jpeg'];
+
+        if (!allowedTypes.includes(file.mimeType || '')) {
+          Alert.alert('Invalid File', 'Please select a PDF or JPEG file only.');
+          return;
+        }
+
+        if (file.size && file.size > 200 * 1024) {
+          Alert.alert('File Too Large', 'File must be less than 200KB.');
+          return;
+        }
+
+        setter(file);
       }
     } catch (error) {
       console.error('Error picking document:', error);
     }
   };
+
+  const handleNext = () => {
+    const formData = {
+      companyName,
+      pinCode,
+      drugLicense,
+      license20B,
+      license20BFile,
+      license21B,
+      license21BFile,
+      gstAvailable,
+      gstNumber,
+      gstFile,
+      aadhaarNumber,
+      aadhaarFile,
+      panNumber,
+      panFile,
+      dob: dob ? dob.toDateString() : '',
+    };
+
+    console.log('Form Data:', formData);
+    Alert.alert('Form Submitted', 'Check console for form data!');
+  };
+
+  const isFormValid =
+    companyName.trim() !== '' &&
+    pinCode.trim() !== '' &&
+    (drugLicense === 'No' ||
+      (license20B.trim() !== '' && license21B.trim() !== '')) &&
+    (gstAvailable === 'No' || gstNumber.trim() !== '') &&
+    aadhaarNumber.trim() !== '' &&
+    panNumber.trim() !== '';
+
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={{ paddingBottom: 50 }}
     >
-      <Text style={styles.heading}>KYC Process</Text>
+      <Text style={styles.heading}>Enter your Details</Text>
+      <View style={styles.inputWrapper}>
+        <Ionicons name='business-outline' size={20} style={styles.icon} />
+        <TextInput
+          placeholder='Company / Firm Name*'
+          value={companyName}
+          onChangeText={setCompanyName}
+          style={styles.input}
+        />
+      </View>
+      <View style={styles.inputWrapper}>
+        <Ionicons name='location-outline' size={20} style={styles.icon} />
+        <TextInput
+          placeholder='Pin Code*'
+          value={pinCode}
+          onChangeText={setPinCode}
+          style={styles.input}
+          keyboardType='numeric'
+        />
+      </View>
 
-      <TextInput
-        mode='outlined'
-        theme={{ roundness: 10 }}
-        label='Company / Firm Name*'
-        value={companyName}
-        onChangeText={setCompanyName}
-        style={styles.input}
-      />
-
-      <TextInput
-        label='Pin Code*'
-        value={pinCode}
-        onChangeText={setPinCode}
-        style={styles.input}
-        keyboardType='numeric'
-        mode='outlined'
-        theme={{ roundness: 10 }}
-      />
       <Text style={styles.subHeading}>Do you have a drug license?</Text>
-      <RadioButton.Group onValueChange={setDrugLicense} value={drugLicense}>
-        <View style={styles.radioRow}>
-          <RadioButton value='Yes' />
-          <Text style={styles.radioText}>Yes</Text>
-          <RadioButton value='No' />
-          <Text style={styles.radioText}>No</Text>
-        </View>
-      </RadioButton.Group>
+      <View style={styles.radioRow}>
+        <TouchableOpacity
+          onPress={() => setDrugLicense('Yes')}
+          style={styles.radioOption}
+        >
+          <View
+            style={[
+              styles.radioCircle,
+              drugLicense === 'Yes' && styles.radioSelected,
+            ]}
+          />
+          <Text>Yes</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setDrugLicense('No')}
+          style={styles.radioOption}
+        >
+          <View
+            style={[
+              styles.radioCircle,
+              drugLicense === 'No' && styles.radioSelected,
+            ]}
+          />
+          <Text>No</Text>
+        </TouchableOpacity>
+      </View>
 
       {drugLicense === 'Yes' && (
         <>
           <TextInput
-            label='20B License No*'
+            placeholder='20B License No*'
             value={license20B}
             onChangeText={setLicense20B}
-            style={styles.input}
-            mode='outlined'
-            theme={{ roundness: 10 }}
+            style={styles.plainInput}
           />
-          <Button
-            icon='upload'
-            mode='outlined'
-            onPress={() => pickDocument(setLicense20BFile)}
+          <TouchableOpacity
             style={styles.uploadBtn}
+            onPress={() => pickDocument(setLicense20BFile)}
           >
-            {license20BFile ? license20BFile : 'Upload 20B License File*'}
-          </Button>
+            <Ionicons name='cloud-upload-outline' size={18} />
+            <Text style={styles.uploadText}>
+              {license20BFile
+                ? license20BFile.name
+                : 'Upload 20B License File (Optional)'}
+            </Text>
+          </TouchableOpacity>
 
           <TextInput
-            label='21B License No*'
+            placeholder='21B License No*'
             value={license21B}
             onChangeText={setLicense21B}
-            style={styles.input}
-            mode='outlined'
-            theme={{ roundness: 10 }}
+            style={styles.plainInput}
           />
-          <Button
-            icon='upload'
-            mode='outlined'
-            onPress={() => pickDocument(setLicense21BFile)}
+          <TouchableOpacity
             style={styles.uploadBtn}
+            onPress={() => pickDocument(setLicense21BFile)}
           >
-            {license21BFile ? license21BFile : 'Upload 21B License File*'}
-          </Button>
+            <Ionicons name='cloud-upload-outline' size={18} />
+            <Text style={styles.uploadText}>
+              {license21BFile
+                ? license21BFile.name
+                : 'Upload 21B License File (Optional)'}
+            </Text>
+          </TouchableOpacity>
         </>
       )}
 
       <Text style={styles.subHeading}>Do you have a GST number?</Text>
-      <RadioButton.Group onValueChange={setGstAvailable} value={gstAvailable}>
-        <View style={styles.radioRow}>
-          <RadioButton value='Yes' />
-          <Text style={styles.radioText}>Yes</Text>
-          <RadioButton value='No' />
-          <Text style={styles.radioText}>No</Text>
-        </View>
-      </RadioButton.Group>
+      <View style={styles.radioRow}>
+        <TouchableOpacity
+          onPress={() => setGstAvailable('Yes')}
+          style={styles.radioOption}
+        >
+          <View
+            style={[
+              styles.radioCircle,
+              gstAvailable === 'Yes' && styles.radioSelected,
+            ]}
+          />
+          <Text>Yes</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setGstAvailable('No')}
+          style={styles.radioOption}
+        >
+          <View
+            style={[
+              styles.radioCircle,
+              gstAvailable === 'No' && styles.radioSelected,
+            ]}
+          />
+          <Text>No</Text>
+        </TouchableOpacity>
+      </View>
 
       {gstAvailable === 'Yes' && (
         <>
-          <TextInput
-            mode='outlined'
-            theme={{ roundness: 10 }}
-            label='GST No.*'
-            value={gstNumber}
-            onChangeText={setGstNumber}
-            style={styles.input}
-          />
-          <Button
-            icon='upload'
-            mode='outlined'
-            onPress={() => pickDocument(setGstFile)}
+          <View style={styles.inputWrapper}>
+            <MaterialCommunityIcons
+              name='file-document-outline'
+              size={20}
+              style={styles.icon}
+            />
+            <TextInput
+              placeholder='GST No.*'
+              value={gstNumber}
+              onChangeText={setGstNumber}
+              style={styles.input}
+            />
+          </View>
+          <TouchableOpacity
             style={styles.uploadBtn}
+            onPress={() => pickDocument(setGstFile)}
           >
-            {gstFile ? gstFile : 'Upload GST File*'}
-          </Button>
+            <Ionicons name='cloud-upload-outline' size={18} />
+            <Text style={styles.uploadText}>
+              {gstFile ? gstFile.name : 'Upload GST File (Optional)'}
+            </Text>
+          </TouchableOpacity>
         </>
       )}
 
       <TextInput
-        mode='outlined'
-        theme={{ roundness: 10 }}
-        label='Aadhaar No.*'
+        placeholder='Aadhaar No.*'
         value={aadhaarNumber}
         onChangeText={setAadhaarNumber}
-        style={styles.input}
+        style={styles.plainInput}
         keyboardType='numeric'
       />
-      <Button
-        icon='upload'
-        mode='outlined'
-        onPress={() => pickDocument(setAadhaarFile)}
+      <TouchableOpacity
         style={styles.uploadBtn}
+        onPress={() => pickDocument(setAadhaarFile)}
       >
-        {aadhaarFile ? aadhaarFile : 'Upload Aadhaar File*'}
-      </Button>
+        <Ionicons name='cloud-upload-outline' size={18} />
+        <Text style={styles.uploadText}>
+          {aadhaarFile ? aadhaarFile.name : 'Upload Aadhaar File (Optional)'}
+        </Text>
+      </TouchableOpacity>
 
       <TextInput
-        label='PAN No*'
+        placeholder='PAN No*'
         value={panNumber}
         onChangeText={setPanNumber}
-        style={styles.input}
-        mode='outlined'
-        theme={{ roundness: 10 }}
+        style={styles.plainInput}
       />
-      <Button
-        icon='upload'
-        mode='outlined'
-        onPress={() => pickDocument(setPanFile)}
+      <TouchableOpacity
         style={styles.uploadBtn}
+        onPress={() => pickDocument(setPanFile)}
       >
-        {panFile ? panFile : 'Upload PAN File*'}
-      </Button>
+        <Ionicons name='cloud-upload-outline' size={18} />
+        <Text style={styles.uploadText}>
+          {panFile ? panFile.name : 'Upload PAN File (Optional)'}
+        </Text>
+      </TouchableOpacity>
 
       <TouchableOpacity onPress={() => setShowDobPicker(true)}>
         <TextInput
-          label='Date of Birth*'
-          value={dob.toDateString()}
-          style={styles.input}
+          placeholder='Date of Birth'
+          value={dob ? dob.toDateString() : ''}
+          style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
           editable={false}
-          mode='outlined'
-          theme={{ roundness: 10 }}
         />
       </TouchableOpacity>
       {showDobPicker && (
         <DateTimePicker
-          value={dob}
+          value={dob || new Date()}
           mode='date'
           display='default'
           onChange={(event, selectedDate) => {
@@ -200,54 +296,91 @@ export default function KYCForm() {
         />
       )}
 
-      <Button
-        mode='contained'
-        style={styles.submitBtn}
-        onPress={() => alert('Next Clicked')}
-        labelStyle={{ color: 'black', fontWeight: 'bold' }}
+      <TouchableOpacity onPress={() => setShowAnniversaryPicker(true)}>
+        <TextInput
+          placeholder='Date of Anniversary'
+          value={anniversary ? anniversary.toDateString() : ''}
+          style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+          editable={false}
+        />
+      </TouchableOpacity>
+      {showAnniversaryPicker && (
+        <DateTimePicker
+          value={anniversary || new Date()}
+          mode='date'
+          display='default'
+          onChange={(event, selectedDate) => {
+            setShowAnniversaryPicker(false);
+            if (selectedDate) setAnniversary(selectedDate);
+          }}
+        />
+      )}
+
+      <TouchableOpacity
+        style={[
+          styles.submitBtn,
+          { backgroundColor: isFormValid ? '#59AFFF' : '#ccc' },
+        ]}
+        onPress={handleNext}
+        disabled={!isFormValid}
       >
-        Next
-      </Button>
+        <Text style={{ color: 'black', fontWeight: 'bold' }}>Place Order</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
-  },
-  heading: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  subHeading: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 20,
-  },
-  radioRow: {
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
+  subHeading: { fontSize: 16, fontWeight: 'bold', marginTop: 20 },
+  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
-  },
-  radioText: {
-    marginRight: 20,
-  },
-  uploadBtn: {
-    marginBottom: 12,
-  },
-  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
     marginBottom: 15,
-    borderRadius: 15,
+  },
+  icon: { marginRight: 8 },
+  input: { flex: 1, fontSize: 16, paddingVertical: 8 },
+  plainInput: {
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 16,
+  },
+  radioRow: { flexDirection: 'row', marginVertical: 10 },
+  radioOption: { flexDirection: 'row', alignItems: 'center', marginRight: 20 },
+  radioCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: '#080808ff',
+    marginRight: 6,
+  },
+  radioSelected: { backgroundColor: '#080808ff' },
+  uploadBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#accff0ff',
+    borderRadius: 5,
     backgroundColor: '#fff',
   },
+  uploadText: { marginLeft: 8, color: '#080808ff', fontWeight: '500' },
   submitBtn: {
-    backgroundColor: '#B5DE00',
-    marginTop: 10,
+    marginTop: 20,
     borderRadius: 55,
-    paddingVertical: 5,
+    alignItems: 'center',
+    paddingVertical: 12,
   },
 });

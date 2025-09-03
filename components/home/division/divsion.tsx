@@ -1,5 +1,6 @@
+import { fetchProducts } from '@/data/productList';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,47 +9,88 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  Animated,
+  Easing,
 } from 'react-native';
 
-const divisions = [
-  {
-    id: '1',
-    name: 'Meltic Healthcare Pvt. Ltd.',
-    logo: 'https://www.melticgroup.com/assets/images/about/meltic-slide1.png',
-  },
-  {
-    id: '2',
-    name: 'Dalcon Drugs Pvt. Ltd.',
-    logo: 'https://www.melticgroup.com/assets/images/about/dalcon-slide3.png',
-  },
-  {
-    id: '3',
-    name: 'Adchem Biotech',
-    logo: 'https://www.melticgroup.com/assets/images/about/adchem-slide2.png',
-  },
-  {
-    id: '4',
-    name: 'Melvet Animal Health.',
-    logo: 'https://www.melticgroup.com/assets/images/about/melvet-slide5.png',
-  },
-  {
-    id: '5',
-    name: 'Cardiever Pharmaceuticals.',
-    logo: 'https://www.melticgroup.com/assets/images/about/cardic-slide4.png',
-  },
-];
+const LOGO_SIZE = Dimensions.get('window').width * 0.25;
+
+const ShimmerPlaceholder = ({ style }: { style?: any }) => {
+  const shimmerAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(shimmerAnim, {
+        toValue: 1,
+        duration: 1200,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ).start();
+  }, []);
+
+  const translateX = shimmerAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-150, 150],
+  });
+
+  return (
+    <View style={[styles.shimmerContainer, style]}>
+      <Animated.View
+        style={[
+          styles.shimmer,
+          {
+            transform: [{ translateX }],
+          },
+        ]}
+      />
+    </View>
+  );
+};
 
 const OurDivisions = () => {
+  const [brands, setBrands] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadBrands = async () => {
+      setLoading(true);
+      const data = await fetchProducts('brands'); // ✅ Query "brands"
+      if (Array.isArray(data)) {
+        setBrands(data);
+      } else {
+        setBrands([]);
+      }
+      setLoading(false);
+    };
+
+    loadBrands();
+  }, []);
+
+  const onClickHandler = (item: any) => {
+    router.push({
+      pathname: '../productlist',
+      params: { query: item.slug },
+    });
+  };
+
   const renderItem = ({ item }: any) => (
-    <View style={styles.logoContainer}>
-      <Image src={item.logo} style={styles.logo} resizeMode='contain' />
-    </View>
+    <TouchableOpacity
+      style={styles.logoContainer}
+      onPress={() => onClickHandler(item)}
+    >
+      <Image
+        source={{ uri: item?.image?.src }}
+        style={styles.logo}
+        resizeMode='contain'
+      />
+    </TouchableOpacity>
   );
 
   const onViewAllHandler = () => {
     router.push({
       pathname: '/divisions',
-      params: { query: 'brands' },
+      params: { query: 'brands' }, // ✅ Pass query for next page
     });
   };
 
@@ -63,14 +105,30 @@ const OurDivisions = () => {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        horizontal
-        data={divisions}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingLeft: 8 }}
-      />
+      {loading ? (
+        <FlatList
+          horizontal
+          data={[1, 2, 3, 4, 5]}
+          keyExtractor={(item) => item.toString()}
+          renderItem={() => (
+            <View style={styles.logoContainer}>
+              <ShimmerPlaceholder style={styles.logo} />
+            </View>
+          )}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingLeft: 8 }}
+        />
+      ) : (
+        <FlatList
+          horizontal
+          data={brands}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingLeft: 8 }}
+        />
+      )}
+
       <Image
         source={require('../../../assets/images/home_offer_image_section.png')}
         style={{
@@ -84,8 +142,6 @@ const OurDivisions = () => {
 };
 
 export default OurDivisions;
-
-const LOGO_SIZE = Dimensions.get('window').width * 0.25;
 
 const styles = StyleSheet.create({
   container: {
@@ -125,5 +181,17 @@ const styles = StyleSheet.create({
   logo: {
     width: LOGO_SIZE * 0.9,
     height: LOGO_SIZE * 0.8,
+    borderRadius: 50,
+  },
+  shimmerContainer: {
+    backgroundColor: '#E1E9EE',
+    overflow: 'hidden',
+    borderRadius: 50,
+  },
+  shimmer: {
+    width: '50%',
+    height: '100%',
+    backgroundColor: '#F2F8FC',
+    opacity: 0.6,
   },
 });

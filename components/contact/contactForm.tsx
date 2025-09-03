@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Linking, StyleSheet, ScrollView, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Linking, Alert } from 'react-native';
 import { Text, TextInput, Button, Title, IconButton } from 'react-native-paper';
 
 const ContactFormPaper = () => {
-  const [form, setForm] = useState<any>({
+  const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
@@ -11,13 +11,42 @@ const ContactFormPaper = () => {
     message: '',
   });
 
-  const handleChange = (key: any, value: any) => {
+  const [isValid, setIsValid] = useState(false);
+
+  const handleChange = (key: string, value: string) => {
     setForm({ ...form, [key]: value });
   };
 
   const handleSubmit = () => {
-    console.log('Form Data:', form);
+    const emailTo = 'anshuls481@gmail.com';
+    const subject = 'New Contact Form Submission';
+    const body = `Name - ${form.name}
+Email - ${form.email}
+Phone - ${form.phone}
+City - ${form.city}
+Message - ${form.message}`;
+
+    const mailUrl = `mailto:${emailTo}?subject=${encodeURIComponent(
+      subject,
+    )}&body=${encodeURIComponent(body)}`;
+
+    Linking.openURL(mailUrl).catch(() => {
+      Alert.alert('Error', 'Unable to open email client.');
+    });
   };
+
+  // ✅ Validation logic
+  useEffect(() => {
+    const { name, email, phone, city, message } = form;
+
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const isPhoneValid = /^\d{10}$/.test(phone);
+    const areFieldsFilled =
+      name.trim() !== '' && city.trim() !== '' && message.trim() !== '';
+
+    setIsValid(isEmailValid && isPhoneValid && areFieldsFilled);
+  }, [form]);
+
   const fields = ['name', 'email', 'phone', 'city', 'message'];
 
   return (
@@ -27,7 +56,7 @@ const ContactFormPaper = () => {
         <Text style={styles.text}>+91 92162 95095</Text>
 
         <Title style={styles.label1}>Email</Title>
-        <Text style={styles.text}>hcareindia@gmail.com</Text>
+        <Text style={styles.text}>melticgroup@gmail.com</Text>
 
         <Title style={styles.label1}>Address</Title>
         <Text style={styles.text}>
@@ -46,7 +75,7 @@ const ContactFormPaper = () => {
 
       <Title style={styles.formTitle}>Leave your message</Title>
 
-      {fields.map((field: any) => (
+      {fields.map((field) => (
         <View key={field} style={styles.inputContainer}>
           <Text style={styles.label}>
             {field.charAt(0).toUpperCase() + field.slice(1)}
@@ -54,13 +83,14 @@ const ContactFormPaper = () => {
           <TextInput
             mode='outlined'
             numberOfLines={field === 'message' ? 4 : 1}
-            value={form[field]}
+            value={form[field as keyof typeof form]}
             onChangeText={(value) => handleChange(field, value)}
             style={styles.input}
             theme={{ roundness: 10 }}
             placeholder={`Enter your ${
               field.charAt(0).toUpperCase() + field.slice(1)
             }`}
+            keyboardType={field === 'phone' ? 'numeric' : 'default'}
           />
         </View>
       ))}
@@ -68,7 +98,8 @@ const ContactFormPaper = () => {
       <Button
         mode='contained'
         onPress={handleSubmit}
-        style={styles.submitButton}
+        style={[styles.submitButton, !isValid && { opacity: 0.5 }]}
+        disabled={!isValid}
         labelStyle={{ color: 'black', fontWeight: 'bold' }}
       >
         Submit
