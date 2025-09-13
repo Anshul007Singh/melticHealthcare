@@ -243,7 +243,7 @@ const ProductListScreen = () => {
         <Text style={styles.title}>
           {item.categories?.[0]?.name || 'No Category'}
         </Text>
-        <Text style={styles.title}>₹ {item.price}</Text>
+        <Text style={styles.priceText}>₹ {item.price}</Text>
       </View>
     </View>
   );
@@ -391,7 +391,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#59AFFF',
+    color: '#000',
+    marginTop: 5,
+  },
+  priceText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0060AA',
   },
   modalOverlay: {
     flex: 1,
@@ -426,12 +432,12 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   selectedText: {
-    color: '#59AFFF',
+    color: '#0060AA',
     fontWeight: 'bold',
   },
   applyButton: {
     marginTop: 20,
-    backgroundColor: '#59AFFF',
+    backgroundColor: '#0060AA',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',

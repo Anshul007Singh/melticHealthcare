@@ -280,7 +280,7 @@ export default function KYCForm() {
         <TextInput
           placeholder='Date of Birth'
           value={dob ? dob.toDateString() : ''}
-          style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+          style={styles.plainInput}
           editable={false}
         />
       </TouchableOpacity>
@@ -300,7 +300,7 @@ export default function KYCForm() {
         <TextInput
           placeholder='Date of Anniversary'
           value={anniversary ? anniversary.toDateString() : ''}
-          style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+          style={styles.plainInput}
           editable={false}
         />
       </TouchableOpacity>
@@ -319,7 +319,7 @@ export default function KYCForm() {
       <TouchableOpacity
         style={[
           styles.submitBtn,
-          { backgroundColor: isFormValid ? '#59AFFF' : '#ccc' },
+          { backgroundColor: isFormValid ? '#B5DE00' : '#ccc' },
         ]}
         onPress={handleNext}
         disabled={!isFormValid}
@@ -361,10 +361,10 @@ const styles = StyleSheet.create({
     height: 18,
     borderRadius: 9,
     borderWidth: 2,
-    borderColor: '#080808ff',
+    borderColor: '#0060AA',
     marginRight: 6,
   },
-  radioSelected: { backgroundColor: '#080808ff' },
+  radioSelected: { backgroundColor: '#0060AA' },
   uploadBtn: {
     flexDirection: 'row',
     alignItems: 'center',

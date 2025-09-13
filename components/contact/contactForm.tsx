@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Linking, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Text, TextInput, Button, Title, IconButton } from 'react-native-paper';
 
 const ContactFormPaper = () => {
@@ -17,33 +17,39 @@ const ContactFormPaper = () => {
     setForm({ ...form, [key]: value });
   };
 
-  const handleSubmit = () => {
-    const emailTo = 'anshuls481@gmail.com';
-    const subject = 'New Contact Form Submission';
-    const body = `Name - ${form.name}
-Email - ${form.email}
-Phone - ${form.phone}
-City - ${form.city}
-Message - ${form.message}`;
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch(
+        'https://email-contact-q8uvff8t2-anshul-singhs-projects-9282f9cd.vercel.app/api/contact',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        },
+      );
 
-    const mailUrl = `mailto:${emailTo}?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(body)}`;
+      const data = await response.json();
 
-    Linking.openURL(mailUrl).catch(() => {
-      Alert.alert('Error', 'Unable to open email client.');
-    });
+      if (response.ok) {
+        Alert.alert('Success', 'Your message was sent successfully!');
+        console.log('Email response:', data);
+        setForm({ name: '', email: '', phone: '', city: '', message: '' });
+      } else {
+        Alert.alert('Error', data.error || 'Something went wrong');
+        console.log('Error response:', data);
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Network request failed.');
+    }
   };
 
-  // ✅ Validation logic
   useEffect(() => {
     const { name, email, phone, city, message } = form;
-
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const isPhoneValid = /^\d{10}$/.test(phone);
     const areFieldsFilled =
       name.trim() !== '' && city.trim() !== '' && message.trim() !== '';
-
     setIsValid(isEmailValid && isPhoneValid && areFieldsFilled);
   }, [form]);
 
@@ -98,7 +104,7 @@ Message - ${form.message}`;
       <Button
         mode='contained'
         onPress={handleSubmit}
-        style={[styles.submitButton, !isValid && { opacity: 0.5 }]}
+        style={[styles.submitButton, !isValid && { backgroundColor: '#ccc' }]}
         disabled={!isValid}
         labelStyle={{ color: 'black', fontWeight: 'bold' }}
       >
@@ -162,6 +168,7 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: '#B5DE00',
     marginTop: 10,
+    fontSize: 18,
     borderRadius: 55,
     paddingVertical: 5,
   },

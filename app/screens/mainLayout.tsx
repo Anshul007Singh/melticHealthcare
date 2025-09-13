@@ -10,7 +10,6 @@ import { Drawer } from 'expo-router/drawer';
 import { Ionicons } from '@expo/vector-icons';
 import {
   Dimensions,
-  Image,
   Pressable,
   TouchableOpacity,
   View,
@@ -32,7 +31,6 @@ export default function MainLayout() {
   });
 
   const screenWidth = Dimensions.get('window').width;
-
   const { cartItems } = useCart();
   const cartCount = cartItems.length;
 
@@ -50,16 +48,11 @@ export default function MainLayout() {
         onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         style={{ marginLeft: 15 }}
       >
-        <Ionicons name='menu' size={34} color={'white'} />
+        <Ionicons name='menu' size={34} color='white' />
       </Pressable>
     ),
     headerTitle: () => (
-      <View
-        style={{
-          alignItems: 'center',
-          marginLeft: 80,
-        }}
-      >
+      <View style={{ alignItems: 'center', marginLeft: 80 }}>
         <Text style={styles.brandName}>Meltic Group</Text>
       </View>
     ),
@@ -79,22 +72,27 @@ export default function MainLayout() {
 
   const renderHeaderWithBack = () => ({
     headerStyle: {
-      backgroundColor: '#fff',
+      backgroundColor: '#0060AA',
     },
-    headerTintColor: 'black',
+    headerTintColor: '#fff',
     headerTitleAlign: 'center',
+    headerTitleStyle: {
+      color: '#fff',
+      fontWeight: 'bold',
+      fontSize: 18,
+    },
     headerLeft: () => (
       <TouchableOpacity
         onPress={() => router.back()}
         style={{ marginLeft: 15 }}
       >
-        <Ionicons name='arrow-back' size={24} color='black' />
+        <Ionicons name='arrow-back' size={24} color='#fff' />
       </TouchableOpacity>
     ),
     headerRight: () => (
       <Pressable onPress={checkUser} style={{ marginRight: 15, marginTop: 10 }}>
         <View style={{ position: 'relative' }}>
-          <Ionicons name='cart-outline' size={34} />
+          <Ionicons name='cart-outline' size={34} color='#fff' />
           {cartCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{cartCount}</Text>
@@ -149,7 +147,7 @@ export default function MainLayout() {
                       style={{ marginRight: 15, marginTop: 10 }}
                     >
                       <View style={{ position: 'relative' }}>
-                        <Ionicons name='cart-outline' size={34} />
+                        <Ionicons name='cart-outline' size={34} color='#fff' />
                         {cartCount > 0 && (
                           <View style={styles.badge}>
                             <Text style={styles.badgeText}>{cartCount}</Text>

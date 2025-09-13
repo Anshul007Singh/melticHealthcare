@@ -10,7 +10,7 @@ import {
 import { Divider } from 'react-native-paper';
 import { MaterialCommunityIcons, Ionicons, Feather } from '@expo/vector-icons';
 import { router, useRouter } from 'expo-router';
-
+// zhwq lahx kmlp zqcz  jmha rsfu fszz bkvl
 export default function CustomDrawerContent(props: any) {
   const notificationHandler = () => {
     router.push('/notifications');
@@ -26,6 +26,10 @@ export default function CustomDrawerContent(props: any) {
       console.error('Failed to open URL:', err),
     );
   };
+
+  //   service_id: 'service_9ir9p9q', // e.g. service_abcd123
+  // template_id: 'template_drxjfm1', // e.g. template_xyz789
+  // user_id: 'KYUex9lC2KtfXI9WC', // Public Key from EmailJS
 
   return (
     <DrawerContentScrollView
@@ -50,16 +54,6 @@ export default function CustomDrawerContent(props: any) {
       {/* Menu Items */}
       <MenuItem icon='home-outline' label='Home' href='/home' />
       <MenuItem icon='account-outline' label='My Account' href='/account' />
-      <MenuItem
-        icon='cube-outline'
-        label='View / Manage Orders'
-        href='/orders'
-      />
-      <MenuItem
-        icon='monitor-screenshot'
-        label='My Digital Visual Aid'
-        href='/visual-aid'
-      />
       <MenuItem icon='percent' label='Kyc Details' href='/kycDetails' />
 
       <MenuItem
@@ -79,7 +73,7 @@ export default function CustomDrawerContent(props: any) {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          onPress={() => openLink('https://yourwebsite.com/privacy-policy')}
+          onPress={() => openLink('https://www.melticgroup.com/online')}
         >
           <Text style={styles.footerLink}>Privacy Policy</Text>
         </TouchableOpacity>

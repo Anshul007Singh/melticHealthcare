@@ -66,8 +66,24 @@ export default function ProductDetailScreen() {
 
     return data;
   }
-  const descriptionData = parseDescription(description as string);
-
+  const descriptionData = parseDescription(shortDescription as string);
+  const descriptionText = parseDescription(description as string);
+  const sideEffectsText =
+    typeof sideEffects === 'string'
+      ? sideEffects.replace(/<[^>]+>/g, '')
+      : Array.isArray(sideEffects)
+      ? sideEffects
+          .map((s) => (typeof s === 'string' ? s.replace(/<[^>]+>/g, '') : ''))
+          .join(', ')
+      : '';
+  const indicationsText =
+    typeof indications === 'string'
+      ? indications.replace(/<[^>]+>/g, '')
+      : Array.isArray(indications)
+      ? indications
+          .map((s) => (typeof s === 'string' ? s.replace(/<[^>]+>/g, '') : ''))
+          .join(', ')
+      : '';
   const handleAddToCart = () => {
     const item = {
       id: id as string,
@@ -96,24 +112,29 @@ export default function ProductDetailScreen() {
                   ? img
                   : 'https://via.placeholder.com/300x200.png?text=Product+Image',
             }}
-            style={{ resizeMode: 'contain' }}
+            style={{ resizeMode: 'contain', height: 390 }}
           />
         </Card>
 
         <View style={styles.infoContainer}>
           <Text style={styles.productTitle}>{title || 'Product Name'}</Text>
           <Text style={styles.productSubTitle}>
-            {category
-              ? `Category: ${category}`
-              : 'LEVOSALBUTAMOL 1.25mg + IPRATROPIUM BROMIDE 500mcg'}
+            {category ? `Category: ${category}` : 'Category: Not specified'}
           </Text>
-          <Text style={styles.packInfo}>{sku}</Text>
+          {/* <Text style={styles.packInfo}>{sku}</Text> */}
         </View>
-        <Text style={styles.composition}>{descriptionData.composition}</Text>
         <View style={styles.priceRow}>
-          <Text style={styles.priceText}>MRP - {price}</Text>
+          <Text style={styles.priceText}>MRP - ₹{price}</Text>
         </View>
-        <Text style={styles.minOrder}>Packaging: {descriptionData.type}</Text>
+        <Text style={styles.composition}>
+          <Text style={{ fontWeight: 'bold' }}>Composition: </Text>
+          {descriptionData.composition}
+        </Text>
+
+        <Text style={styles.minOrder}>
+          <Text style={{ fontWeight: 'bold' }}>Packaging: </Text>
+          {descriptionData.type}
+        </Text>
         <Divider style={{ marginVertical: 10 }} />
 
         <View style={styles.iconsRow}>
@@ -128,7 +149,7 @@ export default function ProductDetailScreen() {
             onPress={() => setExpandedDesc(!expandedDesc)}
           >
             <ScrollView style={{ maxHeight: 200, paddingHorizontal: 16 }}>
-              <Text style={{ fontSize: 14 }}>{descriptionData.name}</Text>
+              <Text style={{ fontSize: 14 }}>{descriptionText.name}</Text>
             </ScrollView>
           </List.Accordion>
           <List.Accordion
@@ -137,7 +158,11 @@ export default function ProductDetailScreen() {
             onPress={() => setExpandedSideEffects(!expandedSideEffects)}
           >
             <ScrollView style={{ maxHeight: 200, paddingHorizontal: 16 }}>
-              <Text style={{ fontSize: 14 }}>{sideEffects}</Text>
+              <Text style={{ fontSize: 14 }}>
+                {sideEffectsText === ''
+                  ? 'No side effect available.'
+                  : sideEffectsText}
+              </Text>
             </ScrollView>
           </List.Accordion>
           <List.Accordion
@@ -146,7 +171,11 @@ export default function ProductDetailScreen() {
             onPress={() => setExpendedIndication(!expandedIndication)}
           >
             <ScrollView style={{ maxHeight: 200, paddingHorizontal: 16 }}>
-              <Text style={{ fontSize: 14 }}>{indications}</Text>
+              <Text style={{ fontSize: 14 }}>
+                {indicationsText === ''
+                  ? 'No indications available.'
+                  : indicationsText}
+              </Text>
             </ScrollView>
           </List.Accordion>
         </List.Section>
@@ -203,8 +232,9 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   priceText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#0060AA',
   },
   minOrder: {
     fontSize: 14,

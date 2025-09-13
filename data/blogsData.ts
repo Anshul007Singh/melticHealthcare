@@ -23,84 +23,84 @@ export default function ProductDetailPage() {
   const { addToCart } = useCart();
   const product = { id: '1', name: 'Etobix-120t', price: 120, quantity: 100 };
 
-  return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <Card style={styles.card}>
-          <Card.Content>
-            <Image
-              src={`${img}`}
-              style={styles.productImage}
-              resizeMode='contain'
-            />
-            <Text style={styles.label}>
-              <Text style={styles.bold}>PACK SIZE: </Text>10x10 TABLETS
-            </Text>
-            <Text style={styles.label}>
-              <Text style={styles.bold}>COMPOSITION: </Text>Etoricoxib I.P. 120
-              mg.
-            </Text>
-            <Text style={styles.mrp}>MRP: 125/-</Text>
-          </Card.Content>
-        </Card>
+  //   return (
+  //     <View style={styles.container}>
+  //       <ScrollView contentContainerStyle={styles.scroll}>
+  //         <Card style={styles.card}>
+  //           <Card.Content>
+  //             <Image
+  //               src={`${img}`}
+  //               style={styles.productImage}
+  //               resizeMode='contain'
+  //             />
+  //             <Text style={styles.label}>
+  //               <Text style={styles.bold}>PACK SIZE: </Text>10x10 TABLETS
+  //             </Text>
+  //             <Text style={styles.label}>
+  //               <Text style={styles.bold}>COMPOSITION: </Text>Etoricoxib I.P. 120
+  //               mg.
+  //             </Text>
+  //             <Text style={styles.mrp}>MRP: 125/-</Text>
+  //           </Card.Content>
+  //         </Card>
 
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>ETORICOXIB 120 MG (ALU ALU)</Text>
-        <Text style={styles.category}>
-          Category: <Text style={{ color: 'green' }}>{category}</Text>
-        </Text>
+  //         <Text style={styles.title}>{title}</Text>
+  //         <Text style={styles.subtitle}>ETORICOXIB 120 MG (ALU ALU)</Text>
+  //         <Text style={styles.category}>
+  //           Category: <Text style={{ color: 'green' }}>{category}</Text>
+  //         </Text>
 
-        <Divider style={{ marginVertical: 16 }} />
+  //         <Divider style={{ marginVertical: 16 }} />
 
-        <Text variant='titleMedium' style={styles.reviewHeader}>
-          Reviews 0
-        </Text>
-        <Text>There are no reviews yet.</Text>
-        <Text style={{ marginTop: 8 }}>
-          Be the first to review "ETOBIX-120 t"
-        </Text>
-        <Text style={styles.note}>
-          Your email address will not be published. Required fields are marked *
-        </Text>
+  //         <Text variant='titleMedium' style={styles.reviewHeader}>
+  //           Reviews 0
+  //         </Text>
+  //         <Text>There are no reviews yet.</Text>
+  //         <Text style={{ marginTop: 8 }}>
+  //           Be the first to review "ETOBIX-120 t"
+  //         </Text>
+  //         <Text style={styles.note}>
+  //           Your email address will not be published. Required fields are marked *
+  //         </Text>
 
-        <Text style={styles.ratingLabel}>Your rating *</Text>
-        <View style={styles.ratingRow}>
-          {[1, 2, 3, 4, 5].map((num) => (
-            <Text key={num} style={styles.starBox}>
-              ☆ {num} of 5
-            </Text>
-          ))}
-        </View>
+  //         <Text style={styles.ratingLabel}>Your rating *</Text>
+  //         <View style={styles.ratingRow}>
+  //           {[1, 2, 3, 4, 5].map((num) => (
+  //             <Text key={num} style={styles.starBox}>
+  //               ☆ {num} of 5
+  //             </Text>
+  //           ))}
+  //         </View>
 
-        <RNTextInput
-          multiline
-          numberOfLines={4}
-          placeholder='Write your review...'
-          style={styles.textArea}
-        />
-        <RNTextInput placeholder='Name *' style={styles.input} />
-        <RNTextInput placeholder='Email *' style={styles.input} />
+  //         <RNTextInput
+  //           multiline
+  //           numberOfLines={4}
+  //           placeholder='Write your review...'
+  //           style={styles.textArea}
+  //         />
+  //         <RNTextInput placeholder='Name *' style={styles.input} />
+  //         <RNTextInput placeholder='Email *' style={styles.input} />
 
-        <View style={styles.checkboxContainer}>
-          <Checkbox status='checked' />
-          <Text style={{ flex: 1 }}>
-            Save my name, email, and website in this browser for the next time I
-            comment.
-          </Text>
-        </View>
+  //         <View style={styles.checkboxContainer}>
+  //           <Checkbox status='checked' />
+  //           <Text style={{ flex: 1 }}>
+  //             Save my name, email, and website in this browser for the next time I
+  //             comment.
+  //           </Text>
+  //         </View>
 
-        <Button
-          mode='contained'
-          style={styles.submitButton}
-          onPress={() => addToCart(product)}
-        >
-          Add to Cart
-        </Button>
-      </ScrollView>
-    </View>
-  );
+  //         <Button
+  //           mode='contained'
+  //           style={styles.submitButton}
+  //           onPress={() => addToCart(product)}
+  //         >
+  //           Add to Cart
+  //         </Button>
+  //       </ScrollView>
+  //     </View>
+  //   );
+  // }
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   scroll: { padding: 16 },
