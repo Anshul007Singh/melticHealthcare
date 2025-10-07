@@ -10,7 +10,6 @@ import {
 import { Divider } from 'react-native-paper';
 import { MaterialCommunityIcons, Ionicons, Feather } from '@expo/vector-icons';
 import { router, useRouter } from 'expo-router';
-// zhwq lahx kmlp zqcz  jmha rsfu fszz bkvl
 export default function CustomDrawerContent(props: any) {
   const notificationHandler = () => {
     router.push('/notifications');
@@ -20,16 +19,11 @@ export default function CustomDrawerContent(props: any) {
     router.push('/contact');
   };
 
-  // ✅ Function to open links safely
   const openLink = (url: string) => {
     Linking.openURL(url).catch((err) =>
       console.error('Failed to open URL:', err),
     );
   };
-
-  //   service_id: 'service_9ir9p9q', // e.g. service_abcd123
-  // template_id: 'template_drxjfm1', // e.g. template_xyz789
-  // user_id: 'KYUex9lC2KtfXI9WC', // Public Key from EmailJS
 
   return (
     <DrawerContentScrollView
@@ -37,7 +31,6 @@ export default function CustomDrawerContent(props: any) {
       style={styles.container}
       contentContainerStyle={styles.scrollContent}
     >
-      {/* Profile Section */}
       <View style={styles.profileSection}>
         <Ionicons name='person-circle-outline' size={48} color='#0060AA' />
         <View style={styles.profileText}>
@@ -51,10 +44,9 @@ export default function CustomDrawerContent(props: any) {
 
       <Divider style={styles.divider} />
 
-      {/* Menu Items */}
       <MenuItem icon='home-outline' label='Home' href='/home' />
       <MenuItem icon='account-outline' label='My Account' href='/account' />
-      <MenuItem icon='percent' label='Kyc Details' href='/kycDetails' />
+      <MenuItem icon='percent' label='KYC Details' href='/kycDetails' />
 
       <MenuItem
         icon='bell-outline'
@@ -70,20 +62,18 @@ export default function CustomDrawerContent(props: any) {
         onPress={kycHandler}
       />
       <MenuItem icon='power' label='Logout' href='/logout' />
-
-      <View style={styles.footer}>
-        <TouchableOpacity
-          onPress={() => openLink('https://www.melticgroup.com/online')}
-        >
-          <Text style={styles.footerLink}>Privacy Policy</Text>
-        </TouchableOpacity>
-        <Text style={styles.footerSeparator}>|</Text>
-        <TouchableOpacity
-          onPress={() => openLink('https://www.melticgroup.com/about')}
-        >
-          <Text style={styles.footerLink}>Terms and Conditions</Text>
-        </TouchableOpacity>
-      </View>
+      <MenuItem
+        icon='shield-account'
+        label='Privacy Policy'
+        onPress={() => openLink('https://www.melticgroup.com/online')}
+        href={'#'}
+      />
+      <MenuItem
+        icon='file-document-outline'
+        label='Terms and Conditions'
+        href='#'
+        onPress={() => openLink('https://www.melticgroup.com/about')}
+      />
     </DrawerContentScrollView>
   );
 }

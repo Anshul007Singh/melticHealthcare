@@ -22,7 +22,6 @@ const DynamicListScreen = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      console.log('DynamicListScreen query--- ', query);
       try {
         const data = await fetchProducts(query);
         if (data && Array.isArray(data)) {

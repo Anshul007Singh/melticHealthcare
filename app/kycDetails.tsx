@@ -81,7 +81,6 @@ export default function KYCForm() {
       dob: dob ? dob.toDateString() : '',
     };
 
-    console.log('Form Data:', formData);
     Alert.alert('Form Submitted', 'Check console for form data!');
   };
 

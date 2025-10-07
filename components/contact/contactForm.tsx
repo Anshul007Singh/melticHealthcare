@@ -32,11 +32,9 @@ const ContactFormPaper = () => {
 
       if (response.ok) {
         Alert.alert('Success', 'Your message was sent successfully!');
-        console.log('Email response:', data);
         setForm({ name: '', email: '', phone: '', city: '', message: '' });
       } else {
         Alert.alert('Error', data.error || 'Something went wrong');
-        console.log('Error response:', data);
       }
     } catch (error) {
       console.error(error);

@@ -199,7 +199,6 @@ const ProductListScreen = () => {
       data.value.filter(
         (content: { id: string }) => content.id === 'side-effects',
       )[0]?.content || '';
-
     router.push({
       pathname: '/productDetail',
       params: {
@@ -216,7 +215,6 @@ const ProductListScreen = () => {
       },
     });
   };
-
   const handleCategorySelect = (cat: string) => {
     setSelectedCategory(cat);
   };
@@ -252,9 +250,11 @@ const ProductListScreen = () => {
     <>
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>
-          {selectedCategory === 'all' && selectedBrand === 'all'
-            ? 'All Products'
-            : `${selectedCategory !== 'all' ? selectedCategory : ''} ${
+          {selectedCategory === 'all'
+            ? `All Products${
+                selectedBrand !== 'all' ? ` - ${selectedBrand}` : ''
+              }`
+            : `${selectedCategory}${
                 selectedBrand !== 'all' ? ` - ${selectedBrand}` : ''
               }`}
         </Text>
