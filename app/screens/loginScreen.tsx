@@ -1,36 +1,47 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert, Button, Text, TextInput, View } from 'react-native';
+import { loginUser } from '../../api/auth'; // adjust path if needed
 
-export default function LoginScreen({ onLogin }: { onLogin: () => void }) {
-  const [email, setEmail] = useState('');
+interface LoginScreenProps {
+  onLoginSuccess: () => void;
+  onGoToRegister: () => void;
+}
+
+export default function LoginScreen({
+  onLoginSuccess,
+  onGoToRegister,
+}: LoginScreenProps) {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
-    const stored = await AsyncStorage.getItem('user');
-    const user = stored ? JSON.parse(stored) : null;
-
-    if (user?.email === email && user?.password === password) {
-      await AsyncStorage.setItem('loggedIn', 'true');
-      onLogin();
-    } else {
-      Alert.alert('Invalid credentials');
+    try {
+      const data = await loginUser(username, password);
+      Alert.alert('Success', `Welcome ${data.user_display_name}`);
+      onLoginSuccess(); // ✅ Navigate to main layout
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
     }
   };
 
   return (
-    <View>
+    <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
+      <Text style={{ fontSize: 24, marginBottom: 20 }}>Login</Text>
       <TextInput
-        placeholder='Email'
-        onChangeText={setEmail}
-        keyboardType='email-address'
+        placeholder='Username'
+        value={username}
+        onChangeText={setUsername}
+        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
       />
       <TextInput
         placeholder='Password'
+        value={password}
         onChangeText={setPassword}
         secureTextEntry
+        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
       />
       <Button title='Login' onPress={handleLogin} />
+      <Button title='Register' onPress={onGoToRegister} />
     </View>
   );
 }
