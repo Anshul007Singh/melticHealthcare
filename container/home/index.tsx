@@ -5,6 +5,7 @@ import PremiumProducts from '@/components/home/categories';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { Divider } from 'react-native-paper';
+import VisualAid from '@/components/home/visualAid';
 
 const Home = () => {
   return (
@@ -13,6 +14,7 @@ const Home = () => {
         <Carousel />
         <Divider />
       </View>
+      <VisualAid />
       <PremiumProducts />
       <HighQualityProducts />
       <Divider />

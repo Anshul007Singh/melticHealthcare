@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,8 +11,19 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '@/context/cartContext';
 import { placeOrder } from '@/api/orders';
+import { getStoredUserInfo } from '@/api/auth';
 
 export default function CartScreen() {
+  const [userInfo, setUserInfo] = useState<any>(null);
+
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      const data = await getStoredUserInfo();
+      setUserInfo(data);
+      console.log('User Info:', data);
+    };
+    loadUserInfo();
+  }, []);
   const { cartItems, removeFromCart, updateQuantity, emptyCart } = useCart();
   const [promoCode, setPromoCode] = useState('');
 
@@ -30,10 +41,10 @@ export default function CartScreen() {
       payment_method_title: 'Direct Bank Transfer',
       set_paid: true,
       billing: {
-        first_name: 'Anshul',
-        last_name: 'Singh',
-        email: 'anshul@gmail.com',
-        phone: '8219663876',
+        first_name: userInfo?.username || 'Unknown User',
+        last_name: userInfo?.username || 'Unknown User',
+        email: userInfo?.email || 'Unknown Email',
+        phone: userInfo?.phone || '0000000000',
       },
       // Product list in correct WooCommerce format
       line_items: cartItems.map((item) => ({

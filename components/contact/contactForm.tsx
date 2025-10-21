@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Text, TextInput, Button, Title, IconButton } from 'react-native-paper';
+import { Linking } from 'react-native';
 
 const ContactFormPaper = () => {
   const [form, setForm] = useState({
@@ -57,15 +58,14 @@ const ContactFormPaper = () => {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.contactInfo}>
         <Title style={styles.label1}>Phone</Title>
-        <Text style={styles.text}>+91 92162 95095</Text>
+        <Text style={styles.text}>+91 9504600000</Text>
 
         <Title style={styles.label1}>Email</Title>
-        <Text style={styles.text}>melticgroup@gmail.com</Text>
+        <Text style={styles.text}>info@meltichealth.com</Text>
 
         <Title style={styles.label1}>Address</Title>
         <Text style={styles.text}>
-          Plot no 344, Industrial Area, Phase 2, HSIIDC, Alipur, Barwala,
-          Panchkula, Haryana 134118
+          Nanhera Road Kuldeep Nagar, Ambala Cantt, India 133004
         </Text>
 
         <IconButton
@@ -73,7 +73,28 @@ const ContactFormPaper = () => {
           iconColor='#25D366'
           size={55}
           style={styles.whatsappButton}
-          onPress={() => console.log('WhatsApp icon pressed')}
+          onPress={async () => {
+            const phoneNumber = '+919504600000';
+            const message =
+              'Hello, I would like to know more about your services.';
+            const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+              message,
+            )}`;
+
+            try {
+              const supported = await Linking.canOpenURL(url);
+              if (supported) {
+                await Linking.openURL(url);
+              } else {
+                Alert.alert(
+                  'Error',
+                  'WhatsApp is not installed on your device.',
+                );
+              }
+            } catch (error) {
+              Alert.alert('Error', 'Unable to open WhatsApp.');
+            }
+          }}
         />
       </View>
 

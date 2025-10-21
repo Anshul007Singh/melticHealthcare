@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import {
   View,
@@ -10,7 +10,19 @@ import {
 import { Divider } from 'react-native-paper';
 import { MaterialCommunityIcons, Ionicons, Feather } from '@expo/vector-icons';
 import { router, useRouter } from 'expo-router';
+import { logoutUser } from '@/api/auth';
+import { getStoredUserInfo } from '@/api/auth';
+
 export default function CustomDrawerContent(props: any) {
+  const [userInfo, setUserInfo] = useState<any>(null);
+
+  useEffect(() => {
+    const loadUserInfo = async () => {
+      const data = await getStoredUserInfo();
+      setUserInfo(data);
+    };
+    loadUserInfo();
+  }, []);
   const notificationHandler = () => {
     router.push('/notifications');
   };
@@ -25,6 +37,11 @@ export default function CustomDrawerContent(props: any) {
     );
   };
 
+  const handleLogout = async () => {
+    await logoutUser();
+    router.replace('/loginScreen'); // or '/(auth)/loginScreen' if you use an auth folder
+  };
+
   return (
     <DrawerContentScrollView
       {...props}
@@ -34,12 +51,13 @@ export default function CustomDrawerContent(props: any) {
       <View style={styles.profileSection}>
         <Ionicons name='person-circle-outline' size={48} color='#0060AA' />
         <View style={styles.profileText}>
-          <Text style={styles.profileName}>Anshul</Text>
-          <Text style={styles.profilePhone}>8219663876</Text>
+          <Text style={styles.profileName}>
+            {userInfo?.name ?? 'Unknown User'}
+          </Text>
+          <Text style={styles.profilePhone}>
+            {userInfo?.email ?? 'Unknown Email'}
+          </Text>
         </View>
-        <TouchableOpacity style={styles.editIcon}>
-          <Feather name='edit-2' size={16} color='#0060AA' />
-        </TouchableOpacity>
       </View>
 
       <Divider style={styles.divider} />
@@ -61,7 +79,12 @@ export default function CustomDrawerContent(props: any) {
         href='/contact'
         onPress={kycHandler}
       />
-      <MenuItem icon='power' label='Logout' href='/logout' />
+      <MenuItem
+        icon='power'
+        label='Logout'
+        onPress={handleLogout}
+        href={undefined}
+      />
       <MenuItem
         icon='shield-account'
         label='Privacy Policy'
@@ -127,9 +150,6 @@ const styles = StyleSheet.create({
   profileText: {
     flex: 1,
   },
-  editIcon: {
-    padding: 4,
-  },
   profileName: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -168,3 +188,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+function reloadApp() {
+  throw new Error('Function not implemented.');
+}

@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { Alert, Button, Text, TextInput, View } from 'react-native';
+import {
+  Alert,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { loginUser } from '../../api/auth'; // adjust path if needed
 
 interface LoginScreenProps {
@@ -11,37 +19,124 @@ export default function LoginScreen({
   onLoginSuccess,
   onGoToRegister,
 }: LoginScreenProps) {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     try {
-      const data = await loginUser(username, password);
+      const data = await loginUser(email, password);
+      console.log(data);
       Alert.alert('Success', `Welcome ${data.user_display_name}`);
-      onLoginSuccess(); // ✅ Navigate to main layout
+      onLoginSuccess();
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      Alert.alert('Error', error.message || 'Login failed');
     }
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
-      <Text style={{ fontSize: 24, marginBottom: 20 }}>Login</Text>
-      <TextInput
-        placeholder='Username'
-        value={username}
-        onChangeText={setUsername}
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
-      />
-      <TextInput
-        placeholder='Password'
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
-      />
-      <Button title='Login' onPress={handleLogin} />
-      <Button title='Register' onPress={onGoToRegister} />
-    </View>
+    <LinearGradient
+      colors={['#0060AA', '#0060AA']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 0 }}
+      style={styles.container}
+    >
+      <View style={styles.content}>
+        <Text style={styles.title}>Login</Text>
+        <Text style={styles.subtitle}>Sign in to continue.</Text>
+
+        <Text style={styles.label}>User Name</Text>
+        <TextInput
+          placeholder='Enter your Email'
+          placeholderTextColor='#ccc'
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+        />
+
+        <Text style={styles.label}>PASSWORD</Text>
+        <TextInput
+          placeholder='Enter your password'
+          placeholderTextColor='#ccc'
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          style={styles.input}
+        />
+
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginButtonText}>Login</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={onGoToRegister}>
+          <Text style={styles.registerText}>
+            Don’t have an account?{' '}
+            <Text style={styles.registerLink}>Register</Text>
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </LinearGradient>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 30,
+  },
+  title: {
+    fontSize: 42,
+    fontWeight: 'bold',
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#cfcfcf',
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+  label: {
+    fontSize: 12,
+    color: '#fff',
+    marginBottom: 6,
+    marginTop: 10,
+    letterSpacing: 1,
+  },
+  input: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 10,
+    padding: 14,
+    color: '#fff',
+    marginBottom: 15,
+  },
+  loginButton: {
+    borderWidth: 1,
+    borderColor: '#fff',
+    borderRadius: 10,
+    paddingVertical: 14,
+    marginTop: 20,
+  },
+  loginButtonText: {
+    textAlign: 'center',
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  registerText: {
+    textAlign: 'center',
+    color: '#fff',
+    fontSize: 14,
+    marginTop: 25,
+    opacity: 0.8,
+  },
+  registerLink: {
+    textDecorationLine: 'underline',
+    color: '#fff',
+    fontWeight: '600',
+  },
+});

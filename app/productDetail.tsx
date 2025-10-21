@@ -1,8 +1,24 @@
 import React, { useState } from 'react';
-import { View, Image, StyleSheet, ScrollView, Dimensions } from 'react-native';
-import { Text, Button, Card, Divider, List } from 'react-native-paper';
+import {
+  View,
+  Image,
+  StyleSheet,
+  ScrollView,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
+import {
+  Text,
+  Button,
+  Card,
+  Divider,
+  List,
+  Icon,
+  IconButton,
+} from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
 import { useCart } from '../context/cartContext';
+import { WebView } from 'react-native-webview';
 
 export default function ProductDetailScreen() {
   const {
@@ -23,6 +39,11 @@ export default function ProductDetailScreen() {
   const [expandedSideEffects, setExpandedSideEffects] = useState(false);
   const [expandedIndication, setExpendedIndication] = useState(false);
   const [showRibbon, setShowRibbon] = useState(false);
+  const [showPDF, setShowPDF] = useState(false);
+  const pdfLink =
+    typeof shortDescription === 'string'
+      ? shortDescription.split('href="')[1]?.split('"')[0]
+      : undefined;
 
   function parseDescription(description: string) {
     let decoded = description.replace(/\\u003C/g, '<').replace(/\\u003E/g, '>');
@@ -98,6 +119,38 @@ export default function ProductDetailScreen() {
     setTimeout(() => setShowRibbon(false), 2000);
   };
 
+  const pdfUrl =
+    'https://www.melticgroup.com/img/MELVET%20ANIMAL%20HEALTH%20PRODUCT%20CARD.pdf';
+
+  if (showPDF) {
+    return (
+      <View style={{ flex: 1 }}>
+        <View style={styles.pdfHeader}>
+          <Button
+            mode='contained-tonal'
+            onPress={() => setShowPDF(false)}
+            style={{ margin: 8 }}
+          >
+            Close PDF
+          </Button>
+        </View>
+        <WebView
+          source={{
+            uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
+              pdfLink || pdfUrl,
+            )}`,
+          }}
+          style={{ flex: 1 }}
+          startInLoadingState
+          renderError={() => (
+            <Text style={{ textAlign: 'center', marginTop: 20 }}>
+              Failed to load PDF.
+            </Text>
+          )}
+        />
+      </View>
+    );
+  }
   return (
     <View style={{ flex: 1 }}>
       <ScrollView
@@ -138,8 +191,9 @@ export default function ProductDetailScreen() {
         <Divider style={{ marginVertical: 10 }} />
 
         <View style={styles.iconsRow}>
-          <Text>✅ 100% genuine products</Text>
-          <Text>📞 24x7 Support</Text>
+          <TouchableOpacity onPress={() => setShowPDF(true)}>
+            <Icon source='file-pdf-box' size={60} color='red' />
+          </TouchableOpacity>
         </View>
 
         <List.Section>
@@ -216,6 +270,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  pdfHeader: {
+    backgroundColor: '#f2f2f2',
+    paddingVertical: 4,
+    alignItems: 'flex-start',
+  },
   productSubTitle: {
     fontSize: 14,
     color: '#555',
@@ -251,9 +310,7 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 10,
   },
-  iconsRow: {
-    marginVertical: 15,
-  },
+  iconsRow: {},
   floatingBtnContainer: {
     position: 'absolute',
     bottom: 20,

@@ -154,7 +154,8 @@ const styles = StyleSheet.create({
   },
   label: {
     marginTop: 8,
-    fontSize: 14,
+    fontSize: 13,
+    textTransform: 'capitalize',
     fontWeight: '600',
     color: '#1A1A1A',
     textAlign: 'center',

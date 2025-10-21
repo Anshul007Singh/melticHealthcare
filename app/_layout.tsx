@@ -1,49 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import SignUpScreen from './screens/signUpScreen';
 import LoginScreen from './screens/loginScreen';
-import MainLayout from './screens/mainLayout';
+import MainLayout from './mainLayout'; // ✅ not ./index
 import SplashScreen from './screens/splashscreen';
 import { CartProvider } from '@/context/cartContext';
+import { getStoredToken } from '@/api/auth';
 
 export default function App() {
   const [screen, setScreen] = useState<'splash' | 'signup' | 'login' | 'main'>(
     'splash',
   );
 
-  // Simulate splash delay
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setScreen('login'); // start from signup
-    }, 2000);
-    return () => clearTimeout(timer);
+    const checkAuth = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const token = await getStoredToken();
+      setScreen(token ? 'main' : 'login');
+    };
+    checkAuth();
   }, []);
 
-  if (screen === 'splash') {
-    return <SplashScreen />;
-  }
+  if (screen === 'splash') return <SplashScreen />;
 
-  if (screen === 'signup') {
+  if (screen === 'signup')
     return (
       <SignUpScreen
-        // 👇 redirect to login after successful registration
         onRegistered={() => setScreen('login')}
         onGoToLogin={() => setScreen('login')}
       />
     );
-  }
 
-  if (screen === 'login') {
+  if (screen === 'login')
     return (
       <LoginScreen
-        // 👇 redirect to main layout after successful login
         onLoginSuccess={() => setScreen('main')}
-        // 👇 redirect to signup when user taps Register
         onGoToRegister={() => setScreen('signup')}
       />
     );
-  }
 
-  // ✅ Main App
   return (
     <CartProvider>
       <MainLayout />

@@ -75,23 +75,13 @@ const styles = StyleSheet.create({
   },
   label: {
     marginTop: 8,
-    fontSize: 14,
+    fontSize: 13,
     textAlign: 'center',
     fontWeight: '600',
     color: '#1A1A1A',
   },
   card: {
     width: '30%',
-    backgroundColor: '#F5FAFD',
-    borderRadius: 10,
-    borderColor: '#C4E0F5',
-    padding: 10,
-    borderWidth: 1,
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   headerRow: {
     flexDirection: 'row',
@@ -120,8 +110,6 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
   },
   logo: {
     width: LOGO_SIZE * 0.9,

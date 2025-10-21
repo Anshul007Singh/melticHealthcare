@@ -193,7 +193,7 @@ const ProductListScreen = () => {
     const data = item.meta_data[0];
     const indications =
       data.value.filter(
-        (content: { id: string }) => content.id === 'indications',
+        (content: { id: string }) => content.id === 'indication',
       )[0]?.content || '';
     const sideEffects =
       data.value.filter(
@@ -237,12 +237,10 @@ const ProductListScreen = () => {
         />
       </TouchableOpacity>
       <Text style={styles.title}>{item.name} </Text>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={styles.title}>
-          {item.categories?.[0]?.name || 'No Category'}
-        </Text>
-        <Text style={styles.priceText}>₹ {item.price}</Text>
-      </View>
+      <Text style={styles.titleCategory}>
+        {item.categories?.[0]?.name || 'No Category'}
+      </Text>
+      <Text style={styles.priceText}>₹ {item.price}</Text>
     </View>
   );
 
@@ -394,10 +392,15 @@ const styles = StyleSheet.create({
     color: '#000',
     marginTop: 5,
   },
+  titleCategory: {
+    fontSize: 11,
+    color: '#333',
+  },
   priceText: {
     fontSize: 16,
     fontWeight: '700',
     color: '#0060AA',
+    textAlign: 'right',
   },
   modalOverlay: {
     flex: 1,

@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   DarkTheme,
   DefaultTheme,
@@ -17,27 +18,28 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import React from 'react';
 import CustomDrawerContent from '@/components/drawerContent';
 import { router } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
 import type { DrawerNavigationOptions } from '@react-navigation/drawer';
 import { useCart } from '@/context/cartContext';
+import Home from './(drawer)/(tabs)/home';
 
 export default function MainLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   const screenWidth = Dimensions.get('window').width;
   const { cartItems } = useCart();
   const cartCount = cartItems.length;
 
-  const checkUser = async () => {
+  const goToCart = async () => {
     router.push('/cart');
   };
 
+  // ✅ Header style when Drawer menu is available
   const renderHeaderWithDrawer = (navigation: any) => ({
     headerStyle: {
       backgroundColor: '#0060AA',
@@ -48,18 +50,18 @@ export default function MainLayout() {
         onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         style={{ marginLeft: 15 }}
       >
-        <Ionicons name='menu' size={34} color='white' />
+        <Ionicons name='menu' size={30} color='white' />
       </Pressable>
     ),
     headerTitle: () => (
-      <View style={{ alignItems: 'center', marginLeft: 80 }}>
+      <View style={{ alignItems: 'center', marginLeft: 60 }}>
         <Text style={styles.brandName}>Meltic Group</Text>
       </View>
     ),
     headerRight: () => (
-      <Pressable onPress={checkUser} style={{ marginRight: 15, marginTop: 10 }}>
+      <Pressable onPress={goToCart} style={{ marginRight: 15, marginTop: 6 }}>
         <View style={{ position: 'relative' }}>
-          <Ionicons name='cart-outline' size={34} color='white' />
+          <Ionicons name='cart-outline' size={28} color='white' />
           {cartCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{cartCount}</Text>
@@ -70,6 +72,7 @@ export default function MainLayout() {
     ),
   });
 
+  // ✅ Header style with back button
   const renderHeaderWithBack = () => ({
     headerStyle: {
       backgroundColor: '#0060AA',
@@ -90,9 +93,9 @@ export default function MainLayout() {
       </TouchableOpacity>
     ),
     headerRight: () => (
-      <Pressable onPress={checkUser} style={{ marginRight: 15, marginTop: 10 }}>
+      <Pressable onPress={goToCart} style={{ marginRight: 15, marginTop: 6 }}>
         <View style={{ position: 'relative' }}>
-          <Ionicons name='cart-outline' size={34} color='#fff' />
+          <Ionicons name='cart-outline' size={28} color='white' />
           {cartCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{cartCount}</Text>
@@ -107,27 +110,32 @@ export default function MainLayout() {
 
   return (
     <PaperProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <ThemeProvider value={DefaultTheme}>
         <Drawer
+          // ✅ Custom Drawer (Your existing styled drawer)
           drawerContent={(props: any) => <CustomDrawerContent {...props} />}
           screenOptions={{
             drawerStyle: {
-              width: screenWidth * 0.7,
+              width: screenWidth * 0.75,
             },
+            headerShown: true,
           }}
         >
+          {/* ✅ Main app drawer content */}
           <Drawer.Screen
-            name='(drawer)'
+            name='(drawer)' // 👈 this loads your /app/(drawer)/_layout.tsx and tabs
             options={({ navigation }) => ({
               drawerLabel: 'Home',
               title: 'Home',
               ...(renderHeaderWithDrawer(navigation) as any),
             })}
           />
+
+          {/* ✅ Additional drawer-accessible routes */}
           {[
             { name: 'cart', title: 'Cart' },
             { name: 'category', title: 'Category' },
-            { name: 'productDetail', title: 'PCD Products' },
+            { name: 'productDetail', title: 'Product Details' },
             { name: 'divisions', title: 'Our Divisions' },
             { name: 'notifications', title: 'Notifications' },
             { name: 'kycDetails', title: 'KYC Details' },
@@ -138,24 +146,6 @@ export default function MainLayout() {
               options={{
                 title: screen.title,
                 ...(renderHeaderWithBack() as DrawerNavigationOptions),
-                headerRight: () =>
-                  screen.name === 'cart' ||
-                  screen.name === 'kycDetails' ||
-                  screen.name === 'notifications' ? null : (
-                    <Pressable
-                      onPress={checkUser}
-                      style={{ marginRight: 15, marginTop: 10 }}
-                    >
-                      <View style={{ position: 'relative' }}>
-                        <Ionicons name='cart-outline' size={34} color='#fff' />
-                        {cartCount > 0 && (
-                          <View style={styles.badge}>
-                            <Text style={styles.badgeText}>{cartCount}</Text>
-                          </View>
-                        )}
-                      </View>
-                    </Pressable>
-                  ),
               }}
             />
           ))}
@@ -184,7 +174,7 @@ const styles = StyleSheet.create({
   },
   brandName: {
     color: 'white',
-    fontSize: 24,
+    fontSize: 22,
     fontStyle: 'italic',
     fontWeight: 'bold',
   },

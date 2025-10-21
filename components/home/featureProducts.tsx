@@ -216,19 +216,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#F2F9FF',
   },
   productName: {
-    color: '#0060AA',
+    color: '#000',
     fontWeight: '700',
     fontSize: 16,
   },
   productType: {
-    fontSize: 15,
+    fontSize: 12,
     fontWeight: '500',
     marginTop: 2,
   },
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 8,
+    marginTop: 5,
   },
   price: {
     color: '#0060AA',

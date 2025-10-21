@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     height: LOGO_SIZE,
     borderRadius: LOGO_SIZE / 2,
     backgroundColor: '#fff',
-    marginRight: 16,
+    marginRight: 15,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -175,12 +175,10 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
   },
   logo: {
     width: LOGO_SIZE * 0.9,
-    height: LOGO_SIZE * 0.8,
+    height: LOGO_SIZE * 0.9,
     borderRadius: 50,
   },
   shimmerContainer: {
