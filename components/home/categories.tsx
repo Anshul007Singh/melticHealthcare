@@ -17,7 +17,7 @@ const placeholderImg = 'https://via.placeholder.com/150';
 
 const viewAllHandle = () => {
   router.push({
-    pathname: '/category',
+    pathname: '/pages/category',
     params: { query: 'categories' }, // This sets query param
   });
 };

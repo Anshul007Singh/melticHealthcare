@@ -53,7 +53,7 @@ const FeatureProductsCarousel = () => {
       )[0]?.content || '';
 
     router.push({
-      pathname: '/productDetail',
+      pathname: '/pages/productDetail',
       params: {
         id: item.id,
         title: item.name,

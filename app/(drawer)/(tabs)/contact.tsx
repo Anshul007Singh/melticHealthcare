@@ -2,35 +2,76 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Text, TextInput, Button, Title, IconButton } from 'react-native-paper';
 import { Linking } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Contact = () => {
   const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
-    city: '',
     message: '',
   });
 
   const [isValid, setIsValid] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  // Handle input changes
   const handleChange = (key: string, value: string) => {
     setForm({ ...form, [key]: value });
   };
 
+  // Validate inputs
   useEffect(() => {
-    const { name, email, phone, city, message } = form;
+    const { name, email, phone, message } = form;
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     const isPhoneValid = /^\d{10}$/.test(phone);
-    const areFieldsFilled =
-      name.trim() !== '' && city.trim() !== '' && message.trim() !== '';
+    const areFieldsFilled = name.trim() !== '' && message.trim() !== '';
     setIsValid(isEmailValid && isPhoneValid && areFieldsFilled);
   }, [form]);
 
-  const fields = ['name', 'email', 'phone', 'city', 'message'];
+  // Submit handler
+  const handleSubmit = async () => {
+    if (!isValid) {
+      Alert.alert('Invalid Form', 'Please fill all fields correctly.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = await AsyncStorage.getItem('token');
+
+      const response = await fetch(
+        'https://www.melticgroup.com/online/wp-json/app/v1/contact',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(form),
+        },
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        Alert.alert('Success', 'Contact form submitted!');
+        setForm({ name: '', email: '', phone: '', message: '' });
+      } else {
+        Alert.alert('Error', data.message || 'Submission failed');
+      }
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Error', 'Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fields = ['name', 'email', 'phone', 'message'];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* Contact Info */}
       <View style={styles.contactInfo}>
         <Title style={styles.label1}>Phone</Title>
         <Text style={styles.text}>+91 9504600000</Text>
@@ -73,6 +114,7 @@ const Contact = () => {
         />
       </View>
 
+      {/* Form */}
       <Title style={styles.formTitle}>Leave your message</Title>
 
       {fields.map((field) => (
@@ -98,8 +140,10 @@ const Contact = () => {
       <Button
         mode='contained'
         style={[styles.submitButton, !isValid && { backgroundColor: '#ccc' }]}
-        disabled={!isValid}
+        disabled={!isValid || loading}
         labelStyle={{ color: 'black', fontWeight: 'bold' }}
+        onPress={handleSubmit}
+        loading={loading}
       >
         Submit
       </Button>

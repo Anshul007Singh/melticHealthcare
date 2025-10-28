@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { fetchProducts } from '../data/productList';
+import { fetchProducts } from '@/data/productList';
 
 type NotificationType = {
   id: string;

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 const BASE_URL = 'https://www.melticgroup.com/online';
 
 export const loginUser = async (email: string, password: string) => {
@@ -12,6 +11,7 @@ export const loginUser = async (email: string, password: string) => {
   const data = response.data;
 
   await AsyncStorage.setItem('userToken', data.token);
+  console.log('auth data', data);
 
   const userInfo = {
     name: data.user_display_name,

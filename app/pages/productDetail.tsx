@@ -17,7 +17,8 @@ import {
   IconButton,
 } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
-import { useCart } from '../context/cartContext';
+// import { useCart } from '../context/cartContext';
+import { useCart } from '@/context/cartContext';
 import { WebView } from 'react-native-webview';
 
 export default function ProductDetailScreen() {

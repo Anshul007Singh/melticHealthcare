@@ -89,7 +89,7 @@ const OurDivisions = () => {
 
   const onViewAllHandler = () => {
     router.push({
-      pathname: '/divisions',
+      pathname: '/pages/divisions',
       params: { query: 'brands' }, // ✅ Pass query for next page
     });
   };

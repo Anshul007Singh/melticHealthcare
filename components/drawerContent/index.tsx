@@ -1,21 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
+import * as Updates from 'expo-updates';
+
 import {
   View,
   StyleSheet,
   Text,
   TouchableOpacity,
   Linking,
+  Alert,
 } from 'react-native';
 import { Divider } from 'react-native-paper';
 import { MaterialCommunityIcons, Ionicons, Feather } from '@expo/vector-icons';
 import { router, useRouter } from 'expo-router';
 import { logoutUser } from '@/api/auth';
 import { getStoredUserInfo } from '@/api/auth';
+import { useAuth } from '@/context/authContext';
 
 export default function CustomDrawerContent(props: any) {
   const [userInfo, setUserInfo] = useState<any>(null);
-
+  const { logout } = useAuth();
   useEffect(() => {
     const loadUserInfo = async () => {
       const data = await getStoredUserInfo();
@@ -24,11 +28,15 @@ export default function CustomDrawerContent(props: any) {
     loadUserInfo();
   }, []);
   const notificationHandler = () => {
-    router.push('/notifications');
+    router.push('/pages/notifications');
   };
 
   const kycHandler = () => {
     router.push('/contact');
+  };
+
+  const myAccountHandler = () => {
+    router.push('/pages/profile');
   };
 
   const openLink = (url: string) => {
@@ -36,10 +44,24 @@ export default function CustomDrawerContent(props: any) {
       console.error('Failed to open URL:', err),
     );
   };
-
   const handleLogout = async () => {
-    await logoutUser();
-    router.replace('/loginScreen'); // or '/(auth)/loginScreen' if you use an auth folder
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+            await logoutUser();
+            await Updates.reloadAsync();
+          },
+        },
+      ],
+      { cancelable: true },
+    );
   };
 
   return (
@@ -63,7 +85,12 @@ export default function CustomDrawerContent(props: any) {
       <Divider style={styles.divider} />
 
       <MenuItem icon='home-outline' label='Home' href='/home' />
-      <MenuItem icon='account-outline' label='My Account' href='/account' />
+      <MenuItem
+        icon='account-outline'
+        label='My Account'
+        href=''
+        onPress={myAccountHandler}
+      />
       <MenuItem icon='percent' label='KYC Details' href='/kycDetails' />
 
       <MenuItem

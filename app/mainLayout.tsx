@@ -36,7 +36,7 @@ export default function MainLayout() {
   const cartCount = cartItems.length;
 
   const goToCart = async () => {
-    router.push('/cart');
+    router.push('/pages/cart');
   };
 
   // ✅ Header style when Drawer menu is available
@@ -133,12 +133,13 @@ export default function MainLayout() {
 
           {/* ✅ Additional drawer-accessible routes */}
           {[
-            { name: 'cart', title: 'Cart' },
-            { name: 'category', title: 'Category' },
-            { name: 'productDetail', title: 'Product Details' },
-            { name: 'divisions', title: 'Our Divisions' },
-            { name: 'notifications', title: 'Notifications' },
-            { name: 'kycDetails', title: 'KYC Details' },
+            { name: 'pages/cart', title: 'Cart' },
+            { name: 'pages/category', title: 'Category' },
+            { name: 'pages/productDetail', title: 'Product Details' },
+            { name: 'pages/divisions', title: 'Our Divisions' },
+            { name: 'pages/notifications', title: 'Notifications' },
+            { name: 'pages/kycDetails', title: 'KYC Details' },
+            { name: 'pages/profile', title: 'Profile' },
           ].map((screen) => (
             <Drawer.Screen
               key={screen.name}

@@ -5,61 +5,67 @@ import {
   Image,
   StyleSheet,
   Dimensions,
-  TouchableOpacity,
-  ScrollView,
   Pressable,
+  ScrollView,
+  Linking,
+  Alert,
 } from 'react-native';
-import { router } from 'expo-router';
 
 const CARD_WIDTH = Dimensions.get('window').width * 0.28;
 
-// 👉 static visual aid items
 const visualAidItems = [
   {
     id: 1,
     name: 'Immunity',
     image: require('../../assets/images/offers.jpg'),
+    pdfUrl: 'https://www.melticgroup.com/img/immunity.pdf',
   },
   {
     id: 2,
     name: 'Digestive Health',
     image: require('../../assets/images/offers.jpg'),
+    pdfUrl: 'https://www.melticgroup.com/img/digestive-health.pdf',
   },
   {
     id: 3,
     name: 'Heart Care',
     image: require('../../assets/images/offers.jpg'),
+    pdfUrl: 'https://www.melticgroup.com/img/heart-care.pdf',
   },
   {
     id: 4,
     name: 'Joint Relief',
     image: require('../../assets/images/offers.jpg'),
+    pdfUrl: 'https://www.melticgroup.com/img/joint-relief.pdf',
   },
   {
     id: 5,
     name: 'Skin & Hair',
     image: require('../../assets/images/offers.jpg'),
+    pdfUrl: 'https://www.melticgroup.com/img/skin-hair.pdf',
   },
   {
     id: 6,
     name: 'Respiratory',
     image: require('../../assets/images/offers.jpg'),
+    pdfUrl: 'https://www.melticgroup.com/img/respiratory.pdf',
   },
 ];
 
-const viewAllHandle = () => {
-  router.push({
-    pathname: '/category',
-    params: { query: 'categories' },
-  });
-};
-
 const VisualAid = () => {
-  const onClickItem = (item: string) => {
-    router.push({
-      pathname: '../productlist',
-      params: { query: item },
-    });
+  const onClickItem = async (item: any) => {
+    console.log(item);
+    try {
+      const supported = await Linking.canOpenURL(item.pdfUrl);
+      if (supported) {
+        await Linking.openURL(item.pdfUrl); // 👉 opens in default browser
+      } else {
+        Alert.alert('Error', 'Unable to open PDF link');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong while opening the link');
+      console.error('Linking Error:', error);
+    }
   };
 
   return (
@@ -67,9 +73,6 @@ const VisualAid = () => {
       {/* Header */}
       <View style={styles.headerRow}>
         <Text style={styles.headerTitle}>Visual Aid</Text>
-        <TouchableOpacity onPress={viewAllHandle}>
-          <Text style={styles.viewAll}>View All</Text>
-        </TouchableOpacity>
       </View>
 
       {/* Horizontal Scroll Cards */}
@@ -82,7 +85,7 @@ const VisualAid = () => {
           <Pressable
             key={item.id}
             style={styles.card}
-            onPress={() => onClickItem(item.name)}
+            onPress={() => onClickItem(item)}
           >
             <Image
               source={item.image}
@@ -114,11 +117,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#1A1A1A',
-  },
-  viewAll: {
-    fontSize: 14,
-    color: '#0060AA',
-    fontWeight: '600',
   },
   card: {
     width: CARD_WIDTH,

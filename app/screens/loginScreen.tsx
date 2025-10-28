@@ -25,8 +25,6 @@ export default function LoginScreen({
   const handleLogin = async () => {
     try {
       const data = await loginUser(email, password);
-      console.log(data);
-      Alert.alert('Success', `Welcome ${data.user_display_name}`);
       onLoginSuccess();
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Login failed');

@@ -8,7 +8,7 @@ import Drawer from 'expo-router/drawer';
 
 export default function Index() {
   const goToCart = async () => {
-    router.push('/cart');
+    router.push('/pages/cart');
   };
   const cartCount = 0;
   const renderHeaderWithDrawer = (navigation: any) => ({

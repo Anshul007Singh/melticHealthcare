@@ -200,7 +200,7 @@ const ProductListScreen = () => {
         (content: { id: string }) => content.id === 'side-effects',
       )[0]?.content || '';
     router.push({
-      pathname: '/productDetail',
+      pathname: '/pages/productDetail',
       params: {
         id: item.id,
         title: item.name,

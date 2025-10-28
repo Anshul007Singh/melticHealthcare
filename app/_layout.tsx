@@ -1,43 +1,61 @@
 import React, { useEffect, useState } from 'react';
 import SignUpScreen from './screens/signUpScreen';
 import LoginScreen from './screens/loginScreen';
-import MainLayout from './mainLayout'; // ✅ not ./index
+import MainLayout from './mainLayout';
 import SplashScreen from './screens/splashscreen';
 import { CartProvider } from '@/context/cartContext';
 import { getStoredToken } from '@/api/auth';
+import { AuthProvider, useAuth } from '@/context/authContext';
 
+// ✅ Wrap entire logic inside AuthProvider so that useAuth() always works
 export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+
+function AppContent() {
+  const { isLoggedIn } = useAuth();
   const [screen, setScreen] = useState<'splash' | 'signup' | 'login' | 'main'>(
     'splash',
   );
+  const [loading, setLoading] = useState(true);
+  const [hasToken, setHasToken] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       const token = await getStoredToken();
+      setHasToken(!!token);
+      setLoading(false);
       setScreen(token ? 'main' : 'login');
     };
     checkAuth();
   }, []);
 
-  if (screen === 'splash') return <SplashScreen />;
+  if (screen === 'splash' && loading) return <SplashScreen />;
 
-  if (screen === 'signup')
+  if (!isLoggedIn && screen === 'signup') {
     return (
       <SignUpScreen
         onRegistered={() => setScreen('login')}
         onGoToLogin={() => setScreen('login')}
       />
     );
+  }
 
-  if (screen === 'login')
+  if (!isLoggedIn && screen === 'login') {
     return (
       <LoginScreen
         onLoginSuccess={() => setScreen('main')}
         onGoToRegister={() => setScreen('signup')}
       />
     );
+  }
 
+  // ✅ Logged in — show Drawer + Tabs inside providers
   return (
     <CartProvider>
       <MainLayout />
