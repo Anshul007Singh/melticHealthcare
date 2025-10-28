@@ -7,7 +7,6 @@ import { CartProvider } from '@/context/cartContext';
 import { getStoredToken } from '@/api/auth';
 import { AuthProvider, useAuth } from '@/context/authContext';
 
-// ✅ Wrap entire logic inside AuthProvider so that useAuth() always works
 export default function App() {
   return (
     <AuthProvider>

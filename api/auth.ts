@@ -9,6 +9,7 @@ export const loginUser = async (email: string, password: string) => {
   });
 
   const data = response.data;
+  console.log(data);
 
   await AsyncStorage.setItem('userToken', data.token);
   console.log('auth data', data);

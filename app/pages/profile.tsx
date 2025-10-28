@@ -1,12 +1,9 @@
+import { getStoredUserInfo } from '@/api/auth';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Alert, StyleSheet } from 'react-native';
 import { TextInput, Button, Title } from 'react-native-paper';
 
 const Profile = () => {
-  // Hardcoded user token and ID (replace with dynamic later if needed)
-  const token =
-    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3d3dy5tZWx0aWNncm91cC5jb20vb25saW5lIiwiaWF0IjoxNzYxMzEyMDY4LCJuYmYiOjE3NjEzMTIwNjgsImV4cCI6MTc2MTkxNjg2OCwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiMiJ9fX0._JHzyq0gXCMl41S76CcD1glSbwKBWLC7PTijEt80r2M';
-
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -16,34 +13,19 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    // Fetch user info from your /user endpoint
-    const fetchUserInfo = async () => {
-      try {
-        const res = await fetch(
-          'https://www.melticgroup.com/online/wp-json/custom/v1/user/2',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        const data = await res.json();
-
-        setForm({
-          name: data.name || '',
-          email: data.email || '',
-          phone: data.mobile || '',
-        });
-      } catch (err) {
-        console.error(err);
-        Alert.alert('Error', 'Failed to fetch user info');
-      }
+    const loadUserInfo = async () => {
+      const data = await getStoredUserInfo();
+      setForm({
+        name: data.name || '',
+        email: data.email || '',
+        phone: data.mobile || '',
+      });
     };
-
-    fetchUserInfo();
+    loadUserInfo();
   }, []);
+  const mytoken =
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3d3dy5tZWx0aWNncm91cC5jb20vb25saW5lIiwiaWF0IjoxNzYxNjczMDg3LCJuYmYiOjE3NjE2NzMwODcsImV4cCI6MTc2MjI3Nzg4NywiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiMiJ9fX0.C5E6Ztl5KsGizeYLSzf7yQu4ti2eTtLJuujHi-S-fTg';
 
-  // Validate input fields
   const validateForm = () => {
     const { name, email, phone } = form;
     if (!name || !email || !phone) {
@@ -66,19 +48,23 @@ const Profile = () => {
     return true;
   };
 
-  // Handle profile update
   const handleUpdate = async () => {
     if (!validateForm()) return;
 
     setLoading(true);
     try {
+      if (!mytoken) {
+        Alert.alert('Error', 'No user token found');
+        return;
+      }
+
       const res = await fetch(
         'https://www.melticgroup.com/online/wp-json/custom/v1/update-user',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${mytoken}`,
           },
           body: JSON.stringify({
             name: form.name,
