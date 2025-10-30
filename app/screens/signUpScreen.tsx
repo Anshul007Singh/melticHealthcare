@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Alert,
   Text,
   TextInput,
   TouchableOpacity,
@@ -9,6 +8,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { registerUser } from '@/api/auth';
+import CustomModal from '@/components/modal';
 
 interface RegisterScreenProps {
   onRegistered: () => void;
@@ -31,7 +31,15 @@ export default function RegisterScreen({
   });
   const [isValid, setIsValid] = useState(false);
 
-  // --- validation logic (unchanged) ---
+  // Modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalData, setModalData] = useState({
+    title: '',
+    message: '',
+    type: 'success' as 'success' | 'error',
+  });
+
+  // --- validation logic ---
   const validateName = (text: string) => {
     if (!text) return 'Name is required';
     if (text.length < 6) return 'Name must be at least 6 characters';
@@ -78,10 +86,19 @@ export default function RegisterScreen({
 
     try {
       await registerUser(name, email, password, mobile);
-      Alert.alert('Success', 'Registration successful');
-      onRegistered();
+      setModalData({
+        title: 'Success',
+        message: 'Registration successful!',
+        type: 'success',
+      });
+      setModalVisible(true);
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      setModalData({
+        title: 'Error',
+        message: error.message || 'Something went wrong!',
+        type: 'error',
+      });
+      setModalVisible(true);
     }
   };
 
@@ -107,7 +124,7 @@ export default function RegisterScreen({
           </Text>
         </Text>
 
-        {/* --- name --- */}
+        {/* --- INPUT FIELDS --- */}
         <Text style={styles.label}>Full Name</Text>
         <TextInput
           placeholder='Enter full name'
@@ -123,7 +140,6 @@ export default function RegisterScreen({
           <Text style={styles.errorText}>{errors.name}</Text>
         ) : null}
 
-        {/* --- EMAIL --- */}
         <Text style={styles.label}>EMAIL</Text>
         <TextInput
           placeholder='Enter your Email'
@@ -140,7 +156,6 @@ export default function RegisterScreen({
           <Text style={styles.errorText}>{errors.email}</Text>
         ) : null}
 
-        {/* --- PASSWORD --- */}
         <Text style={styles.label}>PASSWORD</Text>
         <TextInput
           placeholder='Enter your password'
@@ -160,7 +175,6 @@ export default function RegisterScreen({
           <Text style={styles.errorText}>{errors.password}</Text>
         ) : null}
 
-        {/* --- MOBILE --- */}
         <Text style={styles.label}>MOBILE</Text>
         <TextInput
           placeholder='Enter mobile number'
@@ -179,7 +193,6 @@ export default function RegisterScreen({
           <Text style={styles.errorText}>{errors.mobile}</Text>
         ) : null}
 
-        {/* --- BUTTON --- */}
         <TouchableOpacity
           style={[styles.signupButton, !isValid && { opacity: 0.5 }]}
           onPress={handleRegister}
@@ -188,6 +201,19 @@ export default function RegisterScreen({
           <Text style={styles.signupButtonText}>Sign up</Text>
         </TouchableOpacity>
       </View>
+
+      {/* ✅ Reusable Success/Error Modal */}
+      <CustomModal
+        visible={modalVisible}
+        title={modalData.title}
+        message={modalData.message}
+        type={modalData.type}
+        onClose={() => {
+          setModalVisible(false);
+          if (modalData.type === 'success') onRegistered();
+        }}
+        confirmText='OK'
+      />
     </LinearGradient>
   );
 }

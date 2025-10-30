@@ -6,15 +6,24 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
-  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useCart } from '@/context/cartContext';
 import { placeOrder } from '@/api/orders';
 import { getStoredUserInfo } from '@/api/auth';
+import CustomModal from '@/components/modal';
 
 export default function CartScreen() {
   const [userInfo, setUserInfo] = useState<any>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalData, setModalData] = useState({
+    title: '',
+    message: '',
+    type: 'success' as 'success' | 'error',
+  });
+
+  const { cartItems, removeFromCart, updateQuantity, emptyCart } = useCart();
+  const [promoCode, setPromoCode] = useState('');
 
   useEffect(() => {
     const loadUserInfo = async () => {
@@ -24,8 +33,6 @@ export default function CartScreen() {
     };
     loadUserInfo();
   }, []);
-  const { cartItems, removeFromCart, updateQuantity, emptyCart } = useCart();
-  const [promoCode, setPromoCode] = useState('');
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -36,6 +43,16 @@ export default function CartScreen() {
   const total = subtotal + deliveryFee - discount;
 
   const onPlaceOrder = async () => {
+    if (cartItems.length === 0) {
+      setModalData({
+        title: 'Empty Cart',
+        message: 'Please add items to your cart before placing an order.',
+        type: 'error',
+      });
+      setModalVisible(true);
+      return;
+    }
+
     const orderData = {
       payment_method: 'bacs',
       payment_method_title: 'Direct Bank Transfer',
@@ -46,12 +63,10 @@ export default function CartScreen() {
         email: userInfo?.email || 'Unknown Email',
         phone: userInfo?.phone || '0000000000',
       },
-      // Product list in correct WooCommerce format
       line_items: cartItems.map((item) => ({
         product_id: parseInt(item.id),
         quantity: item.quantity,
       })),
-      // Optionally attach extra info
       meta_data: [
         {
           key: 'cart_summary',
@@ -66,10 +81,20 @@ export default function CartScreen() {
 
     try {
       const data = await placeOrder(orderData);
-      Alert.alert('Success', `Order placed! Order ID: ${data.id}`);
+      setModalData({
+        title: 'Success',
+        message: `Order placed successfully!\nOrder ID: ${data.id}`,
+        type: 'success',
+      });
+      setModalVisible(true);
       emptyCart();
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      setModalData({
+        title: 'Error',
+        message: error.message || 'Something went wrong while placing order.',
+        type: 'error',
+      });
+      setModalVisible(true);
     }
   };
 
@@ -166,31 +191,23 @@ export default function CartScreen() {
           </TouchableOpacity>
         </>
       )}
+
+      {/* ✅ Reusable Modal for success/error */}
+      <CustomModal
+        visible={modalVisible}
+        title={modalData.title}
+        message={modalData.message}
+        type={modalData.type}
+        onClose={() => setModalVisible(false)}
+        confirmText='OK'
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 50,
-    paddingBottom: 10,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  listContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 15,
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  listContainer: { paddingHorizontal: 16, paddingTop: 15 },
   itemCard: {
     flexDirection: 'row',
     backgroundColor: '#F9F9F9',
@@ -204,17 +221,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginRight: 10,
   },
-  itemDetails: {
-    flex: 1,
-  },
-  itemName: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  itemPrice: {
-    color: '#333',
-    marginTop: 2,
-  },
+  itemDetails: { flex: 1 },
+  itemName: { fontSize: 16, fontWeight: '600' },
+  itemPrice: { color: '#333', marginTop: 2 },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -229,47 +238,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
   },
-  qtyButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  qtyText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  qtyNumber: {
-    fontSize: 16,
-    fontWeight: '500',
-    paddingHorizontal: 6,
-  },
-  itemTotal: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  promoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F9F9F9',
-    borderRadius: 10,
-    marginHorizontal: 16,
-    marginTop: 8,
-    paddingHorizontal: 10,
-  },
-  input: {
-    flex: 1,
-    paddingVertical: 8,
-    fontSize: 14,
-  },
-  applyButton: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-    elevation: 1,
-  },
-  applyText: {
-    fontWeight: '600',
-  },
+  qtyButton: { paddingHorizontal: 10, paddingVertical: 4 },
+  qtyText: { fontSize: 16, fontWeight: '600' },
+  qtyNumber: { fontSize: 16, fontWeight: '500', paddingHorizontal: 6 },
+  itemTotal: { fontSize: 15, fontWeight: '600' },
   summaryCard: {
     backgroundColor: '#F9F9F9',
     borderRadius: 10,
@@ -282,26 +254,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 3,
   },
-  summaryLabel: {
-    color: '#555',
-  },
-  summaryValue: {
-    color: '#111',
-    fontWeight: '500',
-  },
+  summaryLabel: { color: '#555' },
+  summaryValue: { color: '#111', fontWeight: '500' },
   divider: {
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
     marginVertical: 6,
   },
-  totalLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  totalValue: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
+  totalLabel: { fontSize: 16, fontWeight: '600' },
+  totalValue: { fontSize: 16, fontWeight: '700' },
   checkoutButton: {
     backgroundColor: '#28a745',
     margin: 16,
@@ -309,18 +270,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
   },
-  checkoutText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyText: {
-    marginTop: 10,
-    color: '#999',
-  },
+  checkoutText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  emptyText: { marginTop: 10, color: '#999' },
 });

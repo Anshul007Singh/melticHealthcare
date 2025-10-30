@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Linking } from 'react-native';
 import { Text, TextInput, Button, Title, IconButton } from 'react-native-paper';
-import { Linking } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomModal from '@/components/modal';
 
 const Contact = () => {
   const [form, setForm] = useState({
@@ -15,12 +15,16 @@ const Contact = () => {
   const [isValid, setIsValid] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+
   // Handle input changes
   const handleChange = (key: string, value: string) => {
     setForm({ ...form, [key]: value });
   };
 
-  // Validate inputs
   useEffect(() => {
     const { name, email, phone, message } = form;
     const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -29,10 +33,15 @@ const Contact = () => {
     setIsValid(isEmailValid && isPhoneValid && areFieldsFilled);
   }, [form]);
 
-  // Submit handler
+  const showModal = (title: string, message: string) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalVisible(true);
+  };
+
   const handleSubmit = async () => {
     if (!isValid) {
-      Alert.alert('Invalid Form', 'Please fill all fields correctly.');
+      showModal('Invalid Form', 'Please fill all fields correctly.');
       return;
     }
 
@@ -54,100 +63,109 @@ const Contact = () => {
 
       const data = await response.json();
       if (response.ok) {
-        Alert.alert('Success', 'Contact form submitted!');
+        showModal('Success', 'Contact form submitted successfully!');
         setForm({ name: '', email: '', phone: '', message: '' });
       } else {
-        Alert.alert('Error', data.message || 'Submission failed');
+        showModal('Error', data.message || 'Submission failed.');
       }
     } catch (err) {
       console.error(err);
-      Alert.alert('Error', 'Something went wrong.');
+      showModal('Error', 'Something went wrong. Please try again later.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleWhatsApp = async () => {
+    const phoneNumber = '+919504600000';
+    const message = 'Hello, I would like to know more about your services.';
+    const url = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(
+      message,
+    )}`;
+
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      } else {
+        showModal('Error', 'WhatsApp is not installed on your device.');
+      }
+    } catch (error) {
+      showModal('Error', 'Unable to open WhatsApp.');
     }
   };
 
   const fields = ['name', 'email', 'phone', 'message'];
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Contact Info */}
-      <View style={styles.contactInfo}>
-        <Title style={styles.label1}>Phone</Title>
-        <Text style={styles.text}>+91 9504600000</Text>
+    <>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Contact Info */}
+        <View style={styles.contactInfo}>
+          <Title style={styles.label1}>Phone</Title>
+          <Text style={styles.text}>+91 9504600000</Text>
 
-        <Title style={styles.label1}>Email</Title>
-        <Text style={styles.text}>info@meltichealth.com</Text>
+          <Title style={styles.label1}>Email</Title>
+          <Text style={styles.text}>info@meltichealth.com</Text>
 
-        <Title style={styles.label1}>Address</Title>
-        <Text style={styles.text}>
-          Nanhera Road Kuldeep Nagar, Ambala Cantt, India 133004
-        </Text>
-
-        <IconButton
-          icon='whatsapp'
-          iconColor='#25D366'
-          size={55}
-          style={styles.whatsappButton}
-          onPress={async () => {
-            const phoneNumber = '+919504600000';
-            const message =
-              'Hello, I would like to know more about your services.';
-            const url = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(
-              message,
-            )}`;
-
-            try {
-              const supported = await Linking.canOpenURL(url);
-              if (supported) {
-                await Linking.openURL(url);
-              } else {
-                Alert.alert(
-                  'Error',
-                  'WhatsApp is not installed on your device.',
-                );
-              }
-            } catch (error) {
-              Alert.alert('Error', `Unable to open WhatsApp. ${error}`);
-            }
-          }}
-        />
-      </View>
-
-      {/* Form */}
-      <Title style={styles.formTitle}>Leave your message</Title>
-
-      {fields.map((field) => (
-        <View key={field} style={styles.inputContainer}>
-          <Text style={styles.label}>
-            {field.charAt(0).toUpperCase() + field.slice(1)}
+          <Title style={styles.label1}>Address</Title>
+          <Text style={styles.text}>
+            Nanhera Road Kuldeep Nagar, Ambala Cantt, India 133004
           </Text>
-          <TextInput
-            mode='outlined'
-            numberOfLines={field === 'message' ? 4 : 1}
-            value={form[field as keyof typeof form]}
-            onChangeText={(value) => handleChange(field, value)}
-            style={styles.input}
-            theme={{ roundness: 10 }}
-            placeholder={`Enter your ${
-              field.charAt(0).toUpperCase() + field.slice(1)
-            }`}
-            keyboardType={field === 'phone' ? 'numeric' : 'default'}
+
+          <IconButton
+            icon='whatsapp'
+            iconColor='#25D366'
+            size={55}
+            style={styles.whatsappButton}
+            onPress={handleWhatsApp}
           />
         </View>
-      ))}
 
-      <Button
-        mode='contained'
-        style={[styles.submitButton, !isValid && { backgroundColor: '#ccc' }]}
-        disabled={!isValid || loading}
-        labelStyle={{ color: 'black', fontWeight: 'bold' }}
-        onPress={handleSubmit}
-        loading={loading}
-      >
-        Submit
-      </Button>
-    </ScrollView>
+        {/* Form */}
+        <Title style={styles.formTitle}>Leave your message</Title>
+
+        {fields.map((field) => (
+          <View key={field} style={styles.inputContainer}>
+            <Text style={styles.label}>
+              {field.charAt(0).toUpperCase() + field.slice(1)}
+            </Text>
+            <TextInput
+              mode='outlined'
+              numberOfLines={field === 'message' ? 4 : 1}
+              value={form[field as keyof typeof form]}
+              onChangeText={(value) => handleChange(field, value)}
+              style={styles.input}
+              theme={{ roundness: 10 }}
+              placeholder={`Enter your ${
+                field.charAt(0).toUpperCase() + field.slice(1)
+              }`}
+              keyboardType={field === 'phone' ? 'numeric' : 'default'}
+            />
+          </View>
+        ))}
+
+        <Button
+          mode='contained'
+          style={[styles.submitButton, !isValid && { backgroundColor: '#ccc' }]}
+          disabled={!isValid || loading}
+          labelStyle={{ color: 'black', fontWeight: 'bold' }}
+          onPress={handleSubmit}
+          loading={loading}
+        >
+          Submit
+        </Button>
+      </ScrollView>
+
+      {/* ✅ Custom Modal */}
+      <CustomModal
+        visible={modalVisible}
+        title={modalTitle}
+        message={modalMessage}
+        onClose={() => setModalVisible(false)}
+        confirmText='OK'
+      />
+    </>
   );
 };
 

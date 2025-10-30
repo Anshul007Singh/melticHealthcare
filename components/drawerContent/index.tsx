@@ -91,7 +91,7 @@ export default function CustomDrawerContent(props: any) {
         href=''
         onPress={myAccountHandler}
       />
-      <MenuItem icon='percent' label='KYC Details' href='/kycDetails' />
+      <MenuItem icon='percent' label='KYC Details' href='/pages/kycDetails' />
 
       <MenuItem
         icon='bell-outline'

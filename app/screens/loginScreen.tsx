@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   Text,
   TextInput,
   TouchableOpacity,
@@ -8,7 +7,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { loginUser } from '../../api/auth'; // adjust path if needed
+import { loginUser } from '../../api/auth';
+import CustomModal from '@/components/modal';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -21,58 +21,103 @@ export default function LoginScreen({
 }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalType, setModalType] = useState<'success' | 'error' | 'info'>(
+    'info',
+  );
+
+  const showModal = (
+    title: string,
+    message: string,
+    type: 'success' | 'error' | 'info' = 'info',
+  ) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalType(type);
+    setModalVisible(true);
+  };
 
   const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      showModal('Validation Error', 'Please fill in both fields.', 'error');
+      return;
+    }
+
     try {
       const data = await loginUser(email, password);
-      onLoginSuccess();
+
+      // ✅ If login succeeds
+      showModal('Login Successful', 'Welcome back!', 'success');
+      setTimeout(() => {
+        setModalVisible(false);
+        onLoginSuccess();
+      }, 1500);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Login failed');
+      // ❌ Error modal
+      showModal(
+        'Login Failed',
+        error.message || 'Invalid credentials. Please try again.',
+        'error',
+      );
     }
   };
 
   return (
-    <LinearGradient
-      colors={['#0060AA', '#0060AA']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 0 }}
-      style={styles.container}
-    >
-      <View style={styles.content}>
-        <Text style={styles.title}>Login</Text>
-        <Text style={styles.subtitle}>Sign in to continue.</Text>
+    <>
+      <LinearGradient
+        colors={['#0060AA', '#0060AA']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 0 }}
+        style={styles.container}
+      >
+        <View style={styles.content}>
+          <Text style={styles.title}>Login</Text>
+          <Text style={styles.subtitle}>Sign in to continue.</Text>
 
-        <Text style={styles.label}>User Name</Text>
-        <TextInput
-          placeholder='Enter your Email'
-          placeholderTextColor='#ccc'
-          value={email}
-          onChangeText={setEmail}
-          style={styles.input}
-        />
+          <Text style={styles.label}>USER NAME</Text>
+          <TextInput
+            placeholder='Enter your Email'
+            placeholderTextColor='#ccc'
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
 
-        <Text style={styles.label}>PASSWORD</Text>
-        <TextInput
-          placeholder='Enter your password'
-          placeholderTextColor='#ccc'
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={styles.input}
-        />
+          <Text style={styles.label}>PASSWORD</Text>
+          <TextInput
+            placeholder='Enter your password'
+            placeholderTextColor='#ccc'
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.input}
+          />
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <Text style={styles.loginButtonText}>Login</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={onGoToRegister}>
-          <Text style={styles.registerText}>
-            Don’t have an account?{' '}
-            <Text style={styles.registerLink}>Register</Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </LinearGradient>
+          <TouchableOpacity onPress={onGoToRegister}>
+            <Text style={styles.registerText}>
+              Don’t have an account?{' '}
+              <Text style={styles.registerLink}>Register</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
+
+      {/* ✅ Custom Modal integrated */}
+      <CustomModal
+        visible={modalVisible}
+        title={modalTitle}
+        message={modalMessage}
+        type={modalType}
+        onClose={() => setModalVisible(false)}
+        confirmText='OK'
+      />
+    </>
   );
 }
 
