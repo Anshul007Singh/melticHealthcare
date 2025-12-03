@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import 'react-native-reanimated';
 import { router, Stack } from 'expo-router';
 import Home from '@/container/home';
 import { Pressable, View, Text, StyleSheet } from 'react-native';

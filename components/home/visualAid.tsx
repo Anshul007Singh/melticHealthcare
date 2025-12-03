@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,75 +7,61 @@ import {
   Dimensions,
   Pressable,
   ScrollView,
-  Linking,
-  Alert,
+  Modal,
+  TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 const CARD_WIDTH = Dimensions.get('window').width * 0.28;
 
 const visualAidItems = [
   {
     id: 1,
-    name: 'Immunity',
+    name: 'Cardiever',
     image: require('../../assets/images/offers.jpg'),
-    pdfUrl: 'https://www.melticgroup.com/img/immunity.pdf',
+    pdfUrl:
+      'https://drive.google.com/file/d/1JL7mXeaND4DSrH5ek2Fgb-vQzRatFBE0/preview',
   },
   {
     id: 2,
-    name: 'Digestive Health',
+    name: 'Dalcon',
     image: require('../../assets/images/offers.jpg'),
-    pdfUrl: 'https://www.melticgroup.com/img/digestive-health.pdf',
+    pdfUrl:
+      'https://drive.google.com/file/d/1wXDIPN0W-juA975DD5IkYoaSOD_soyOa/preview',
   },
   {
     id: 3,
-    name: 'Heart Care',
+    name: 'Meltic',
     image: require('../../assets/images/offers.jpg'),
-    pdfUrl: 'https://www.melticgroup.com/img/heart-care.pdf',
-  },
-  {
-    id: 4,
-    name: 'Joint Relief',
-    image: require('../../assets/images/offers.jpg'),
-    pdfUrl: 'https://www.melticgroup.com/img/joint-relief.pdf',
-  },
-  {
-    id: 5,
-    name: 'Skin & Hair',
-    image: require('../../assets/images/offers.jpg'),
-    pdfUrl: 'https://www.melticgroup.com/img/skin-hair.pdf',
-  },
-  {
-    id: 6,
-    name: 'Respiratory',
-    image: require('../../assets/images/offers.jpg'),
-    pdfUrl: 'https://www.melticgroup.com/img/respiratory.pdf',
+    pdfUrl:
+      'https://drive.google.com/file/d/1qm9M9zB4qAk5hW-_9-bjlAdSQty_eRCv/preview',
   },
 ];
 
 const VisualAid = () => {
-  const onClickItem = async (item: any) => {
-    console.log(item);
-    try {
-      const supported = await Linking.canOpenURL(item.pdfUrl);
-      if (supported) {
-        await Linking.openURL(item.pdfUrl); // 👉 opens in default browser
-      } else {
-        Alert.alert('Error', 'Unable to open PDF link');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Something went wrong while opening the link');
-      console.error('Linking Error:', error);
-    }
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<{
+    name: string;
+    pdfUrl: string;
+  } | null>(null);
+
+  const openModal = (item: { name: string; pdfUrl: string }) => {
+    setSelectedItem(item);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedItem(null);
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.headerRow}>
         <Text style={styles.headerTitle}>Visual Aid</Text>
       </View>
 
-      {/* Horizontal Scroll Cards */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -85,7 +71,7 @@ const VisualAid = () => {
           <Pressable
             key={item.id}
             style={styles.card}
-            onPress={() => onClickItem(item)}
+            onPress={() => openModal(item)}
           >
             <Image
               source={item.image}
@@ -96,6 +82,45 @@ const VisualAid = () => {
           </Pressable>
         ))}
       </ScrollView>
+
+      {/* Modal */}
+      <Modal
+        visible={modalVisible}
+        animationType='fade'
+        transparent
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <SafeAreaView style={{ flex: 1 }}>
+              {/* Header */}
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>
+                  {selectedItem ? selectedItem.name : 'Visual Aid'}
+                </Text>
+                <TouchableOpacity
+                  onPress={closeModal}
+                  style={styles.closeButton}
+                >
+                  <Text style={styles.closeButtonText}>Close ✕</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* PDF Viewer */}
+              {selectedItem && (
+                <WebView
+                  source={{ uri: selectedItem.pdfUrl }}
+                  style={{ flex: 1 }}
+                  originWhitelist={['*']}
+                  startInLoadingState={true}
+                  javaScriptEnabled={true}
+                  domStorageEnabled={true}
+                />
+              )}
+            </SafeAreaView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -135,5 +160,41 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#1A1A1A',
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '95%',
+    height: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    overflow: 'hidden',
+    elevation: 10,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 12,
+    backgroundColor: '#f2f2f2',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#333',
+  },
+  closeButton: {
+    backgroundColor: '#d9534f',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 });

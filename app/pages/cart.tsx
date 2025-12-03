@@ -269,6 +269,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',
+    marginVertical: 50,
   },
   checkoutText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },

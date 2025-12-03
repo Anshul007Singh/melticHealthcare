@@ -1,3 +1,4 @@
+import 'react-native-reanimated';
 import React from 'react';
 import {
   DarkTheme,
@@ -6,7 +7,6 @@ import {
   DrawerActions,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import 'react-native-reanimated';
 import { Drawer } from 'expo-router/drawer';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -130,8 +130,6 @@ export default function MainLayout() {
               ...(renderHeaderWithDrawer(navigation) as any),
             })}
           />
-
-          {/* ✅ Additional drawer-accessible routes */}
           {[
             { name: 'pages/cart', title: 'Cart' },
             { name: 'pages/category', title: 'Category' },
@@ -140,6 +138,8 @@ export default function MainLayout() {
             { name: 'pages/notifications', title: 'Notifications' },
             { name: 'pages/kycDetails', title: 'KYC Details' },
             { name: 'pages/profile', title: 'Profile' },
+            { name: 'pages/termsAndConditions', title: 'Terms & Conditions' },
+            { name: 'pages/privacyPolicy', title: 'Privacy Policy' },
           ].map((screen) => (
             <Drawer.Screen
               key={screen.name}

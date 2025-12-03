@@ -70,13 +70,11 @@ export default function KYCForm() {
             'Invalid File',
             'Please select a PDF or JPG/PNG image.',
           );
-          // Alert.alert('Invalid File', 'Please select a PDF or JPEG file only.');
           return;
         }
 
         if (file.size && file.size > 200 * 1024) {
           showModal('error', 'File Too Large', 'File must be less than 200KB.');
-          // Alert.alert('File Too Large', 'File must be less than 200KB.');
           return;
         }
 
@@ -303,26 +301,6 @@ export default function KYCForm() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => setShowDobPicker(true)}>
-          <TextInput
-            placeholder='Date of Birth'
-            value={dob ? dob.toDateString() : ''}
-            style={styles.plainInput}
-            editable={false}
-          />
-        </TouchableOpacity>
-        {showDobPicker && (
-          <DateTimePicker
-            value={dob || new Date()}
-            mode='date'
-            display='default'
-            onChange={(event, selectedDate) => {
-              setShowDobPicker(false);
-              if (selectedDate) setDob(selectedDate);
-            }}
-          />
-        )}
-
         <TouchableOpacity onPress={() => setShowAnniversaryPicker(true)}>
           <TextInput
             placeholder='Date of Anniversary'
@@ -416,9 +394,9 @@ const styles = StyleSheet.create({
   },
   uploadText: { marginLeft: 8, color: '#080808ff', fontWeight: '500' },
   submitBtn: {
-    marginTop: 20,
     borderRadius: 55,
     alignItems: 'center',
     paddingVertical: 12,
+    marginBottom: 50,
   },
 });

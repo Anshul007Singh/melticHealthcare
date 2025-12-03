@@ -1,3 +1,5 @@
+import { Stack } from 'expo-router';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import SignUpScreen from './screens/signUpScreen';
 import LoginScreen from './screens/loginScreen';
@@ -14,9 +16,9 @@ export default function App() {
     </AuthProvider>
   );
 }
-
 function AppContent() {
   const { isLoggedIn } = useAuth();
+  const [showSplash, setShowSplash] = useState(true);
   const [screen, setScreen] = useState<'splash' | 'signup' | 'login' | 'main'>(
     'splash',
   );
@@ -34,7 +36,8 @@ function AppContent() {
     checkAuth();
   }, []);
 
-  if (screen === 'splash' && loading) return <SplashScreen />;
+  if (screen === 'splash' && loading && showSplash)
+    return <SplashScreen onFinish={() => setShowSplash(false)} />;
 
   if (!isLoggedIn && screen === 'signup') {
     return (

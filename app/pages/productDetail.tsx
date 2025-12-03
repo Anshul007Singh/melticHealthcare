@@ -175,7 +175,6 @@ export default function ProductDetailScreen() {
           <Text style={styles.productSubTitle}>
             {category ? `Category: ${category}` : 'Category: Not specified'}
           </Text>
-          {/* <Text style={styles.packInfo}>{sku}</Text> */}
         </View>
         <View style={styles.priceRow}>
           <Text style={styles.priceText}>MRP - ₹{price}</Text>
@@ -225,7 +224,13 @@ export default function ProductDetailScreen() {
             expanded={expandedIndication}
             onPress={() => setExpendedIndication(!expandedIndication)}
           >
-            <ScrollView style={{ maxHeight: 200, paddingHorizontal: 16 }}>
+            <ScrollView
+              style={{
+                maxHeight: 200,
+                paddingHorizontal: 16,
+                marginBottom: 20,
+              }}
+            >
               <Text style={{ fontSize: 14 }}>
                 {indicationsText === ''
                   ? 'No indications available.'
@@ -322,6 +327,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 8,
     backgroundColor: '#0060AA',
+    marginVertical: 27,
   },
   ribbon: {
     position: 'absolute',
