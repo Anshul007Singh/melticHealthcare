@@ -1,5 +1,3 @@
-import { Stack } from 'expo-router';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import React, { useEffect, useState } from 'react';
 import SignUpScreen from './screens/signUpScreen';
 import LoginScreen from './screens/loginScreen';
@@ -8,12 +6,15 @@ import SplashScreen from './screens/splashscreen';
 import { CartProvider } from '@/context/cartContext';
 import { getStoredToken } from '@/api/auth';
 import { AuthProvider, useAuth } from '@/context/authContext';
+import { PaperProvider } from 'react-native-paper';
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <PaperProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </PaperProvider>
   );
 }
 function AppContent() {
@@ -27,7 +28,7 @@ function AppContent() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 4000));
       const token = await getStoredToken();
       setHasToken(!!token);
       setLoading(false);
@@ -57,7 +58,6 @@ function AppContent() {
     );
   }
 
-  // ✅ Logged in — show Drawer + Tabs inside providers
   return (
     <CartProvider>
       <MainLayout />

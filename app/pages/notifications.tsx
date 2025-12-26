@@ -24,7 +24,6 @@ const NotificationScreen = () => {
     newProducts.forEach((prod) => {
       const createdAt = new Date(prod.date_created).getTime();
 
-      // Only new products created in the last 7 days
       if (createdAt >= oneWeekAgo && !previousProducts.current.has(prod.id)) {
         newNotifs.push({
           id: `${prod.id}-new`,
@@ -77,8 +76,8 @@ const NotificationScreen = () => {
   return (
     <View style={styles.container}>
       {notifications.length === 0 ? (
-        <Text style={{ textAlign: 'center', color: '#999' }}>
-          No new products in the last 7 days
+        <Text style={{ textAlign: 'center', color: '#999', marginTop: 350 }}>
+          No new product added in the last 7 days
         </Text>
       ) : (
         <FlatList

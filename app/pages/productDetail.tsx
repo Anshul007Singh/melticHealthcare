@@ -192,7 +192,17 @@ export default function ProductDetailScreen() {
 
         <View style={styles.iconsRow}>
           <TouchableOpacity onPress={() => setShowPDF(true)}>
-            <Icon source='file-pdf-box' size={60} color='red' />
+            <Image
+              source={require('../../assets/images/adobe.png')}
+              style={{
+                width: 70,
+                height: 70,
+                marginRight: 16,
+                marginBottom: 10,
+                borderRadius: 10,
+                padding: 20,
+              }}
+            />
           </TouchableOpacity>
         </View>
 

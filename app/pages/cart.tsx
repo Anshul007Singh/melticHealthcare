@@ -29,7 +29,6 @@ export default function CartScreen() {
     const loadUserInfo = async () => {
       const data = await getStoredUserInfo();
       setUserInfo(data);
-      console.log('User Info:', data);
     };
     loadUserInfo();
   }, []);
@@ -52,14 +51,13 @@ export default function CartScreen() {
       setModalVisible(true);
       return;
     }
-
     const orderData = {
       payment_method: 'bacs',
       payment_method_title: 'Direct Bank Transfer',
       set_paid: true,
       billing: {
-        first_name: userInfo?.username || 'Unknown User',
-        last_name: userInfo?.username || 'Unknown User',
+        first_name: userInfo?.name || 'Unknown User',
+        last_name: userInfo?.name || 'Unknown User',
         email: userInfo?.email || 'Unknown Email',
         phone: userInfo?.phone || '0000000000',
       },

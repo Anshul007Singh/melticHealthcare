@@ -11,7 +11,7 @@ interface CustomModalProps {
   onConfirm?: () => void;
   confirmText?: string;
   cancelText?: string;
-  type?: 'success' | 'error' | 'info'; // 👈 NEW prop
+  type?: 'success' | 'error' | 'info';
   children?: React.ReactNode;
 }
 
@@ -23,10 +23,9 @@ const CustomModal: React.FC<CustomModalProps> = ({
   onConfirm,
   confirmText = 'OK',
   cancelText = 'Cancel',
-  type = 'info', // 👈 Default type
+  type = 'info',
   children,
 }) => {
-  // 👇 Set colors and icons dynamically based on type
   const themeStyles = {
     success: {
       color: '#2E7D32',
@@ -70,15 +69,9 @@ const CustomModal: React.FC<CustomModalProps> = ({
             {title}
           </Text>
         ) : null}
-
-        {/* Message */}
         {message ? <Text style={styles.message}>{message}</Text> : null}
-
         {children ? <View style={{ marginTop: 10 }}>{children}</View> : null}
-
         <Divider style={{ marginVertical: 15 }} />
-
-        {/* Buttons */}
         <View style={styles.buttonRow}>
           <Button
             mode='outlined'

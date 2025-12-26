@@ -1,8 +1,13 @@
 import { getStoredUserInfo } from '@/api/auth';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import { TextInput, Button, Title } from 'react-native-paper';
-// import CustomModal from '@/components/CustomModal';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import CustomModal from '@/components/modal';
 
 const Profile = () => {
@@ -10,11 +15,20 @@ const Profile = () => {
     name: '',
     email: '',
     phone: '',
+    token: '',
   });
+
+  const [originalForm, setOriginalForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    token: '',
+  });
+
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  // ✅ Modal States
+  // Modal State
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
@@ -25,17 +39,20 @@ const Profile = () => {
   useEffect(() => {
     const loadUserInfo = async () => {
       const data = await getStoredUserInfo();
-      setForm({
-        name: data.name || '',
-        email: data.email || '',
-        phone: data.mobile || '',
-      });
+
+      const userData = {
+        name: data?.name || '',
+        email: data?.email || '',
+        phone: data?.mobile || '',
+        token: data?.token || '',
+      };
+
+      setForm(userData);
+      setOriginalForm(userData); // store original data
     };
+
     loadUserInfo();
   }, []);
-
-  const mytoken =
-    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3d3dy5tZWx0aWNncm91cC5jb20vb25saW5lIiwiaWF0IjoxNzYxODQxNTk2LCJuYmYiOjE3NjE4NDE1OTYsImV4cCI6MTc2MjQ0NjM5NiwiZGF0YSI6eyJ1c2VyIjp7ImlkIjoiMjUifX19.kp7H0LV2I9nwQPbL_i_VUNFacO6bA-Ry-BpBd_Slvg0';
 
   const showModal = (
     title: string,
@@ -50,6 +67,7 @@ const Profile = () => {
 
   const validateForm = () => {
     const { name, email, phone } = form;
+
     if (!name || !email || !phone) {
       showModal('Validation Error', 'All fields are required', 'error');
       return false;
@@ -72,14 +90,9 @@ const Profile = () => {
 
   const handleUpdate = async () => {
     if (!validateForm()) return;
-
+    const mytoken = form.token;
     setLoading(true);
     try {
-      if (!mytoken) {
-        showModal('Error', 'No user token found', 'error');
-        return;
-      }
-
       const res = await fetch(
         'https://www.melticgroup.com/online/wp-json/custom/v1/update-user',
         {
@@ -102,65 +115,84 @@ const Profile = () => {
       if (data.success) {
         showModal('Success', 'Profile updated successfully!', 'success');
         setIsEditing(false);
+        setOriginalForm(form); // update original data after success
       } else {
         showModal('Error', data.message || 'Failed to update profile', 'error');
       }
-    } catch (err) {
+    } catch {
       setLoading(false);
       showModal('Error', 'Something went wrong. Please try again.', 'error');
     }
   };
 
+  const handleCancel = () => {
+    setForm(originalForm); // reset form
+    setIsEditing(false); // back to view mode
+  };
+
   return (
     <>
       <ScrollView contentContainerStyle={styles.container}>
-        <Title>Profile</Title>
+        <Text style={styles.title}>Profile</Text>
 
         <TextInput
-          label='Name'
+          placeholder='Name'
           value={form.name}
+          editable={isEditing}
           onChangeText={(text) => setForm({ ...form, name: text })}
-          style={styles.input}
-          disabled={!isEditing}
+          style={[styles.input, !isEditing && styles.disabled]}
         />
+
         <TextInput
-          label='Email'
+          placeholder='Email'
           value={form.email}
-          onChangeText={(text) => setForm({ ...form, email: text })}
+          editable={isEditing}
           keyboardType='email-address'
-          style={styles.input}
-          disabled={!isEditing}
+          onChangeText={(text) => setForm({ ...form, email: text })}
+          style={[styles.input, !isEditing && styles.disabled]}
         />
+
         <TextInput
-          label='Phone'
+          placeholder='Phone'
           value={form.phone}
-          onChangeText={(text) => setForm({ ...form, phone: text })}
+          editable={isEditing}
           keyboardType='phone-pad'
-          style={styles.input}
-          disabled={!isEditing}
+          onChangeText={(text) => setForm({ ...form, phone: text })}
+          style={[styles.input, !isEditing && styles.disabled]}
         />
 
         {!isEditing ? (
-          <Button
-            mode='contained'
+          <TouchableOpacity
+            style={styles.button}
             onPress={() => setIsEditing(true)}
-            style={{ marginTop: 10 }}
           >
-            Edit Profile
-          </Button>
+            <Text style={styles.buttonText}>Edit Profile</Text>
+          </TouchableOpacity>
         ) : (
-          <Button
-            mode='contained'
-            onPress={handleUpdate}
-            loading={loading}
-            style={{ marginTop: 10 }}
-          >
-            Update Profile
-          </Button>
+          <>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleUpdate}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color='#fff' />
+              ) : (
+                <Text style={styles.buttonText}>Update Profile</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, styles.cancelButton]}
+              onPress={handleCancel}
+              disabled={loading}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </>
         )}
       </ScrollView>
 
-      {/* ✅ Modern Custom Modal */}
       <CustomModal
         visible={modalVisible}
         title={modalTitle}
@@ -174,8 +206,47 @@ const Profile = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
-  input: { marginBottom: 15 },
+  container: {
+    padding: 20,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '600',
+    marginBottom: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    fontSize: 16,
+    backgroundColor: '#fff',
+  },
+  disabled: {
+    backgroundColor: '#ebe8e8ff',
+  },
+  button: {
+    backgroundColor: '#007bff',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  cancelButton: {
+    backgroundColor: '#fd6868ff',
+    color: '#fff',
+  },
+  cancelButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
 
 export default Profile;

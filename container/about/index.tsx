@@ -1,68 +1,68 @@
-import React from 'react';
-import { Divider, Text } from 'react-native-paper';
-import { StyleSheet, View, Dimensions, Image, ScrollView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, StyleSheet, View } from 'react-native';
 
-const { width: screenWidth } = Dimensions.get('window');
+export default function SplashScreen({ onFinish }: any) {
+  const logos = [
+    require('../../assets/images/meltic-ml.png'),
+    require('../../assets/images/adchem-ad.png'),
+    require('../../assets/images/cardic-cd.png'),
+    require('../../assets/images/dalcon-dl.png'),
+    require('../../assets/images/melvet-mv.png'),
+  ];
 
-const data = [
-  {
-    id: 1,
-    image: 'https://hcareindia.com/wp-content/uploads/2024/08/certificaton.jpg',
-  },
-  {
-    id: 2,
-    image:
-      'https://hcareindia.com/wp-content/uploads/2024/08/certification-2.jpg',
-  },
-];
+  const [index, setIndex] = useState(0);
+  const opacity = useRef(new Animated.Value(0)).current;
+  const indexRef = useRef(0); // internal counter
 
-const AboutUs = () => {
+  useEffect(() => {
+    const animateLogo = () => {
+      Animated.sequence([
+        Animated.timing(opacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.delay(500),
+        Animated.timing(opacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        indexRef.current++;
+
+        if (indexRef.current < logos.length) {
+          setIndex(indexRef.current); // safe, no loop
+          animateLogo();
+        } else {
+          onFinish?.();
+        }
+      });
+    };
+
+    animateLogo();
+  }, []); // 👈 RUN ONLY ONCE (THIS FIXES THE ERROR)
+
   return (
     <View style={styles.container}>
-      <Text variant='headlineSmall'>Our Certificates</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        scrollEventThrottle={16}
-      >
-        {data.map((item) => (
-          <View key={item.id} style={styles.imageContainer}>
-            <Image source={{ uri: item.image }} style={styles.image} />
-          </View>
-        ))}
-      </ScrollView>
-      <Divider />
+      <Animated.Image
+        source={logos[index]}
+        style={[styles.logo, { opacity }]}
+        resizeMode='contain'
+      />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    margin: 10,
-    alignItems: 'center',
+    flex: 1,
+    backgroundColor: '#0060AA',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    alignItems: 'center',
   },
-  imageContainer: {
-    width: screenWidth / 2,
-    padding: 10,
-  },
-  image: {
-    width: '100%',
-    height: 150,
-    borderRadius: 10,
-    resizeMode: 'cover',
-  },
-  arrowLeft: {
-    position: 'absolute',
-    left: 10,
-    zIndex: 1,
-  },
-  arrowRight: {
-    position: 'absolute',
-    right: 10,
-    zIndex: 1,
+  logo: {
+    width: 200,
+    height: 200,
   },
 });
-
-export default AboutUs;

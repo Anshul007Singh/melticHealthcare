@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   Text,
   TextInput,
   TouchableOpacity,
@@ -8,7 +7,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { loginUser } from '../../api/auth'; // adjust path if needed
+import { Snackbar } from 'react-native-paper';
+import { loginUser } from '../../api/auth';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -22,27 +22,42 @@ export default function LoginScreen({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarType, setSnackbarType] = useState<'success' | 'error'>(
+    'success',
+  );
+
+  const showSnackbar = (message: string, type: 'success' | 'error') => {
+    setSnackbarMessage(message);
+    setSnackbarType(type);
+    setSnackbarVisible(true);
+  };
+
   const handleLogin = async () => {
     try {
-      const data = await loginUser(email, password);
-      onLoginSuccess();
+      await loginUser(email, password);
+
+      showSnackbar('Login successful!', 'success');
+
+      setTimeout(() => {
+        onLoginSuccess();
+      }, 1500);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Login failed');
+      showSnackbar(
+        error.message || 'Invalid credentials. Please try again.',
+        'error',
+      );
     }
   };
 
   return (
-    <LinearGradient
-      colors={['#0060AA', '#0060AA']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 0 }}
-      style={styles.container}
-    >
+    <LinearGradient colors={['#0060AA', '#0060AA']} style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Login</Text>
         <Text style={styles.subtitle}>Sign in to continue.</Text>
 
-        <Text style={styles.label}>User Name</Text>
+        <Text style={styles.label}>Email</Text>
         <TextInput
           placeholder='Enter your Email'
           placeholderTextColor='#ccc'
@@ -51,7 +66,7 @@ export default function LoginScreen({
           style={styles.input}
         />
 
-        <Text style={styles.label}>PASSWORD</Text>
+        <Text style={styles.label}>Password</Text>
         <TextInput
           placeholder='Enter your password'
           placeholderTextColor='#ccc'
@@ -72,6 +87,20 @@ export default function LoginScreen({
           </Text>
         </TouchableOpacity>
       </View>
+
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={() => setSnackbarVisible(false)}
+        duration={2000}
+        style={[
+          styles.snackbar,
+          snackbarType === 'success'
+            ? styles.successSnackbar
+            : styles.errorSnackbar,
+        ]}
+      >
+        {snackbarMessage}
+      </Snackbar>
     </LinearGradient>
   );
 }
@@ -136,5 +165,15 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     color: '#fff',
     fontWeight: '600',
+  },
+
+  snackbar: {
+    marginBottom: 20,
+  },
+  successSnackbar: {
+    backgroundColor: '#2ecc71',
+  },
+  errorSnackbar: {
+    backgroundColor: '#e74c3c',
   },
 });

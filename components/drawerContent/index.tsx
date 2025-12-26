@@ -45,24 +45,24 @@ export default function CustomDrawerContent(props: any) {
     );
   };
   const handleLogout = async () => {
-    router.push('/screens/login');
-    // Alert.alert(
-    //   'Logout',
-    //   'Are you sure you want to logout?',
-    //   [
-    //     { text: 'Cancel', style: 'cancel' },
-    //     {
-    //       text: 'Logout',
-    //       style: 'destructive',
-    //       onPress: async () => {
-    //         await logout();
-    //         await logoutUser();
-    //         await Updates.reloadAsync();
-    //       },
-    //     },
-    //   ],
-    //   { cancelable: true },
-    // );
+    // router.push('/screens/login');
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: async () => {
+            await logout();
+            await logoutUser();
+            await Updates.reloadAsync();
+          },
+        },
+      ],
+      { cancelable: true },
+    );
   };
 
   return (

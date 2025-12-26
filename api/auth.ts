@@ -18,6 +18,7 @@ export const loginUser = async (email: string, password: string) => {
     name: data.user_display_name,
     email: data.user_email,
     mobile: data.mobile,
+    token: data.token,
   };
 
   await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
