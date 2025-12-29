@@ -5,7 +5,11 @@ import {
   TouchableOpacity,
   View,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import { ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
+
 import { LinearGradient } from 'expo-linear-gradient';
 import { Snackbar } from 'react-native-paper';
 import { loginUser } from '../../api/auth';
@@ -35,6 +39,10 @@ export default function LoginScreen({
   };
 
   const handleLogin = async () => {
+    if (email.length <= 3 || password.length === 4) {
+      showSnackbar('Please enter valid credentials.', 'error');
+      return;
+    }
     try {
       await loginUser(email, password);
 
@@ -53,40 +61,55 @@ export default function LoginScreen({
 
   return (
     <LinearGradient colors={['#0060AA', '#0060AA']} style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Login</Text>
-        <Text style={styles.subtitle}>Sign in to continue.</Text>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            contentContainerStyle={styles.content}
+            keyboardShouldPersistTaps='handled'
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={styles.title}>Login</Text>
+            <Text style={styles.subtitle}>Sign in to continue.</Text>
 
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          placeholder='Enter your Email'
-          placeholderTextColor='#ccc'
-          value={email}
-          onChangeText={setEmail}
-          style={styles.input}
-        />
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              placeholder='Enter your Email'
+              placeholderTextColor='#ccc'
+              value={email}
+              onChangeText={setEmail}
+              style={styles.input}
+              keyboardType='email-address'
+              returnKeyType='next'
+            />
 
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          placeholder='Enter your password'
-          placeholderTextColor='#ccc'
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={styles.input}
-        />
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              placeholder='Enter your password'
+              placeholderTextColor='#ccc'
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              style={styles.input}
+              returnKeyType='done'
+            />
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              <Text style={styles.loginButtonText}>Login</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity onPress={onGoToRegister}>
-          <Text style={styles.registerText}>
-            Don’t have an account?{' '}
-            <Text style={styles.registerLink}>Register</Text>
-          </Text>
-        </TouchableOpacity>
-      </View>
+            <TouchableOpacity onPress={onGoToRegister}>
+              <Text style={styles.registerText}>
+                Don’t have an account?{' '}
+                <Text style={styles.registerLink}>Register</Text>
+              </Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
 
       <Snackbar
         visible={snackbarVisible}

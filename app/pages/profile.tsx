@@ -91,12 +91,13 @@ const Profile = () => {
   const handleUpdate = async () => {
     if (!validateForm()) return;
     const mytoken = form.token;
+    console.log(mytoken);
     setLoading(true);
     try {
       const res = await fetch(
-        'https://www.melticgroup.com/online/wp-json/custom/v1/update-user',
+        'https://www.melticgroup.com/online/wp-json/custom/v1/user',
         {
-          method: 'POST',
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${mytoken}`,

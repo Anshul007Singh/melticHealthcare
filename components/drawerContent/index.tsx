@@ -45,7 +45,6 @@ export default function CustomDrawerContent(props: any) {
     );
   };
   const handleLogout = async () => {
-    // router.push('/screens/login');
     Alert.alert(
       'Logout',
       'Are you sure you want to logout?',
@@ -92,7 +91,9 @@ export default function CustomDrawerContent(props: any) {
         href=''
         onPress={myAccountHandler}
       />
-      <MenuItem icon='percent' label='KYC Details' href='/pages/kycDetails' />
+      {userInfo?.kyc === false && (
+        <MenuItem icon='percent' label='KYC Details' href='/pages/kycDetails' />
+      )}
 
       <MenuItem
         icon='bell-outline'

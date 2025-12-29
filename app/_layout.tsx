@@ -20,7 +20,7 @@ export default function App() {
 function AppContent() {
   const { isLoggedIn } = useAuth();
   const [showSplash, setShowSplash] = useState(true);
-  const [screen, setScreen] = useState<'splash' | 'signup' | 'login' | 'main'>(
+  const [screen, setScreen] = useState<'splash' | 'signup' | 'login' | 'home'>(
     'splash',
   );
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ function AppContent() {
       const token = await getStoredToken();
       setHasToken(!!token);
       setLoading(false);
-      setScreen(token ? 'main' : 'login');
+      setScreen(token ? 'home' : 'login');
     };
     checkAuth();
   }, []);
@@ -52,7 +52,7 @@ function AppContent() {
   if (!isLoggedIn && screen === 'login') {
     return (
       <LoginScreen
-        onLoginSuccess={() => setScreen('main')}
+        onLoginSuccess={() => setScreen('home')}
         onGoToRegister={() => setScreen('signup')}
       />
     );

@@ -9,16 +9,16 @@ export const loginUser = async (email: string, password: string) => {
   });
 
   const data = response.data;
-  console.log(data);
+  console.log('Main Data', data);
 
   await AsyncStorage.setItem('userToken', data.token);
-  console.log('auth data', data);
 
   const userInfo = {
     name: data.user_display_name,
     email: data.user_email,
     mobile: data.mobile,
     token: data.token,
+    kyc: Boolean(data.user_info_completed),
   };
 
   await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
@@ -56,4 +56,18 @@ export const getStoredUserInfo = async () => {
 // 🔹 LOGOUT
 export const logoutUser = async () => {
   await AsyncStorage.multiRemove(['userToken', 'userInfo']);
+};
+
+export const updateStoredUserKyc = async (kycStatus: boolean) => {
+  const json = await AsyncStorage.getItem('userInfo');
+  if (!json) return;
+
+  const userInfo = JSON.parse(json);
+
+  const updatedUserInfo = {
+    ...userInfo,
+    kyc: kycStatus,
+  };
+
+  await AsyncStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
 };

@@ -5,6 +5,11 @@ import {
   TouchableOpacity,
   View,
   StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { registerUser } from '@/api/auth';
@@ -31,7 +36,6 @@ export default function RegisterScreen({
   });
   const [isValid, setIsValid] = useState(false);
 
-  // Modal state
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState({
     title: '',
@@ -39,7 +43,6 @@ export default function RegisterScreen({
     type: 'success' as 'success' | 'error',
   });
 
-  // --- validation logic ---
   const validateName = (text: string) => {
     if (!text) return 'Name is required';
     if (text.length < 6) return 'Name must be at least 6 characters';
@@ -115,94 +118,108 @@ export default function RegisterScreen({
       end={{ x: 0, y: 1 }}
       style={styles.container}
     >
-      <View style={styles.content}>
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>
-          Already Registered?{' '}
-          <Text style={styles.link} onPress={onGoToLogin}>
-            Log in here.
-          </Text>
-        </Text>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
+            contentContainerStyle={styles.content}
+            keyboardShouldPersistTaps='handled'
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>
+              Already Registered?{' '}
+              <Text style={styles.link} onPress={onGoToLogin}>
+                Log in here.
+              </Text>
+            </Text>
 
-        {/* --- INPUT FIELDS --- */}
-        <Text style={styles.label}>Full Name</Text>
-        <TextInput
-          placeholder='Enter full name'
-          placeholderTextColor='#ccc'
-          value={name}
-          onChangeText={(t) => {
-            setName(t);
-            setErrors((e) => ({ ...e, name: validateName(t) }));
-          }}
-          style={[styles.input, errors.name ? styles.inputError : undefined]}
-        />
-        {errors.name ? (
-          <Text style={styles.errorText}>{errors.name}</Text>
-        ) : null}
+            <Text style={styles.label}>FULL NAME</Text>
+            <TextInput
+              placeholder='Enter full name'
+              placeholderTextColor='#ccc'
+              value={name}
+              onChangeText={(t) => {
+                setName(t);
+                setErrors((e) => ({ ...e, name: validateName(t) }));
+              }}
+              style={[styles.input, errors.name && styles.inputError]}
+              returnKeyType='next'
+            />
+            {errors.name ? (
+              <Text style={styles.errorText}>{errors.name}</Text>
+            ) : null}
 
-        <Text style={styles.label}>EMAIL</Text>
-        <TextInput
-          placeholder='Enter your Email'
-          placeholderTextColor='#ccc'
-          value={email}
-          onChangeText={(t) => {
-            setEmail(t);
-            setErrors((e) => ({ ...e, email: validateEmail(t) }));
-          }}
-          keyboardType='email-address'
-          style={[styles.input, errors.email ? styles.inputError : undefined]}
-        />
-        {errors.email ? (
-          <Text style={styles.errorText}>{errors.email}</Text>
-        ) : null}
+            <Text style={styles.label}>EMAIL</Text>
+            <TextInput
+              placeholder='Enter your Email'
+              placeholderTextColor='#ccc'
+              value={email}
+              onChangeText={(t) => {
+                setEmail(t);
+                setErrors((e) => ({ ...e, email: validateEmail(t) }));
+              }}
+              keyboardType='email-address'
+              style={[styles.input, errors.email && styles.inputError]}
+              returnKeyType='next'
+            />
+            {errors.email ? (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            ) : null}
 
-        <Text style={styles.label}>PASSWORD</Text>
-        <TextInput
-          placeholder='Enter your password'
-          placeholderTextColor='#ccc'
-          value={password}
-          onChangeText={(t) => {
-            setPassword(t);
-            setErrors((e) => ({ ...e, password: validatePassword(t) }));
-          }}
-          secureTextEntry
-          style={[
-            styles.input,
-            errors.password ? styles.inputError : undefined,
-          ]}
-        />
-        {errors.password ? (
-          <Text style={styles.errorText}>{errors.password}</Text>
-        ) : null}
+            <Text style={styles.label}>PASSWORD</Text>
+            <TextInput
+              placeholder='Enter your password'
+              placeholderTextColor='#ccc'
+              value={password}
+              onChangeText={(t) => {
+                setPassword(t);
+                setErrors((e) => ({ ...e, password: validatePassword(t) }));
+              }}
+              secureTextEntry
+              style={[styles.input, errors.password && styles.inputError]}
+              returnKeyType='next'
+            />
+            {errors.password ? (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            ) : null}
 
-        <Text style={styles.label}>MOBILE</Text>
-        <TextInput
-          placeholder='Enter mobile number'
-          placeholderTextColor='#ccc'
-          value={mobile}
-          onChangeText={(t) => {
-            const numeric = t.replace(/[^0-9]/g, '');
-            setMobile(numeric);
-            setErrors((e) => ({ ...e, mobile: validateMobile(numeric) }));
-          }}
-          keyboardType='numeric'
-          maxLength={10}
-          style={[styles.input, errors.mobile ? styles.inputError : undefined]}
-        />
-        {errors.mobile ? (
-          <Text style={styles.errorText}>{errors.mobile}</Text>
-        ) : null}
+            <Text style={styles.label}>MOBILE</Text>
+            <TextInput
+              placeholder='Enter mobile number'
+              placeholderTextColor='#ccc'
+              value={mobile}
+              onChangeText={(t) => {
+                const numeric = t.replace(/[^0-9]/g, '');
+                setMobile(numeric);
+                setErrors((e) => ({
+                  ...e,
+                  mobile: validateMobile(numeric),
+                }));
+              }}
+              keyboardType='numeric'
+              maxLength={10}
+              style={[styles.input, errors.mobile && styles.inputError]}
+              returnKeyType='done'
+            />
+            {errors.mobile ? (
+              <Text style={styles.errorText}>{errors.mobile}</Text>
+            ) : null}
 
-        <TouchableOpacity
-          style={[styles.signupButton, !isValid && { opacity: 0.5 }]}
-          onPress={handleRegister}
-          disabled={!isValid}
-        >
-          <Text style={styles.signupButtonText}>Sign up</Text>
-        </TouchableOpacity>
-      </View>
+            <TouchableOpacity
+              style={[styles.signupButton, !isValid && { opacity: 0.5 }]}
+              onPress={handleRegister}
+              disabled={!isValid}
+            >
+              <Text style={styles.signupButtonText}>Sign up</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
 
-      {/* ✅ Reusable Success/Error Modal */}
       <CustomModal
         visible={modalVisible}
         title={modalData.title}

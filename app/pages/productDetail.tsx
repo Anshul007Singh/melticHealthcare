@@ -7,17 +7,8 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import {
-  Text,
-  Button,
-  Card,
-  Divider,
-  List,
-  Icon,
-  IconButton,
-} from 'react-native-paper';
+import { Text, Button, Card, Divider, List } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
-// import { useCart } from '../context/cartContext';
 import { useCart } from '@/context/cartContext';
 import { WebView } from 'react-native-webview';
 
@@ -120,9 +111,6 @@ export default function ProductDetailScreen() {
     setTimeout(() => setShowRibbon(false), 2000);
   };
 
-  const pdfUrl =
-    'https://www.melticgroup.com/img/MELVET%20ANIMAL%20HEALTH%20PRODUCT%20CARD.pdf';
-
   if (showPDF) {
     return (
       <View style={{ flex: 1 }}>
@@ -138,7 +126,7 @@ export default function ProductDetailScreen() {
         <WebView
           source={{
             uri: `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
-              pdfLink || pdfUrl,
+              pdfLink || 'NOT-AVAILABLE.pdf',
             )}`,
           }}
           style={{ flex: 1 }}

@@ -12,6 +12,7 @@ import { useCart } from '@/context/cartContext';
 import { placeOrder } from '@/api/orders';
 import { getStoredUserInfo } from '@/api/auth';
 import CustomModal from '@/components/modal';
+import { router } from 'expo-router';
 
 export default function CartScreen() {
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -41,6 +42,62 @@ export default function CartScreen() {
   const discount = promoCode === 'SAVE10' ? 0.1 * subtotal : 0;
   const total = subtotal + deliveryFee - discount;
 
+  // const onPlaceOrder = async () => {
+  //   if (cartItems.length === 0) {
+  //     setModalData({
+  //       title: 'Empty Cart',
+  //       message: 'Please add items to your cart before placing an order.',
+  //       type: 'error',
+  //     });
+  //     setModalVisible(true);
+  //     return;
+  //   }
+  //   console.log(userInfo);
+  //   return;
+  //   const orderData = {
+  //     payment_method: 'bacs',
+  //     payment_method_title: 'Direct Bank Transfer',
+  //     set_paid: true,
+  //     billing: {
+  //       first_name: userInfo?.name || 'Unknown User',
+  //       last_name: userInfo?.name || 'Unknown User',
+  //       email: userInfo?.email || 'Unknown Email',
+  //       phone: userInfo?.phone || '0000000000',
+  //     },
+  //     line_items: cartItems.map((item) => ({
+  //       product_id: parseInt(item.id),
+  //       quantity: item.quantity,
+  //     })),
+  //     meta_data: [
+  //       {
+  //         key: 'cart_summary',
+  //         value: cartItems.map((item) => ({
+  //           name: item.name,
+  //           price: item.price,
+  //           quantity: item.quantity,
+  //         })),
+  //       },
+  //     ],
+  //   };
+
+  //   try {
+  //     const data = await placeOrder(orderData);
+  //     setModalData({
+  //       title: 'Success',
+  //       message: `Order placed successfully!\nOrder ID: ${data.id}`,
+  //       type: 'success',
+  //     });
+  //     setModalVisible(true);
+  //     emptyCart();
+  //   } catch (error: any) {
+  //     setModalData({
+  //       title: 'Error',
+  //       message: error.message || 'Something went wrong while placing order.',
+  //       type: 'error',
+  //     });
+  //     setModalVisible(true);
+  //   }
+  // };
   const onPlaceOrder = async () => {
     if (cartItems.length === 0) {
       setModalData({
@@ -51,15 +108,31 @@ export default function CartScreen() {
       setModalVisible(true);
       return;
     }
+
+    const storedUser = await getStoredUserInfo();
+    if (!storedUser.kyc) {
+      setModalData({
+        title: 'KYC Required',
+        message: 'Please complete your KYC before placing an order.',
+        type: 'error',
+      });
+      setModalVisible(true);
+
+      setTimeout(() => {
+        router.push('/pages/kycDetails');
+      }, 1200);
+
+      return;
+    }
     const orderData = {
       payment_method: 'bacs',
       payment_method_title: 'Direct Bank Transfer',
       set_paid: true,
       billing: {
-        first_name: userInfo?.name || 'Unknown User',
-        last_name: userInfo?.name || 'Unknown User',
-        email: userInfo?.email || 'Unknown Email',
-        phone: userInfo?.phone || '0000000000',
+        first_name: storedUser.name || 'Unknown User',
+        last_name: storedUser.name || 'Unknown User',
+        email: storedUser.email || 'Unknown Email',
+        phone: storedUser.mobile || '0000000000',
       },
       line_items: cartItems.map((item) => ({
         product_id: parseInt(item.id),
@@ -79,12 +152,14 @@ export default function CartScreen() {
 
     try {
       const data = await placeOrder(orderData);
+
       setModalData({
         title: 'Success',
         message: `Order placed successfully!\nOrder ID: ${data.id}`,
         type: 'success',
       });
       setModalVisible(true);
+
       emptyCart();
     } catch (error: any) {
       setModalData({
@@ -190,7 +265,6 @@ export default function CartScreen() {
         </>
       )}
 
-      {/* ✅ Reusable Modal for success/error */}
       <CustomModal
         visible={modalVisible}
         title={modalData.title}
