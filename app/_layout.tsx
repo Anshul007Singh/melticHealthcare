@@ -24,18 +24,15 @@ function AppContent() {
     'splash',
   );
   const [loading, setLoading] = useState(true);
-  const [hasToken, setHasToken] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
       await new Promise((resolve) => setTimeout(resolve, 4000));
-      const token = await getStoredToken();
-      setHasToken(!!token);
       setLoading(false);
-      setScreen(token ? 'home' : 'login');
+      setScreen(isLoggedIn ? 'home' : 'login');
     };
     checkAuth();
-  }, []);
+  }, [isLoggedIn]);
 
   if (screen === 'splash' && loading && showSplash)
     return <SplashScreen onFinish={() => setShowSplash(false)} />;

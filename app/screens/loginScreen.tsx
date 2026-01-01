@@ -13,6 +13,7 @@ import { ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Snackbar } from 'react-native-paper';
 import { loginUser } from '../../api/auth';
+import { useAuth } from '@/context/authContext';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -23,6 +24,7 @@ export default function LoginScreen({
   onLoginSuccess,
   onGoToRegister,
 }: LoginScreenProps) {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -44,7 +46,7 @@ export default function LoginScreen({
       return;
     }
     try {
-      await loginUser(email, password);
+      await loginUser(email, password, login);
 
       showSnackbar('Login successful!', 'success');
 
