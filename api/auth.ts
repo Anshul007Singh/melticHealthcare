@@ -2,7 +2,11 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const BASE_URL = 'https://www.melticgroup.com/online';
 
-export const loginUser = async (email: string, password: string) => {
+export const loginUser = async (
+  email: string,
+  password: string,
+  onAuthUpdate?: (token: string) => void
+) => {
   const response = await axios.post(`${BASE_URL}/wp-json/jwt-auth/v1/token`, {
     username: email,
     password,
@@ -22,6 +26,11 @@ export const loginUser = async (email: string, password: string) => {
   };
 
   await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+  // Notify AuthContext of successful login
+  if (onAuthUpdate) {
+    onAuthUpdate(data.token);
+  }
 
   return data;
 };
