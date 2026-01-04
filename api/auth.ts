@@ -1,11 +1,30 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
+
 const BASE_URL = 'https://www.melticgroup.com/online';
+
+type JwtPayload = {
+  data?: {
+    user?: {
+      id: number;
+    };
+  };
+};
+
+export type StoredUserInfo = {
+  userId: number | null;
+  name: string;
+  email: string;
+  mobile?: string;
+  token: string;
+  kyc: boolean;
+};
 
 export const loginUser = async (
   email: string,
   password: string,
-  onAuthUpdate?: (token: string) => void
+  onAuthUpdate?: (token: string) => void,
 ) => {
   const response = await axios.post(`${BASE_URL}/wp-json/jwt-auth/v1/token`, {
     username: email,
@@ -13,11 +32,17 @@ export const loginUser = async (
   });
 
   const data = response.data;
-  console.log('Main Data', data);
-
-  await AsyncStorage.setItem('userToken', data.token);
+  const decoded = jwtDecode<any>(data.token);
+  const userId =
+    decoded?.data?.user?.id ||
+    decoded?.data?.id ||
+    decoded?.user_id ||
+    decoded?.id ||
+    decoded?.sub ||
+    null;
 
   const userInfo = {
+    userId,
     name: data.user_display_name,
     email: data.user_email,
     mobile: data.mobile,
@@ -25,17 +50,14 @@ export const loginUser = async (
     kyc: Boolean(data.user_info_completed),
   };
 
+  await AsyncStorage.setItem('userToken', data.token);
   await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
 
-  // Notify AuthContext of successful login
-  if (onAuthUpdate) {
-    onAuthUpdate(data.token);
-  }
+  if (onAuthUpdate) onAuthUpdate(data.token);
 
-  return data;
+  return userInfo;
 };
 
-// 🔹 REGISTER USER
 export const registerUser = async (
   name: string,
   email: string,
@@ -48,30 +70,29 @@ export const registerUser = async (
     password,
     mobile,
   });
+
   return response.data;
 };
 
-// 🔹 CHECK LOGIN STATUS
-export const getStoredToken = async () => {
+export const getStoredToken = async (): Promise<string | null> => {
   return await AsyncStorage.getItem('userToken');
 };
 
-// 🔹 GET STORED USER INFO
-export const getStoredUserInfo = async () => {
+export const getStoredUserInfo = async (): Promise<StoredUserInfo | null> => {
   const json = await AsyncStorage.getItem('userInfo');
   return json ? JSON.parse(json) : null;
 };
 
-// 🔹 LOGOUT
-export const logoutUser = async () => {
-  await AsyncStorage.multiRemove(['userToken', 'userInfo']);
+export const getStoredUserId = async (): Promise<number | null> => {
+  const user = await getStoredUserInfo();
+  return user?.userId ?? null;
 };
 
 export const updateStoredUserKyc = async (kycStatus: boolean) => {
   const json = await AsyncStorage.getItem('userInfo');
   if (!json) return;
 
-  const userInfo = JSON.parse(json);
+  const userInfo: StoredUserInfo = JSON.parse(json);
 
   const updatedUserInfo = {
     ...userInfo,
@@ -79,4 +100,17 @@ export const updateStoredUserKyc = async (kycStatus: boolean) => {
   };
 
   await AsyncStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
+};
+
+export const logoutUser = async () => {
+  await AsyncStorage.multiRemove(['userToken', 'userInfo']);
+};
+
+export const getAuthHeader = async () => {
+  const token = await getStoredToken();
+  if (!token) return {};
+
+  return {
+    Authorization: `Bearer ${token}`,
+  };
 };

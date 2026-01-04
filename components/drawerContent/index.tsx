@@ -101,6 +101,11 @@ export default function CustomDrawerContent(props: any) {
         href='/notifications'
         onPress={notificationHandler}
       />
+      <MenuItem
+        icon='truck-delivery'
+        label='Order Details'
+        href='/pages/orderDetails'
+      />
 
       <MenuItem
         icon='headset'

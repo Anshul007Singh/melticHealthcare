@@ -10,6 +10,11 @@ import {
 } from 'react-native';
 import CustomModal from '@/components/modal';
 
+type StoredUserInfo = {
+  id: number;
+  token: string;
+};
+
 const Profile = () => {
   const [form, setForm] = useState({
     name: '',
@@ -90,17 +95,30 @@ const Profile = () => {
 
   const handleUpdate = async () => {
     if (!validateForm()) return;
-    const mytoken = form.token;
-    console.log(mytoken);
+
     setLoading(true);
+
     try {
+      const userInfo = await getStoredUserInfo();
+
+      // ✅ NULL SAFETY CHECK
+      if (!userInfo || !userInfo.userId || !userInfo.token) {
+        setLoading(false);
+        showModal(
+          'Session Error',
+          'User not logged in. Please login again.',
+          'error',
+        );
+        return;
+      }
+
       const res = await fetch(
-        'https://www.melticgroup.com/online/wp-json/custom/v1/user',
+        `https://www.melticgroup.com/online/wp-json/custom/v1/user/${userInfo.userId}`,
         {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${mytoken}`,
+            Authorization: `Bearer ${userInfo.token}`,
           },
           body: JSON.stringify({
             name: form.name,
@@ -113,14 +131,18 @@ const Profile = () => {
       const data = await res.json();
       setLoading(false);
 
-      if (data.success) {
+      if (res.ok && data.success) {
         showModal('Success', 'Profile updated successfully!', 'success');
         setIsEditing(false);
-        setOriginalForm(form); // update original data after success
+        setOriginalForm(form);
       } else {
-        showModal('Error', data.message || 'Failed to update profile', 'error');
+        showModal(
+          'Error',
+          data?.message || 'Failed to update profile',
+          'error',
+        );
       }
-    } catch {
+    } catch (error) {
       setLoading(false);
       showModal('Error', 'Something went wrong. Please try again.', 'error');
     }
@@ -228,7 +250,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ebe8e8ff',
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#0060AA',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',

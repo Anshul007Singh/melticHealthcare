@@ -181,7 +181,6 @@ export default function KYCForm() {
       if (!response.ok) {
         throw new Error(res.message || 'Submission failed');
       }
-      console.log(res);
       updateStoredUserKyc(true);
       resetForm();
       showModal('success', 'Success', 'KYC submitted successfully');

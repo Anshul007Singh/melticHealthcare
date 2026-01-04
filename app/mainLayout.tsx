@@ -140,6 +140,7 @@ export default function MainLayout() {
             { name: 'pages/profile', title: 'Profile' },
             { name: 'pages/termsAndConditions', title: 'Terms & Conditions' },
             { name: 'pages/privacyPolicy', title: 'Privacy Policy' },
+            { name: 'pages/orderDetails', title: 'Order Details' },
           ].map((screen) => (
             <Drawer.Screen
               key={screen.name}

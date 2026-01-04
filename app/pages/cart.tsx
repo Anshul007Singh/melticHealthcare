@@ -110,7 +110,7 @@ export default function CartScreen() {
     }
 
     const storedUser = await getStoredUserInfo();
-    if (!storedUser.kyc) {
+    if (!storedUser || !storedUser.kyc) {
       setModalData({
         title: 'KYC Required',
         message: 'Please complete your KYC before placing an order.',
