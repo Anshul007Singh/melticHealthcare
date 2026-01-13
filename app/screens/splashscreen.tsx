@@ -5,9 +5,10 @@ export default function SplashScreen({ onFinish }: any) {
   const logos = [
     require('../../assets/images/meltic-ml.png'),
     require('../../assets/images/adchem-ad.png'),
-    require('../../assets/images/cardic-cd.png'),
     require('../../assets/images/dalcon-dl.png'),
+    require('../../assets/images/cardic-cd.png'),
     require('../../assets/images/melvet-mv.png'),
+    require('../../assets/images/mivika-mv.png'),
   ];
 
   const screenHeight = Dimensions.get('window').height;

@@ -10,45 +10,76 @@ import {
 } from 'react-native';
 import { fetchProducts } from '@/data/productList';
 import { router, useLocalSearchParams } from 'expo-router';
+
+const LOGO_SIZE = Dimensions.get('window').width * 0.25;
+
+const BRAND_ORDER = [
+  'meltic',
+  'adchem',
+  'dalcon',
+  'cardiever-pharmaceuticals',
+  'melvet-animal-health',
+  'mivika-wellness',
+];
+
 const OurDivisions = () => {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<any[]>([]);
   const { query } = useLocalSearchParams<{ query?: string }>();
+
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
       try {
         const data = await fetchProducts(query);
-        if (data && Array.isArray(data)) {
-          setProducts(data);
+
+        if (Array.isArray(data)) {
+          const sortedProducts = [...data].sort((a, b) => {
+            const aIndex = BRAND_ORDER.indexOf(a.slug);
+            const bIndex = BRAND_ORDER.indexOf(b.slug);
+
+            if (aIndex === -1 && bIndex === -1) return 0;
+            if (aIndex === -1) return 1;
+            if (bIndex === -1) return -1;
+
+            return aIndex - bIndex;
+          });
+
+          setProducts(sortedProducts);
         }
       } catch (error) {
         console.error('Error fetching products:', error);
       }
       setLoading(false);
     };
+
     loadProducts();
   }, [query]);
 
-  const onClickHandler = (query: string) => {
+  const onClickHandler = (slug: string) => {
     router.push({
       pathname: '../productlist',
-      params: { query: query },
+      params: { query: slug },
     });
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: '#f9f9f9' }}>
       <ScrollView contentContainerStyle={styles.container}>
-        {products.map((item, index) => (
+        {products.map((item) => (
           <TouchableOpacity
-            key={index}
+            key={item.id}
             style={styles.card}
-            onPress={() => onClickHandler(item.name)}
+            onPress={() => onClickHandler(item.slug)}
           >
             <View style={styles.logoContainer}>
               <Image
-                source={{ uri: item.image?.src }}
+                source={{
+                  uri:
+                    typeof item.image === 'string'
+                      ? item.image
+                      : item.image?.src ?? '',
+                }}
                 style={styles.logo}
                 resizeMode='contain'
               />
@@ -63,8 +94,9 @@ const OurDivisions = () => {
 
 export default OurDivisions;
 
-const LOGO_SIZE = Dimensions.get('window').width * 0.25;
-
+/* ---------------------------------------------------
+   STYLES
+--------------------------------------------------- */
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
@@ -73,30 +105,16 @@ const styles = StyleSheet.create({
     gap: 15,
     backgroundColor: '#f9f9f9',
   },
+  card: {
+    width: '30%',
+    alignItems: 'center',
+  },
   label: {
     marginTop: 8,
     fontSize: 13,
     textAlign: 'center',
     fontWeight: '600',
     color: '#1A1A1A',
-  },
-  card: {
-    width: '30%',
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 14,
-    paddingHorizontal: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  viewAll: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0060AA',
   },
   logoContainer: {
     width: LOGO_SIZE,

@@ -15,6 +15,21 @@ import {
 
 const LOGO_SIZE = Dimensions.get('window').width * 0.25;
 
+/* ---------------------------------------------------
+   BRAND ORDER (based on API slug)
+--------------------------------------------------- */
+const BRAND_ORDER = [
+  'meltic',
+  'adchem',
+  'dalcon',
+  'cardiever-pharmaceuticals',
+  'melvet-animal-health',
+  'mivika-wellness', // optional (future brand)
+];
+
+/* ---------------------------------------------------
+   SHIMMER PLACEHOLDER
+--------------------------------------------------- */
 const ShimmerPlaceholder = ({ style }: { style?: any }) => {
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
@@ -37,17 +52,15 @@ const ShimmerPlaceholder = ({ style }: { style?: any }) => {
   return (
     <View style={[styles.shimmerContainer, style]}>
       <Animated.View
-        style={[
-          styles.shimmer,
-          {
-            transform: [{ translateX }],
-          },
-        ]}
+        style={[styles.shimmer, { transform: [{ translateX }] }]}
       />
     </View>
   );
 };
 
+/* ---------------------------------------------------
+   MAIN COMPONENT
+--------------------------------------------------- */
 const OurDivisions = () => {
   const [brands, setBrands] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,12 +68,27 @@ const OurDivisions = () => {
   useEffect(() => {
     const loadBrands = async () => {
       setLoading(true);
-      const data = await fetchProducts('brands'); // ✅ Query "brands"
+
+      const data = await fetchProducts('brands');
+
       if (Array.isArray(data)) {
-        setBrands(data);
+        const sortedBrands = [...data].sort((a, b) => {
+          const aIndex = BRAND_ORDER.indexOf(a.slug);
+          const bIndex = BRAND_ORDER.indexOf(b.slug);
+
+          // Push unknown brands to the end
+          if (aIndex === -1 && bIndex === -1) return 0;
+          if (aIndex === -1) return 1;
+          if (bIndex === -1) return -1;
+
+          return aIndex - bIndex;
+        });
+
+        setBrands(sortedBrands);
       } else {
         setBrands([]);
       }
+
       setLoading(false);
     };
 
@@ -90,7 +118,7 @@ const OurDivisions = () => {
   const onViewAllHandler = () => {
     router.push({
       pathname: '/pages/divisions',
-      params: { query: 'brands' }, // ✅ Pass query for next page
+      params: { query: 'brands' },
     });
   };
 
@@ -98,10 +126,8 @@ const OurDivisions = () => {
     <View style={styles.container}>
       <View style={styles.headerRow}>
         <Text style={styles.title}>Our Divisions</Text>
-        <TouchableOpacity>
-          <Text style={styles.viewAll} onPress={onViewAllHandler}>
-            View All
-          </Text>
+        <TouchableOpacity onPress={onViewAllHandler}>
+          <Text style={styles.viewAll}>View All</Text>
         </TouchableOpacity>
       </View>
 
@@ -143,6 +169,9 @@ const OurDivisions = () => {
 
 export default OurDivisions;
 
+/* ---------------------------------------------------
+   STYLES
+--------------------------------------------------- */
 const styles = StyleSheet.create({
   container: {
     paddingTop: 20,

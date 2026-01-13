@@ -96,13 +96,6 @@ export default function KYCForm() {
     return '';
   };
 
-  const validatePan = (value: string) => {
-    if (!/^[A-Z0-9]{10}$/.test(value)) {
-      return 'PAN must be 10 characters (A–Z, 0–9)';
-    }
-    return '';
-  };
-
   const validateAadhaar = (value: string) => {
     if (!/^\d{12}$/.test(value)) {
       return 'Aadhaar must be exactly 12 digits';
@@ -190,6 +183,11 @@ export default function KYCForm() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const validatePanNumber = (pan: string) => {
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    return panRegex.test(pan) ? '' : 'Invalid PAN number';
   };
 
   const isFormValid =
@@ -365,14 +363,37 @@ export default function KYCForm() {
               autoCapitalize='characters'
               maxLength={10}
               onChangeText={(text) => {
-                const formatted = text
-                  .replace(/[^a-zA-Z0-9]/g, '')
-                  .toUpperCase();
+                // Remove special characters & force uppercase
+                let formatted = text.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+                // Enforce PAN structure while typing
+                if (formatted.length <= 5) {
+                  // First 5 must be alphabets
+                  formatted = formatted.replace(/[^A-Z]/g, '');
+                } else if (formatted.length <= 9) {
+                  // Next 4 must be numbers
+                  const firstFive = formatted
+                    .slice(0, 5)
+                    .replace(/[^A-Z]/g, '');
+                  const nextFour = formatted.slice(5).replace(/[^0-9]/g, '');
+                  formatted = firstFive + nextFour;
+                } else {
+                  // Last character must be alphabet
+                  const firstNine = formatted.slice(0, 9);
+                  const lastChar = formatted.slice(9).replace(/[^A-Z]/g, '');
+                  formatted = firstNine + lastChar;
+                }
+
                 setPanNumber(formatted);
-                setErrors((e) => ({ ...e, panNumber: validatePan(formatted) }));
+                setErrors((e) => ({
+                  ...e,
+                  panNumber:
+                    formatted.length === 10 ? validatePanNumber(formatted) : '',
+                }));
               }}
               style={[styles.input, errors.panNumber && { borderColor: 'red' }]}
             />
+
             {errors.panNumber ? (
               <Text style={styles.errorText}>{errors.panNumber}</Text>
             ) : null}

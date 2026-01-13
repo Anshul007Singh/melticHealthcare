@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,43 +10,72 @@ import {
   Modal,
   TouchableOpacity,
   SafeAreaView,
+  ActivityIndicator,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
+import axios from 'axios';
 
 const CARD_WIDTH = Dimensions.get('window').width * 0.28;
+const API_URL = 'https://www.melticgroup.com/online/wp-json/wp/v2/visual_aids';
 
-const visualAidItems = [
-  {
-    id: 1,
-    name: 'Cardiever',
-    image: require('../../assets/images/offers.jpg'),
-    pdfUrl:
-      'https://drive.google.com/file/d/1JL7mXeaND4DSrH5ek2Fgb-vQzRatFBE0/preview',
-  },
-  {
-    id: 2,
-    name: 'Dalcon',
-    image: require('../../assets/images/offers.jpg'),
-    pdfUrl:
-      'https://drive.google.com/file/d/1wXDIPN0W-juA975DD5IkYoaSOD_soyOa/preview',
-  },
-  {
-    id: 3,
-    name: 'Meltic',
-    image: require('../../assets/images/offers.jpg'),
-    pdfUrl:
-      'https://drive.google.com/file/d/1qm9M9zB4qAk5hW-_9-bjlAdSQty_eRCv/preview',
-  },
-];
+type VisualAidItem = {
+  id: number;
+  name: string;
+  image: string;
+  pdfUrl: string | null;
+};
 
 const VisualAid = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<{
-    name: string;
-    pdfUrl: string;
-  } | null>(null);
+  const [items, setItems] = useState<VisualAidItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [url, setUrl] = useState('');
 
-  const openModal = (item: { name: string; pdfUrl: string }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<VisualAidItem | null>(null);
+
+  const extractPdfUrl = (html: string) => {
+    const regex = /href="(https?:\/\/[^"]+\.pdf)"/;
+    const match = html.match(regex);
+    return match ? match[1] : null;
+  };
+
+  const getPdfViewerUrl = (url: string) =>
+    `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
+      url,
+    )}`;
+
+  const fetchVisualAids = async () => {
+    try {
+      const res = await axios.get(API_URL);
+
+      const mapped: VisualAidItem[] = res.data.map((item: any) => {
+        const pdfUrl = extractPdfUrl(item.content.rendered);
+
+        const image = item.thumbnail
+          ? item.thumbnail
+          : item._links?.['wp:featuredmedia']?.[0]?.href || '';
+
+        return {
+          id: item.id,
+          name: item.title.rendered,
+          image,
+          pdfUrl,
+        };
+      });
+
+      setItems(mapped);
+    } catch (e) {
+      console.log('Visual Aid API error', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchVisualAids();
+  }, []);
+
+  const openModal = (item: VisualAidItem) => {
     setSelectedItem(item);
     setModalVisible(true);
   };
@@ -55,6 +84,14 @@ const VisualAid = () => {
     setModalVisible(false);
     setSelectedItem(null);
   };
+
+  if (loading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size='large' />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -67,14 +104,14 @@ const VisualAid = () => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingRight: 16 }}
       >
-        {visualAidItems.map((item) => (
+        {items.map((item) => (
           <Pressable
             key={item.id}
             style={styles.card}
             onPress={() => openModal(item)}
           >
             <Image
-              source={item.image}
+              source={{ uri: item.image }}
               style={styles.image}
               resizeMode='contain'
             />
@@ -83,7 +120,6 @@ const VisualAid = () => {
         ))}
       </ScrollView>
 
-      {/* Modal */}
       <Modal
         visible={modalVisible}
         animationType='fade'
@@ -93,11 +129,8 @@ const VisualAid = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <SafeAreaView style={{ flex: 1 }}>
-              {/* Header */}
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>
-                  {selectedItem ? selectedItem.name : 'Visual Aid'}
-                </Text>
+                <Text style={styles.modalTitle}>{selectedItem?.name}</Text>
                 <TouchableOpacity
                   onPress={closeModal}
                   style={styles.closeButton}
@@ -106,15 +139,18 @@ const VisualAid = () => {
                 </TouchableOpacity>
               </View>
 
-              {/* PDF Viewer */}
-              {selectedItem && (
+              {!selectedItem?.pdfUrl ? (
+                <View style={styles.pdfLoader}>
+                  <Text>No PDF available</Text>
+                </View>
+              ) : (
                 <WebView
-                  source={{ uri: selectedItem.pdfUrl }}
+                  source={{ uri: getPdfViewerUrl(selectedItem.pdfUrl!) }}
                   style={{ flex: 1 }}
                   originWhitelist={['*']}
-                  startInLoadingState={true}
-                  javaScriptEnabled={true}
-                  domStorageEnabled={true}
+                  javaScriptEnabled
+                  domStorageEnabled
+                  startInLoadingState
                 />
               )}
             </SafeAreaView>
@@ -161,6 +197,10 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     textAlign: 'center',
   },
+  loader: {
+    padding: 40,
+    alignItems: 'center',
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -173,7 +213,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     overflow: 'hidden',
-    elevation: 10,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -196,5 +235,10 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: '#fff',
     fontWeight: '600',
+  },
+  pdfLoader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
