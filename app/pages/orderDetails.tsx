@@ -11,13 +11,12 @@ import {
 import axios from 'axios';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getStoredUserInfo } from '@/api/auth';
+import { getAuthHeader } from '@/api/auth';
+import { ENV } from '@/config/environment';
 
 /* ================= CONFIG ================= */
 
-const BASE_URL = 'https://www.melticgroup.com/online/wp-json/wc/v3/orders';
-const CONSUMER_KEY = 'ck_8ed576e4b09fbadb918a2360c252064763a5a1d8';
-const CONSUMER_SECRET = 'cs_55439183c9806d1a0ac32052649eeb8d6d387bc0';
+const API_URL = ENV.API_URL;
 
 type WooOrder = {
   id: number;
@@ -55,8 +54,6 @@ const OrderStatusScreen: React.FC = () => {
   const [showFromPicker, setShowFromPicker] = useState(false);
   const [showToPicker, setShowToPicker] = useState(false);
 
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-
   /* ================= HELPERS ================= */
 
   const formatISO = (date: Date, endOfDay = false) => {
@@ -67,16 +64,31 @@ const OrderStatusScreen: React.FC = () => {
 
   /* ================= API ================= */
 
+  /**
+   * Fetch orders for the authenticated user
+   *
+   * SECURITY FIX: Orders are now filtered server-side by the authenticated user.
+   * The backend /my-orders endpoint must verify JWT and return only the user's orders.
+   *
+   * Backend Requirements:
+   * - Verify JWT authentication
+   * - Filter orders by authenticated user's email server-side
+   * - Support date range filtering (after/before params)
+   * - Return only the authenticated user's orders (CRITICAL)
+   */
   const fetchOrders = useCallback(async () => {
-    if (!userEmail) return;
-
     try {
       setLoading(true);
       setError(null);
 
+      const authHeader = await getAuthHeader();
+
+      if (!authHeader.Authorization) {
+        setError('Please log in to view your orders');
+        return;
+      }
+
       const params: any = {
-        consumer_key: CONSUMER_KEY,
-        consumer_secret: CONSUMER_SECRET,
         per_page: 50,
         orderby: 'date',
         order: 'desc',
@@ -85,34 +97,32 @@ const OrderStatusScreen: React.FC = () => {
       if (fromDate) params.after = formatISO(fromDate);
       if (toDate) params.before = formatISO(toDate, true);
 
-      const res = await axios.get<WooOrder[]>(BASE_URL, { params });
+      // Server-side filtering by authenticated user - no client-side filtering needed
+      const res = await axios.get<WooOrder[]>(`${API_URL}/my-orders`, {
+        params,
+        headers: authHeader,
+        timeout: 30000, // 30 second timeout
+      });
 
-      // 🔥 EMAIL FILTER (CLIENT SIDE)
-      const filteredOrders = res.data.filter(
-        (order) =>
-          order.billing?.email?.toLowerCase() === userEmail.toLowerCase(),
-      );
-
-      setOrders(filteredOrders);
+      setOrders(res.data);
     } catch (err: any) {
-      setError(err?.message ?? 'Failed to load orders');
+      console.error('Fetch orders error:', err);
+
+      if (err.response?.status === 401) {
+        setError('Your session has expired. Please log in again.');
+      } else if (err.response?.status === 404) {
+        setError('Order service is currently unavailable. Please contact support.');
+      } else {
+        setError(err?.message ?? 'Failed to load orders');
+      }
     } finally {
       setLoading(false);
     }
-  }, [fromDate, toDate, userEmail]);
+  }, [fromDate, toDate]);
 
   useEffect(() => {
-    const loadUserInfo = async () => {
-      const data = await getStoredUserInfo();
-
-      setUserEmail(data?.email || null);
-    };
-    loadUserInfo();
-  }, []);
-
-  useEffect(() => {
-    if (userEmail) fetchOrders();
-  }, [userEmail, fetchOrders]);
+    fetchOrders();
+  }, [fetchOrders]);
 
   const StatusBadge = ({ status }: { status: string }) => {
     const cfg = STATUS_CONFIG[status] ?? {

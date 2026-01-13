@@ -10,6 +10,7 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -17,6 +18,14 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import CustomModal from '@/components/modal';
 import { getStoredUserInfo, updateStoredUserKyc } from '@/api/auth';
 import { router } from 'expo-router';
+import { ENV } from '@/config/environment';
+import {
+  hashSensitiveData,
+  validateAadhaarFormat,
+  validatePANFormat,
+  maskAadhaar,
+  maskPAN,
+} from '@/utils/encryption';
 
 export default function KYCForm() {
   const [companyName, setCompanyName] = useState('');
@@ -97,7 +106,7 @@ export default function KYCForm() {
   };
 
   const validateAadhaar = (value: string) => {
-    if (!/^\d{12}$/.test(value)) {
+    if (!validateAadhaarFormat(value)) {
       return 'Aadhaar must be exactly 12 digits';
     }
     return '';
@@ -114,19 +123,97 @@ export default function KYCForm() {
     setModalVisible(true);
   };
 
-  const pickDocument = async (setter: (file: any) => void) => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: ['application/pdf', 'image/jpeg'],
-    });
+  /**
+   * Enhanced file picker with security validation
+   * - Validates file size (max 5MB)
+   * - Validates MIME type
+   * - Validates file extension
+   */
+  const pickDocument = async (
+    setter: (file: any) => void,
+    fieldName: string,
+  ) => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/pdf', 'image/jpeg', 'image/jpg'],
+        copyToCacheDirectory: true,
+      });
 
-    if (!result.canceled && result.assets?.length) {
-      setter(result.assets[0]);
+      if (result.canceled) {
+        return;
+      }
+
+      if (!result.assets?.length) {
+        Alert.alert('Error', 'No file selected');
+        return;
+      }
+
+      const file = result.assets[0];
+
+      // Validate file size (5MB max)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      if (file.size && file.size > maxSize) {
+        Alert.alert(
+          'File Too Large',
+          `${fieldName} must be under 5MB. Selected file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`,
+        );
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg'];
+      if (file.mimeType && !allowedTypes.includes(file.mimeType)) {
+        Alert.alert(
+          'Invalid File Type',
+          `${fieldName} must be a PDF or JPEG image.`,
+        );
+        return;
+      }
+
+      // Validate file extension (defense in depth)
+      const allowedExtensions = ['.pdf', '.jpg', '.jpeg'];
+      const fileExtension = file.name.toLowerCase().match(/\.[^.]+$/)?.[0];
+      if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
+        Alert.alert(
+          'Invalid File',
+          'File must have .pdf, .jpg, or .jpeg extension.',
+        );
+        return;
+      }
+
+      setter(file);
+    } catch (error: any) {
+      console.error('Document picker error:', error);
+      Alert.alert('Error', error.message || 'Failed to pick document');
     }
   };
 
+  /**
+   * Submit KYC form with encrypted sensitive data
+   *
+   * SECURITY ENHANCEMENTS:
+   * - Sensitive data (Aadhaar/PAN) is hashed using SHA-256 before transmission
+   * - Files are validated for size and type
+   * - Backend receives hashed values + document files for verification
+   *
+   * Backend Requirements:
+   * - Accept 'aadhaarHash' and 'panHash' instead of cleartext values
+   * - Store hashed values in database
+   * - Validate uploaded documents match the provided information
+   * - Encrypt files at rest
+   */
   const submitKYC = async () => {
     try {
       setLoading(true);
+
+      // Additional validation before submission
+      if (!validateAadhaarFormat(aadhaarNumber)) {
+        throw new Error('Please enter a valid 12-digit Aadhaar number');
+      }
+
+      if (!validatePANFormat(panNumber)) {
+        throw new Error('Please enter a valid PAN number');
+      }
 
       const formData = new FormData();
 
@@ -137,8 +224,19 @@ export default function KYCForm() {
       formData.append('license21B', license21B);
       formData.append('gstAvailable', gstAvailable);
       formData.append('gstNumber', gstNumber);
-      formData.append('aadhaarNumber', aadhaarNumber);
-      formData.append('panNumber', panNumber);
+
+      // SECURITY FIX: Hash sensitive data before transmission
+      // Backend will store hashed values and use uploaded documents for verification
+      const aadhaarHash = await hashSensitiveData(aadhaarNumber);
+      const panHash = await hashSensitiveData(panNumber);
+
+      formData.append('aadhaarHash', aadhaarHash);
+      formData.append('panHash', panHash);
+
+      // Also send masked values for display purposes (optional)
+      formData.append('aadhaarMasked', maskAadhaar(aadhaarNumber));
+      formData.append('panMasked', maskPAN(panNumber));
+
       formData.append(
         'anniversary',
         anniversary ? anniversary.toISOString().split('T')[0] : '',
@@ -159,26 +257,27 @@ export default function KYCForm() {
       addFile('gstFile', gstFile);
       addFile('aadhaarFile', aadhaarFile);
       addFile('panFile', panFile);
-      const response = await fetch(
-        'https://www.melticgroup.com/online/wp-json/app/v1/userinfo',
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-          body: formData,
+
+      const response = await fetch(`${ENV.API_URL}/userinfo`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${userToken}`,
         },
-      );
+        body: formData,
+      });
+
       const res = await response.json();
 
       if (!response.ok) {
         throw new Error(res.message || 'Submission failed');
       }
+
       updateStoredUserKyc(true);
       resetForm();
       showModal('success', 'Success', 'KYC submitted successfully');
       router.push('/pages/cart');
     } catch (e: any) {
+      console.error('KYC submission error:', e);
       showModal('error', 'Error', e.message || 'Something went wrong');
     } finally {
       setLoading(false);
@@ -186,8 +285,7 @@ export default function KYCForm() {
   };
 
   const validatePanNumber = (pan: string) => {
-    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
-    return panRegex.test(pan) ? '' : 'Invalid PAN number';
+    return validatePANFormat(pan) ? '' : 'Invalid PAN number (Format: ABCDE1234F)';
   };
 
   const isFormValid =
@@ -264,7 +362,7 @@ export default function KYCForm() {
                 />
                 <TouchableOpacity
                   style={styles.uploadBtn}
-                  onPress={() => pickDocument(setLicense20BFile)}
+                  onPress={() => pickDocument(setLicense20BFile, '20B License')}
                 >
                   <Ionicons name='cloud-upload-outline' size={18} />
                   <Text style={styles.uploadText}>
@@ -280,7 +378,7 @@ export default function KYCForm() {
                 />
                 <TouchableOpacity
                   style={styles.uploadBtn}
-                  onPress={() => pickDocument(setLicense21BFile)}
+                  onPress={() => pickDocument(setLicense21BFile, '21B License')}
                 >
                   <Ionicons name='cloud-upload-outline' size={18} />
                   <Text style={styles.uploadText}>
@@ -317,7 +415,7 @@ export default function KYCForm() {
                 />
                 <TouchableOpacity
                   style={styles.uploadBtn}
-                  onPress={() => pickDocument(setGstFile)}
+                  onPress={() => pickDocument(setGstFile, 'GST File')}
                 >
                   <Ionicons name='cloud-upload-outline' size={18} />
                   <Text style={styles.uploadText}>
@@ -350,7 +448,7 @@ export default function KYCForm() {
 
             <TouchableOpacity
               style={styles.uploadBtn}
-              onPress={() => pickDocument(setAadhaarFile)}
+              onPress={() => pickDocument(setAadhaarFile, 'Aadhaar File')}
             >
               <Ionicons name='cloud-upload-outline' size={18} />
               <Text style={styles.uploadText}>
@@ -400,7 +498,7 @@ export default function KYCForm() {
 
             <TouchableOpacity
               style={styles.uploadBtn}
-              onPress={() => pickDocument(setPanFile)}
+              onPress={() => pickDocument(setPanFile, 'PAN File')}
             >
               <Ionicons name='cloud-upload-outline' size={18} />
               <Text style={styles.uploadText}>

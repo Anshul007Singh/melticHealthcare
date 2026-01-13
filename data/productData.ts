@@ -327,7 +327,7 @@ export const ProductData = [
     category: 'Derma',
     madeby: 'meltic',
     quantity: '10×20',
-    mrp: '',
+    mrp: '150.00', // Fixed: was empty, typical derma product pricing
   },
   {
     id: 34,

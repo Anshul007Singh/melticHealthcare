@@ -1,8 +1,9 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
+import { ENV } from '@/config/environment';
 
-const BASE_URL = 'https://www.melticgroup.com/online';
+const BASE_URL = ENV.WC_BASE_URL;
 
 type JwtPayload = {
   data?: {
@@ -113,4 +114,51 @@ export const getAuthHeader = async () => {
   return {
     Authorization: `Bearer ${token}`,
   };
+};
+
+/**
+ * Request password reset for a user
+ *
+ * BACKEND REQUIRED: This endpoint needs to be implemented on the server.
+ * The backend should:
+ * 1. Verify the email exists in the database
+ * 2. Generate a secure password reset token (with expiration)
+ * 3. Send an email with the reset link
+ * 4. Return success response
+ *
+ * @param email - User's email address
+ * @returns Promise that resolves when reset email is sent
+ */
+export const requestPasswordReset = async (email: string): Promise<void> => {
+  try {
+    const response = await axios.post(
+      `${BASE_URL}/wp-json/custom/v1/forgot-password`,
+      { email },
+      {
+        timeout: 30000, // 30 second timeout
+      }
+    );
+
+    if (response.data.success === false) {
+      throw new Error(
+        response.data.message || 'Failed to send password reset email.'
+      );
+    }
+
+    return response.data;
+  } catch (error: unknown) {
+    const axiosError = error as any;
+    console.error('Password reset error:', axiosError.response?.data || axiosError.message);
+
+    if (axiosError.response?.status === 404) {
+      throw new Error('No account found with that email address.');
+    } else if (axiosError.response?.status === 429) {
+      throw new Error('Too many requests. Please try again later.');
+    }
+
+    throw new Error(
+      axiosError.response?.data?.message ||
+        'Failed to send password reset email. Please try again.'
+    );
+  }
 };

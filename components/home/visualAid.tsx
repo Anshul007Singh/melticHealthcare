@@ -11,12 +11,15 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
+import type { WebViewErrorEvent, WebViewHttpErrorEvent } from 'react-native-webview/lib/WebViewTypes';
 import axios from 'axios';
+import { ENV } from '@/config/environment';
 
 const CARD_WIDTH = Dimensions.get('window').width * 0.28;
-const API_URL = 'https://www.melticgroup.com/online/wp-json/wp/v2/visual_aids';
+const API_URL = `${ENV.API_URL.replace('/app/v1', '')}/wp/v2/visual_aids`;
 
 type VisualAidItem = {
   id: number;
@@ -39,6 +42,23 @@ const VisualAid = () => {
     return match ? match[1] : null;
   };
 
+  /**
+   * Validate that a PDF URL is from a trusted domain
+   * Security: Only allow PDFs from melticgroup.com domain
+   */
+  const isValidPdfUrl = (url: string): boolean => {
+    try {
+      const parsedUrl = new URL(url);
+      // Only allow PDFs from trusted domain
+      const isTrustedDomain = parsedUrl.hostname.endsWith('melticgroup.com');
+      const isPdfFile = parsedUrl.pathname.toLowerCase().endsWith('.pdf');
+
+      return isTrustedDomain && isPdfFile;
+    } catch {
+      return false;
+    }
+  };
+
   const getPdfViewerUrl = (url: string) =>
     `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(
       url,
@@ -46,7 +66,7 @@ const VisualAid = () => {
 
   const fetchVisualAids = async () => {
     try {
-      const res = await axios.get(API_URL);
+      const res = await axios.get(API_URL, { timeout: 10000 });
 
       const mapped: VisualAidItem[] = res.data.map((item: any) => {
         const pdfUrl = extractPdfUrl(item.content.rendered);
@@ -64,8 +84,14 @@ const VisualAid = () => {
       });
 
       setItems(mapped);
-    } catch (e) {
-      console.log('Visual Aid API error', e);
+    } catch (e: any) {
+      console.error('Visual Aid API error', e);
+      // Show user-friendly error message
+      Alert.alert(
+        'Error Loading Visual Aids',
+        'Unable to load visual aids. Please check your internet connection and try again.',
+        [{ text: 'OK' }]
+      );
     } finally {
       setLoading(false);
     }
@@ -76,6 +102,21 @@ const VisualAid = () => {
   }, []);
 
   const openModal = (item: VisualAidItem) => {
+    // Validate PDF URL before opening
+    if (!item.pdfUrl) {
+      Alert.alert('Error', 'No PDF available for this item');
+      return;
+    }
+
+    if (!isValidPdfUrl(item.pdfUrl)) {
+      Alert.alert(
+        'Security Error',
+        'This PDF cannot be displayed for security reasons. Please contact support.',
+      );
+      console.error('Blocked potentially malicious URL:', item.pdfUrl);
+      return;
+    }
+
     setSelectedItem(item);
     setModalVisible(true);
   };
@@ -147,10 +188,43 @@ const VisualAid = () => {
                 <WebView
                   source={{ uri: getPdfViewerUrl(selectedItem.pdfUrl!) }}
                   style={{ flex: 1 }}
-                  originWhitelist={['*']}
+                  originWhitelist={[
+                    'https://docs.google.com',
+                    'https://www.melticgroup.com',
+                    'https://*.melticgroup.com',
+                  ]}
                   javaScriptEnabled
                   domStorageEnabled
                   startInLoadingState
+                  renderLoading={() => (
+                    <View style={styles.pdfLoader}>
+                      <ActivityIndicator size="large" color="#0060AA" />
+                      <Text style={{ marginTop: 10 }}>Loading PDF...</Text>
+                    </View>
+                  )}
+                  onError={(syntheticEvent: WebViewErrorEvent) => {
+                    const { nativeEvent } = syntheticEvent;
+                    console.error('WebView error:', nativeEvent);
+                    Alert.alert('Error', 'Failed to load PDF viewer. Please try again.');
+                  }}
+                  onHttpError={(syntheticEvent: WebViewHttpErrorEvent) => {
+                    const { nativeEvent } = syntheticEvent;
+                    console.warn('WebView HTTP error:', nativeEvent.statusCode);
+                    if (nativeEvent.statusCode >= 400) {
+                      Alert.alert('Error', 'Failed to load PDF. Please try again later.');
+                    }
+                  }}
+                  onNavigationStateChange={(navState) => {
+                    const { url } = navState;
+                    // Block navigation to unauthorized domains
+                    if (
+                      !url.includes('docs.google.com') &&
+                      !url.includes('melticgroup.com')
+                    ) {
+                      console.warn('Blocked navigation to unauthorized URL:', url);
+                      return false;
+                    }
+                  }}
                 />
               )}
             </SafeAreaView>

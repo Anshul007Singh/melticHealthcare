@@ -86,19 +86,44 @@ const Contact = () => {
   const handleWhatsApp = async () => {
     const phoneNumber = '+919504600000';
     const message = 'Hello, I would like to know more about your services.';
-    const url = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(
+    const whatsappUrl = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(
+      message,
+    )}`;
+    const webUrl = `https://wa.me/${phoneNumber.replace(/\+/g, '')}?text=${encodeURIComponent(
       message,
     )}`;
 
     try {
-      const supported = await Linking.canOpenURL(url);
+      // Try to open WhatsApp app first
+      const supported = await Linking.canOpenURL(whatsappUrl);
       if (supported) {
-        await Linking.openURL(url);
+        await Linking.openURL(whatsappUrl);
+      } else if (Platform.OS === 'ios') {
+        // iOS fallback: Open WhatsApp Web in Safari
+        const webSupported = await Linking.canOpenURL(webUrl);
+        if (webSupported) {
+          await Linking.openURL(webUrl);
+        } else {
+          showModal(
+            'Error',
+            'Unable to open WhatsApp. Please install the app or enable Safari.',
+          );
+        }
       } else {
-        showModal('Error', 'WhatsApp is not installed on your device.');
+        // Android: Show error if app not installed
+        showModal(
+          'WhatsApp Not Installed',
+          'Please install WhatsApp from the Play Store to continue.',
+        );
       }
     } catch (error) {
-      showModal('Error', 'Unable to open WhatsApp.');
+      console.error('WhatsApp error:', error);
+      // Final fallback: Try web URL
+      try {
+        await Linking.openURL(webUrl);
+      } catch (webError) {
+        showModal('Error', 'Unable to open WhatsApp. Please try again later.');
+      }
     }
   };
 

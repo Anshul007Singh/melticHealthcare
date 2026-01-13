@@ -6,16 +6,64 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_WC_BASE_URL": "https://www.melticgroup.com/online",
+        "EXPO_PUBLIC_API_URL": "https://www.melticgroup.com/online/wp-json/app/v1",
+        "EXPO_PUBLIC_APP_ENV": "development"
+      },
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": true
+      }
+    },
+    "staging": {
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_WC_BASE_URL": "https://staging.melticgroup.com/online",
+        "EXPO_PUBLIC_API_URL": "https://staging.melticgroup.com/online/wp-json/app/v1",
+        "EXPO_PUBLIC_APP_ENV": "staging"
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_WC_BASE_URL": "https://www.melticgroup.com/online",
+        "EXPO_PUBLIC_API_URL": "https://www.melticgroup.com/online/wp-json/app/v1",
+        "EXPO_PUBLIC_APP_ENV": "preview"
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_WC_BASE_URL": "https://www.melticgroup.com/online",
+        "EXPO_PUBLIC_API_URL": "https://www.melticgroup.com/online/wp-json/app/v1",
+        "EXPO_PUBLIC_APP_ENV": "production"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "./secrets/google-play-service-account.json",
+        "track": "internal"
+      },
+      "ios": {
+        "appleId": "your-apple-id@melticgroup.com",
+        "ascAppId": "your-app-store-connect-id",
+        "appleTeamId": "YOUR_TEAM_ID"
+      }
+    }
   }
 }

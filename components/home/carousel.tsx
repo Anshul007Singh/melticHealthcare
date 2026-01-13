@@ -29,28 +29,34 @@ const data = [
 ];
 
 const Home = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const currentIndexRef = useRef(0);
 
   const handleScroll = (event: any) => {
     const xOffset = event.nativeEvent.contentOffset.x;
     const slideIndex = Math.round(xOffset / screenWidth);
-    setActiveIndex(slideIndex);
+    currentIndexRef.current = slideIndex;
   };
 
-  // Auto-slide effect
+  // Auto-slide effect - Fixed: interval no longer resets every 3 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
-      const nextIndex = (activeIndex + 1) % data.length;
-      setActiveIndex(nextIndex);
+    intervalRef.current = setInterval(() => {
+      const nextIndex = (currentIndexRef.current + 1) % data.length;
+      currentIndexRef.current = nextIndex;
       scrollViewRef.current?.scrollTo({
         x: nextIndex * screenWidth,
         animated: true,
       });
     }, 3000);
 
-    return () => clearInterval(interval);
-  }, [activeIndex]);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []); // Empty dependency array - interval runs continuously without resetting
 
   return (
     <View style={styles.container}>

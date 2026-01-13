@@ -9,7 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import { ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
-
+import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Snackbar } from 'react-native-paper';
 import { loginUser } from '../../api/auth';
@@ -18,15 +18,18 @@ import { useAuth } from '@/context/authContext';
 interface LoginScreenProps {
   onLoginSuccess: () => void;
   onGoToRegister: () => void;
+  onGoToForgotPassword?: () => void;
 }
 
 export default function LoginScreen({
   onLoginSuccess,
   onGoToRegister,
+  onGoToForgotPassword,
 }: LoginScreenProps) {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -41,12 +44,21 @@ export default function LoginScreen({
   };
 
   const handleLogin = async () => {
-    if (email.length <= 3 || password.length === 4) {
-      showSnackbar('Please enter valid credentials.', 'error');
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      showSnackbar('Please enter a valid email address.', 'error');
       return;
     }
+
+    // Validate password length (minimum 6 characters for reasonable security)
+    if (password.length < 6) {
+      showSnackbar('Password must be at least 6 characters.', 'error');
+      return;
+    }
+
     try {
-      await loginUser(email, password, login);
+      await loginUser(email.trim(), password, login);
 
       showSnackbar('Login successful!', 'success');
 
@@ -89,15 +101,37 @@ export default function LoginScreen({
             />
 
             <Text style={styles.label}>Password</Text>
-            <TextInput
-              placeholder='Enter your password'
-              placeholderTextColor='#ccc'
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              style={styles.input}
-              returnKeyType='done'
-            />
+            <View style={styles.passwordContainer}>
+              <TextInput
+                placeholder='Enter your password (min 6 characters)'
+                placeholderTextColor='#ccc'
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                style={[styles.input, styles.passwordInput]}
+                returnKeyType='done'
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.eyeIcon}
+              >
+                <Ionicons
+                  name={showPassword ? 'eye-off' : 'eye'}
+                  size={20}
+                  color='#ccc'
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Forgot Password Link */}
+            {onGoToForgotPassword && (
+              <TouchableOpacity
+                style={styles.forgotPasswordButton}
+                onPress={onGoToForgotPassword}
+              >
+                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
               <Text style={styles.loginButtonText}>Login</Text>
@@ -165,6 +199,34 @@ const styles = StyleSheet.create({
     padding: 14,
     color: '#fff',
     marginBottom: 15,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 10,
+    marginBottom: 15,
+  },
+  passwordInput: {
+    flex: 1,
+    padding: 14,
+    color: '#fff',
+    marginBottom: 0,
+    backgroundColor: 'transparent',
+  },
+  eyeIcon: {
+    padding: 14,
+  },
+  forgotPasswordButton: {
+    alignSelf: 'flex-end',
+    marginTop: 5,
+    marginBottom: 10,
+  },
+  forgotPasswordText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+    textDecorationLine: 'underline',
   },
   loginButton: {
     borderWidth: 1,
