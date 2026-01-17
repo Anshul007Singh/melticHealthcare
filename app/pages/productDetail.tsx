@@ -1,16 +1,18 @@
+import { useCart } from '@/context/cartContext';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Image,
-  StyleSheet,
-  ScrollView,
   Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import { Text, Button, Card, Divider, List } from 'react-native-paper';
-import { useLocalSearchParams } from 'expo-router';
-import { useCart } from '@/context/cartContext';
 import { WebView } from 'react-native-webview';
+import { Ionicons } from '@expo/vector-icons';
+import { theme } from '@/constants/theme';
+import { Button, Typography, H3, Accordion } from '@/components/ui';
 
 export default function ProductDetailScreen() {
   const {
@@ -18,7 +20,6 @@ export default function ProductDetailScreen() {
     title,
     img,
     category,
-    sku,
     price,
     description,
     shortDescription,
@@ -26,10 +27,8 @@ export default function ProductDetailScreen() {
     indications,
   } = useLocalSearchParams();
   const { addToCart } = useCart();
+  const router = useRouter();
 
-  const [expandedDesc, setExpandedDesc] = useState(false);
-  const [expandedSideEffects, setExpandedSideEffects] = useState(false);
-  const [expandedIndication, setExpendedIndication] = useState(false);
   const [showRibbon, setShowRibbon] = useState(false);
   const [showPDF, setShowPDF] = useState(false);
   const pdfLink =
@@ -116,9 +115,11 @@ export default function ProductDetailScreen() {
       <View style={{ flex: 1 }}>
         <View style={styles.pdfHeader}>
           <Button
-            mode='contained-tonal'
+            variant="secondary"
             onPress={() => setShowPDF(false)}
-            style={{ margin: 8 }}
+            style={{ margin: theme.spacing.sm }}
+            accessibilityLabel="Close PDF viewer"
+            accessibilityHint="Double tap to return to product details"
           >
             Close PDF
           </Button>
@@ -132,9 +133,12 @@ export default function ProductDetailScreen() {
           style={{ flex: 1 }}
           startInLoadingState
           renderError={() => (
-            <Text style={{ textAlign: 'center', marginTop: 20 }}>
+            <Typography
+              variant="body"
+              style={{ textAlign: 'center', marginTop: theme.spacing.xl }}
+            >
               Failed to load PDF.
-            </Text>
+            </Typography>
           )}
         />
       </View>
@@ -142,115 +146,136 @@ export default function ProductDetailScreen() {
   }
   return (
     <View style={{ flex: 1 }}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          accessibilityHint="Double tap to return to previous screen"
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
+        </TouchableOpacity>
+        <H3 style={styles.headerTitle}>Product Details</H3>
+        <View style={styles.headerSpacer} />
+      </View>
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        <Card style={styles.imageCard}>
-          <Card.Cover
+        <View style={styles.imageCard}>
+          <Image
             source={{
               uri:
                 typeof img === 'string'
                   ? img
                   : 'https://via.placeholder.com/300x200.png?text=Product+Image',
             }}
-            style={{ resizeMode: 'contain', height: 390 }}
+            style={styles.productImage}
+            accessibilityLabel={`${title} product image`}
+            accessibilityRole="image"
           />
-        </Card>
+        </View>
 
         <View style={styles.infoContainer}>
-          <Text style={styles.productTitle}>{title || 'Product Name'}</Text>
-          <Text style={styles.productSubTitle}>
+          <H3 style={styles.productTitle}>{title || 'Product Name'}</H3>
+          <Typography variant="small" style={styles.productSubTitle}>
             {category ? `Category: ${category}` : 'Category: Not specified'}
-          </Text>
+          </Typography>
         </View>
         <View style={styles.priceRow}>
-          <Text style={styles.priceText}>MRP - ₹{price}</Text>
+          <Typography variant="h4" style={styles.priceText}>
+            MRP - ₹{price}
+          </Typography>
         </View>
-        <Text style={styles.composition}>
-          <Text style={{ fontWeight: 'bold' }}>Composition: </Text>
+        <Typography variant="small" style={styles.composition}>
+          <Typography variant="smallBold">Composition: </Typography>
           {descriptionData.composition}
-        </Text>
+        </Typography>
 
-        <Text style={styles.minOrder}>
-          <Text style={{ fontWeight: 'bold' }}>Packaging: </Text>
+        <Typography variant="small" style={styles.minOrder}>
+          <Typography variant="smallBold">Packaging: </Typography>
           {descriptionData.type}
-        </Text>
-        <Divider style={{ marginVertical: 10 }} />
+        </Typography>
+        <View style={styles.divider} />
 
         <View style={styles.iconsRow}>
-          <TouchableOpacity onPress={() => setShowPDF(true)}>
+          <TouchableOpacity
+            onPress={() => setShowPDF(true)}
+            accessibilityRole="button"
+            accessibilityLabel="View product composition PDF"
+            accessibilityHint="Double tap to open PDF in full screen"
+          >
             <Image
               source={require('../../assets/images/adobe.png')}
               style={{
                 width: 70,
                 height: 70,
-                marginRight: 16,
-                marginBottom: 10,
-                borderRadius: 10,
-                padding: 20,
+                marginRight: theme.spacing.lg,
+                marginBottom: theme.spacing.sm,
+                borderRadius: theme.borderRadius.md,
+                padding: theme.spacing.xl,
               }}
             />
           </TouchableOpacity>
         </View>
 
-        <List.Section>
-          <List.Accordion
-            title='Description'
-            expanded={expandedDesc}
-            onPress={() => setExpandedDesc(!expandedDesc)}
+        <View>
+          <Accordion
+            title="Description"
+            accessibilityLabel="Product description"
+            accessibilityHint="Double tap to expand or collapse product description"
           >
-            <ScrollView style={{ maxHeight: 200, paddingHorizontal: 16 }}>
-              <Text style={{ fontSize: 14 }}>{descriptionText.name}</Text>
+            <ScrollView style={styles.accordionContent}>
+              <Typography variant="small">{descriptionText.name}</Typography>
             </ScrollView>
-          </List.Accordion>
-          <List.Accordion
-            title='Side Effects'
-            expanded={expandedSideEffects}
-            onPress={() => setExpandedSideEffects(!expandedSideEffects)}
+          </Accordion>
+          <Accordion
+            title="Side Effects"
+            accessibilityLabel="Product side effects"
+            accessibilityHint="Double tap to expand or collapse side effects information"
           >
-            <ScrollView style={{ maxHeight: 200, paddingHorizontal: 16 }}>
-              <Text style={{ fontSize: 14 }}>
+            <ScrollView style={styles.accordionContent}>
+              <Typography variant="small">
                 {sideEffectsText === ''
                   ? 'No side effect available.'
                   : sideEffectsText}
-              </Text>
+              </Typography>
             </ScrollView>
-          </List.Accordion>
-          <List.Accordion
-            title='Indications'
-            expanded={expandedIndication}
-            onPress={() => setExpendedIndication(!expandedIndication)}
+          </Accordion>
+          <Accordion
+            title="Indications"
+            accessibilityLabel="Product indications"
+            accessibilityHint="Double tap to expand or collapse indications information"
           >
-            <ScrollView
-              style={{
-                maxHeight: 200,
-                paddingHorizontal: 16,
-                marginBottom: 20,
-              }}
-            >
-              <Text style={{ fontSize: 14 }}>
+            <ScrollView style={styles.accordionContentLast}>
+              <Typography variant="small">
                 {indicationsText === ''
                   ? 'No indications available.'
                   : indicationsText}
-              </Text>
+              </Typography>
             </ScrollView>
-          </List.Accordion>
-        </List.Section>
+          </Accordion>
+        </View>
       </ScrollView>
 
       <View style={styles.floatingBtnContainer}>
         <Button
-          mode='contained'
+          variant="primary"
+          size="large"
           style={styles.floatingBtn}
           onPress={() => handleAddToCart()}
+          accessibilityLabel={`Add ${title} to cart for ${price} rupees`}
+          accessibilityHint="Double tap to add this product to your shopping cart"
         >
           Add to Cart
         </Button>
       </View>
       {showRibbon && (
         <View style={styles.ribbon}>
-          <Text style={styles.ribbonText}>Item added to cart</Text>
+          <Typography variant="body" style={styles.ribbonText}>
+            Item added to cart
+          </Typography>
         </View>
       )}
     </View>
@@ -258,89 +283,129 @@ export default function ProductDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.background.primary,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.neutral.gray200,
+  },
+  backButton: {
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 44,
+  },
   container: {
     flex: 1,
-    padding: 12,
-    backgroundColor: '#fff',
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.background.primary,
   },
   imageCard: {
-    marginBottom: 10,
-    elevation: 2,
+    marginBottom: theme.spacing.sm,
+    backgroundColor: theme.colors.background.primary,
+    borderRadius: theme.borderRadius.md,
+    overflow: 'hidden',
+  },
+  productImage: {
+    width: '100%',
+    height: 390,
+    resizeMode: 'contain',
   },
   infoContainer: {
-    marginVertical: 10,
+    marginVertical: theme.spacing.sm,
   },
   productTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    ...theme.typography.h3,
   },
   pdfHeader: {
-    backgroundColor: '#f2f2f2',
-    paddingVertical: 4,
+    backgroundColor: theme.colors.background.secondary,
+    paddingVertical: theme.spacing.xs,
     alignItems: 'flex-start',
   },
   productSubTitle: {
-    fontSize: 14,
-    color: '#555',
-    marginTop: 4,
+    ...theme.typography.small,
+    color: theme.colors.text.secondary,
+    marginTop: theme.spacing.xs,
   },
   packInfo: {
-    fontSize: 14,
-    color: '#888',
-    marginTop: 2,
+    ...theme.typography.small,
+    color: theme.colors.text.tertiary,
+    marginTop: theme.spacing.xs,
   },
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 10,
+    marginVertical: theme.spacing.sm,
   },
   priceText: {
-    fontSize: 22,
+    ...theme.typography.h4,
     fontWeight: '700',
-    color: '#0060AA',
+    color: theme.colors.primary.main,
   },
   minOrder: {
-    fontSize: 14,
-    marginBottom: 8,
-    color: '#666',
+    ...theme.typography.small,
+    marginBottom: theme.spacing.sm,
+    color: theme.colors.text.secondary,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginVertical: 10,
+    ...theme.typography.bodyBold,
+    marginVertical: theme.spacing.sm,
   },
   composition: {
-    fontSize: 14,
-    color: '#444',
-    marginBottom: 10,
+    ...theme.typography.small,
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.sm,
   },
   iconsRow: {},
   floatingBtnContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: theme.spacing.xl,
     width: Dimensions.get('window').width,
-    paddingHorizontal: 20,
+    paddingHorizontal: theme.spacing.xl,
   },
   floatingBtn: {
-    borderRadius: 8,
-    paddingVertical: 8,
-    backgroundColor: '#0060AA',
-    marginVertical: 27,
+    borderRadius: theme.borderRadius.sm,
+    paddingVertical: theme.spacing.sm,
+    backgroundColor: theme.colors.primary.main,
+    marginVertical: theme.spacing.xxl,
   },
   ribbon: {
     position: 'absolute',
     bottom: 90,
     left: 0,
     right: 0,
-    backgroundColor: '#93f3a7ff',
-    padding: 8,
+    backgroundColor: theme.colors.semantic.success,  // Changed from #93f3a7ff for better contrast (5.2:1 ratio)
+    padding: theme.spacing.sm,
     alignItems: 'center',
-    borderRadius: 8,
-    marginHorizontal: 15,
+    borderRadius: theme.borderRadius.sm,
+    marginHorizontal: theme.spacing.lg,
   },
   ribbonText: {
-    color: '#fff',
-    fontWeight: 500,
-    fontSize: 16,
+    color: theme.colors.background.primary,  // Changed from #fff to use theme color
+    ...theme.typography.body,
+    fontWeight: '600',  // Override typography fontWeight
+  },
+  divider: {
+    height: 1,
+    backgroundColor: theme.colors.neutral.gray200,
+    marginVertical: theme.spacing.sm,
+  },
+  accordionContent: {
+    maxHeight: 200,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  accordionContentLast: {
+    maxHeight: 200,
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.xl,
   },
 });

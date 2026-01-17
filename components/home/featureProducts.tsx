@@ -1,38 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { Card, H3, Shimmer, Typography } from '@/components/ui';
+import { theme } from '@/constants/theme';
+import { fetchProducts } from '@/data/productList';
+import { router } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
+  Dimensions,
   FlatList,
   Image,
   StyleSheet,
-  Dimensions,
   TouchableOpacity,
-  Animated,
-  Easing,
+  View,
 } from 'react-native';
-import { fetchProducts } from '@/data/productList';
-import { router } from 'expo-router';
 
 const FeatureProductsCarousel = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const shimmerAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(shimmerAnim, {
-        toValue: 1,
-        duration: 1200,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ).start();
-  }, []);
-
-  const translateX = shimmerAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-200, 200], // Move shimmer across
-  });
 
   const onViewAllHandler = () => {
     router.push({
@@ -86,64 +68,70 @@ const FeatureProductsCarousel = () => {
   }, []);
 
   const renderItem = ({ item }: any) => (
-    <TouchableOpacity style={styles.card} onPress={() => onClickHandler(item)}>
-      <Image
-        source={{
-          uri: item.images?.[0]?.src || 'https://via.placeholder.com/150',
-        }}
-        style={styles.image}
-        resizeMode='contain'
-      />
-      <View style={styles.cardBody}>
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productType}>
-          {item.categories?.[0]?.name || 'Category'}
-        </Text>
-        <View style={styles.cardFooter}>
-          <Text style={styles.price}>
-            {item.price ? `₹ ${item.price}` : 'Price on Request'}
-          </Text>
-          <Text style={styles.packing}>
-            {item.sku ? `SKU: ${item.sku}` : ''}
-          </Text>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => onClickHandler(item)}
+      accessibilityRole="button"
+      accessibilityLabel={`Product: ${item.name}`}
+    >
+      <Card variant="default" style={styles.cardInner}>
+        <Image
+          source={{
+            uri: item.images?.[0]?.src || 'https://via.placeholder.com/150',
+          }}
+          style={styles.image}
+          resizeMode='contain'
+          accessibilityLabel={`${item.name} product image`}
+        />
+        <View style={styles.cardBody}>
+          <Typography variant="small" numberOfLines={2}>
+            {item.name}
+          </Typography>
+          <Typography variant="tiny" color="secondary" style={styles.categoryText}>
+            {item.categories?.[0]?.name || 'Category'}
+          </Typography>
+          <View style={styles.cardFooter}>
+            <Typography variant="bodyBold" color="link">
+              {item.price ? `₹ ${item.price}` : 'Price on Request'}
+            </Typography>
+            {item.sku && (
+              <Typography variant="caption" color="tertiary">
+                SKU: {item.sku}
+              </Typography>
+            )}
+          </View>
         </View>
-      </View>
+      </Card>
     </TouchableOpacity>
   );
 
   const renderShimmerItem = () => (
-    <View style={styles.card}>
-      {/* Image shimmer */}
-      <View style={[styles.image, styles.shimmerContainer]}>
-        <Animated.View
-          style={[
-            styles.shimmerEffect,
-            {
-              transform: [{ translateX }],
-            },
-          ]}
-        />
-      </View>
+    <Card variant="default" style={styles.card}>
+      <Shimmer width="100%" height={140} borderRadius={0} />
       <View style={styles.cardBody}>
-        <View style={[styles.shimmerLine, { width: 120, height: 16 }]} />
-        <View
-          style={[styles.shimmerLine, { width: 80, height: 14, marginTop: 8 }]}
-        />
-        <View
-          style={[styles.shimmerLine, { width: 100, height: 14, marginTop: 8 }]}
-        />
+        <Shimmer width={120} height={16} borderRadius={theme.borderRadius.sm} />
+        <View style={{ marginTop: theme.spacing.xs }}>
+          <Shimmer width={80} height={14} borderRadius={theme.borderRadius.sm} />
+        </View>
+        <View style={{ marginTop: theme.spacing.sm }}>
+          <Shimmer width={100} height={14} borderRadius={theme.borderRadius.sm} />
+        </View>
       </View>
-    </View>
+    </Card>
   );
 
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Feature Products</Text>
-        <TouchableOpacity>
-          <Text style={styles.viewAll} onPress={onViewAllHandler}>
+        <H3>Feature Products</H3>
+        <TouchableOpacity
+          onPress={onViewAllHandler}
+          accessibilityRole="button"
+          accessibilityLabel="View all featured products"
+        >
+          <Typography variant="smallBold" color="link">
             View All
-          </Text>
+          </Typography>
         </TouchableOpacity>
       </View>
 
@@ -154,12 +142,17 @@ const FeatureProductsCarousel = () => {
           renderItem={renderShimmerItem}
           keyExtractor={(item, index) => `shimmer-${index}`}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 8 }}
+          contentContainerStyle={{ paddingHorizontal: theme.spacing.sm }}
         />
       ) : products.length === 0 ? (
-        <Text style={{ textAlign: 'center', marginVertical: 20 }}>
+        <Typography
+          variant="body"
+          color="secondary"
+          center
+          style={{ marginVertical: theme.spacing.xl }}
+        >
           No featured products available.
-        </Text>
+        </Typography>
       ) : (
         <FlatList
           horizontal
@@ -167,7 +160,7 @@ const FeatureProductsCarousel = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 8 }}
+          contentContainerStyle={{ paddingHorizontal: theme.spacing.sm }}
         />
       )}
     </View>
@@ -176,83 +169,45 @@ const FeatureProductsCarousel = () => {
 
 export default FeatureProductsCarousel;
 
-const CARD_WIDTH = Dimensions.get('window').width * 0.6;
+const CARD_WIDTH = Dimensions.get('window').width * 0.5;
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 20,
-    paddingHorizontal: 8,
+    paddingTop: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.sm,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 14,
-    paddingHorizontal: 8,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  viewAll: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0060AA',
+    alignItems: 'center',
+    marginBottom: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.sm,
   },
   card: {
     width: CARD_WIDTH,
-    backgroundColor: '#fff',
-    borderRadius: 14,
-    marginRight: 12,
+    marginRight: theme.spacing.md,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
+    
+  },
+  cardInner: {
+    padding: 0,
+    overflow: 'hidden',
+    backgroundColor: theme.colors.neutral.white,
   },
   image: {
     width: '100%',
     height: 140,
   },
   cardBody: {
-    padding: 10,
-    backgroundColor: '#F2F9FF',
+    padding: theme.spacing.md,
   },
-  productName: {
-    color: '#000',
-    fontWeight: '700',
-    fontSize: 16,
-  },
-  productType: {
-    fontSize: 12,
-    fontWeight: '500',
-    marginTop: 2,
+  categoryText: {
+    marginTop: theme.spacing.xs,
   },
   cardFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 5,
-  },
-  price: {
-    color: '#0060AA',
-    fontWeight: '700',
-    fontSize: 20,
-  },
-  packing: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-
-  /* Shimmer styles */
-  shimmerContainer: {
-    backgroundColor: '#E1E9EE',
-    overflow: 'hidden',
-  },
-  shimmerEffect: {
-    width: '50%',
-    height: '100%',
-    backgroundColor: '#F2F8FC',
-    opacity: 0.6,
-  },
-  shimmerLine: {
-    backgroundColor: '#E1E9EE',
-    borderRadius: 4,
+    alignItems: 'center',
+    marginTop: theme.spacing.xs,
   },
 });

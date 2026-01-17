@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
-  Text,
   Image,
   StyleSheet,
   Dimensions,
@@ -10,6 +9,8 @@ import {
 } from 'react-native';
 import { fetchProducts } from '@/data/productList';
 import { router, useLocalSearchParams } from 'expo-router';
+import { theme } from '@/constants/theme';
+import { Typography } from '@/components/ui';
 
 const LOGO_SIZE = Dimensions.get('window').width * 0.25;
 
@@ -64,13 +65,15 @@ const OurDivisions = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f9f9f9' }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.background.secondary }}>
       <ScrollView contentContainerStyle={styles.container}>
         {products.map((item) => (
           <TouchableOpacity
             key={item.id}
             style={styles.card}
             onPress={() => onClickHandler(item.slug)}
+            accessibilityRole="button"
+            accessibilityLabel={`${item.name} division`}
           >
             <View style={styles.logoContainer}>
               <Image
@@ -82,9 +85,12 @@ const OurDivisions = () => {
                 }}
                 style={styles.logo}
                 resizeMode='contain'
+                accessibilityLabel={`${item.name} logo`}
               />
             </View>
-            <Text style={styles.label}>{item.name}</Text>
+            <Typography variant="caption" style={styles.label} center>
+              {item.name}
+            </Typography>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -101,33 +107,27 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    padding: 15,
-    gap: 15,
-    backgroundColor: '#f9f9f9',
+    padding: theme.spacing.lg,
+    gap: theme.spacing.lg,
+    backgroundColor: theme.colors.background.secondary,
   },
   card: {
     width: '30%',
     alignItems: 'center',
   },
   label: {
-    marginTop: 8,
-    fontSize: 13,
-    textAlign: 'center',
-    fontWeight: '600',
-    color: '#1A1A1A',
+    marginTop: theme.spacing.sm,
   },
   logoContainer: {
     width: LOGO_SIZE,
     height: LOGO_SIZE,
     borderRadius: LOGO_SIZE / 2,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background.primary,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
+    borderColor: theme.colors.neutral.gray200,
+    ...theme.shadows.sm,
   },
   logo: {
     width: LOGO_SIZE * 0.9,

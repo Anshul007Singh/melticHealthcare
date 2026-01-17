@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Modal, Portal, Text, Button, Divider } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
+import { theme } from '@/constants/theme';
 
 interface CustomModalProps {
   visible: boolean;
@@ -28,19 +29,19 @@ const CustomModal: React.FC<CustomModalProps> = ({
 }) => {
   const themeStyles = {
     success: {
-      color: '#2E7D32',
+      color: theme.colors.semantic.success,
       icon: 'check-circle',
-      bg: '#E8F5E9',
+      bg: theme.colors.semantic.successBackground,
     },
     error: {
-      color: '#C62828',
+      color: theme.colors.semantic.error,
       icon: 'error',
-      bg: '#FFEBEE',
+      bg: theme.colors.semantic.errorBackground,
     },
     info: {
-      color: '#1565C0',
+      color: theme.colors.semantic.info,
       icon: 'info',
-      bg: '#E3F2FD',
+      bg: theme.colors.semantic.infoBackground,
     },
   }[type];
 
@@ -70,8 +71,8 @@ const CustomModal: React.FC<CustomModalProps> = ({
           </Text>
         ) : null}
         {message ? <Text style={styles.message}>{message}</Text> : null}
-        {children ? <View style={{ marginTop: 10 }}>{children}</View> : null}
-        <Divider style={{ marginVertical: 15 }} />
+        {children ? <View style={{ marginTop: theme.spacing.sm }}>{children}</View> : null}
+        <Divider style={{ marginVertical: theme.spacing.lg }} />
         <View style={styles.buttonRow}>
           <Button
             mode='outlined'
@@ -87,7 +88,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
               mode='contained'
               onPress={onConfirm}
               buttonColor={themeStyles.color}
-              textColor='white'
+              textColor={theme.colors.background.primary}
               style={styles.button}
             >
               {confirmText}
@@ -97,7 +98,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
               mode='contained'
               onPress={onClose}
               buttonColor={themeStyles.color}
-              textColor='white'
+              textColor={theme.colors.background.primary}
               style={styles.button}
             >
               {confirmText}
@@ -111,30 +112,30 @@ const CustomModal: React.FC<CustomModalProps> = ({
 
 const styles = StyleSheet.create({
   modalContainer: {
-    marginHorizontal: 20,
-    borderRadius: 12,
-    padding: 25,
+    marginHorizontal: theme.spacing.xl,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.xxl,
     elevation: 6,
   },
   iconWrapper: {
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: theme.spacing.sm,
   },
   title: {
-    fontSize: 20,
+    ...theme.typography.h4,
     fontWeight: '700',
     textAlign: 'center',
   },
   message: {
-    fontSize: 16,
-    color: '#333',
+    ...theme.typography.body,
+    color: theme.colors.text.primary,
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: theme.spacing.sm,
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    marginTop: 10,
+    marginTop: theme.spacing.sm,
   },
   button: {
     width: '40%',

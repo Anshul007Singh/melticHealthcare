@@ -1,17 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   SafeAreaView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import axios from 'axios';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getStoredUserInfo } from '@/api/auth';
+import { theme } from '@/constants/theme';
+import { Button, Typography, H3, EmptyState, ErrorCard, Shimmer } from '@/components/ui';
 
 /* ================= CONFIG ================= */
 
@@ -36,13 +35,13 @@ const STATUS_CONFIG: Record<
   string,
   { label: string; bg: string; text: string }
 > = {
-  pending: { label: 'Pending Payment', bg: '#FFF7ED', text: '#C2410C' },
-  'on-hold': { label: 'On Hold', bg: '#FEF3C7', text: '#92400E' },
-  processing: { label: 'Processing', bg: '#E0F2FE', text: '#0369A1' },
-  completed: { label: 'Completed', bg: '#DCFCE7', text: '#166534' },
-  cancelled: { label: 'Cancelled', bg: '#FEE2E2', text: '#991B1B' },
-  failed: { label: 'Failed', bg: '#FCA5A5', text: '#7F1D1D' },
-  refunded: { label: 'Refunded', bg: '#EDE9FE', text: '#5B21B6' },
+  pending: { label: 'Pending Payment', bg: theme.colors.semantic.warningBackground, text: theme.colors.semantic.warning },
+  'on-hold': { label: 'On Hold', bg: theme.colors.semantic.warningBackground, text: theme.colors.semantic.warning },
+  processing: { label: 'Processing', bg: theme.colors.semantic.infoBackground, text: theme.colors.semantic.info },
+  completed: { label: 'Completed', bg: theme.colors.semantic.successBackground, text: theme.colors.semantic.success },
+  cancelled: { label: 'Cancelled', bg: theme.colors.semantic.errorBackground, text: theme.colors.semantic.error },
+  failed: { label: 'Failed', bg: theme.colors.semantic.errorBackground, text: theme.colors.semantic.error },
+  refunded: { label: 'Refunded', bg: theme.colors.neutral.gray100, text: theme.colors.text.secondary },
 };
 
 const OrderStatusScreen: React.FC = () => {
@@ -117,13 +116,15 @@ const OrderStatusScreen: React.FC = () => {
   const StatusBadge = ({ status }: { status: string }) => {
     const cfg = STATUS_CONFIG[status] ?? {
       label: status,
-      bg: '#E5E7EB',
-      text: '#374151',
+      bg: theme.colors.neutral.gray200,
+      text: theme.colors.text.secondary,
     };
 
     return (
       <View style={[styles.badge, { backgroundColor: cfg.bg }]}>
-        <Text style={[styles.badgeText, { color: cfg.text }]}>{cfg.label}</Text>
+        <Typography variant="caption" style={{ color: cfg.text, fontWeight: '600' }}>
+          {cfg.label}
+        </Typography>
       </View>
     );
   };
@@ -131,20 +132,28 @@ const OrderStatusScreen: React.FC = () => {
   const renderOrderItem = ({ item }: { item: WooOrder }) => (
     <View style={styles.orderCard}>
       <View style={styles.orderHeader}>
-        <Text style={styles.orderId}>Order #{item.id}</Text>
+        <Typography variant="bodyBold" style={styles.orderId}>
+          Order #{item.id}
+        </Typography>
         <StatusBadge status={item.status} />
       </View>
 
       <View style={styles.row}>
-        <Text style={styles.label}>Date</Text>
-        <Text>{new Date(item.date_created).toLocaleString()}</Text>
+        <Typography variant="small" style={styles.label}>
+          Date
+        </Typography>
+        <Typography variant="small">
+          {new Date(item.date_created).toLocaleString()}
+        </Typography>
       </View>
 
       <View style={styles.row}>
-        <Text style={styles.label}>Total</Text>
-        <Text style={styles.amount}>
+        <Typography variant="small" style={styles.label}>
+          Total
+        </Typography>
+        <Typography variant="bodyBold" style={styles.amount}>
           {item.currency} {item.total}
-        </Text>
+        </Typography>
       </View>
     </View>
   );
@@ -152,9 +161,16 @@ const OrderStatusScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>My Orders</Text>
-        <TouchableOpacity onPress={fetchOrders}>
-          <Text style={styles.refresh}>Refresh</Text>
+        <H3>My Orders</H3>
+        <TouchableOpacity
+          onPress={fetchOrders}
+          accessibilityRole="button"
+          accessibilityLabel="Refresh orders"
+          accessibilityHint="Double tap to reload order list"
+        >
+          <Typography variant="bodyBold" style={styles.refresh}>
+            Refresh
+          </Typography>
         </TouchableOpacity>
       </View>
 
@@ -163,20 +179,37 @@ const OrderStatusScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.dateBtn}
           onPress={() => setShowFromPicker(true)}
+          accessibilityRole="button"
+          accessibilityLabel={fromDate ? `From date: ${fromDate.toDateString()}` : 'Select from date'}
+          accessibilityHint="Double tap to select start date for filtering"
         >
-          <Text>{fromDate ? fromDate.toDateString() : 'From Date'}</Text>
+          <Typography variant="small">
+            {fromDate ? fromDate.toDateString() : 'From Date'}
+          </Typography>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.dateBtn}
           onPress={() => setShowToPicker(true)}
+          accessibilityRole="button"
+          accessibilityLabel={toDate ? `To date: ${toDate.toDateString()}` : 'Select to date'}
+          accessibilityHint="Double tap to select end date for filtering"
         >
-          <Text>{toDate ? toDate.toDateString() : 'To Date'}</Text>
+          <Typography variant="small">
+            {toDate ? toDate.toDateString() : 'To Date'}
+          </Typography>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.applyBtn} onPress={fetchOrders}>
-          <Text style={styles.applyText}>Apply</Text>
-        </TouchableOpacity>
+        <Button
+          variant="primary"
+          size="small"
+          onPress={fetchOrders}
+          style={styles.applyBtn}
+          accessibilityLabel="Apply date filter"
+          accessibilityHint="Double tap to filter orders by selected date range"
+        >
+          Apply
+        </Button>
       </View>
 
       {showFromPicker && (
@@ -201,20 +234,35 @@ const OrderStatusScreen: React.FC = () => {
         />
       )}
 
+      {error && (
+        <ErrorCard
+          message={error}
+          onRetry={fetchOrders}
+        />
+      )}
+
       {loading ? (
-        <ActivityIndicator size='large' />
+        <View style={styles.shimmerContainer}>
+          {[...Array(5)].map((_, i) => (
+            <View key={i} style={styles.shimmerCard}>
+              <Shimmer width="100%" height={120} borderRadius={theme.borderRadius.lg} />
+            </View>
+          ))}
+        </View>
       ) : (
         <FlatList
           data={orders}
           keyExtractor={(item) => String(item.id)}
           renderItem={renderOrderItem}
           ListEmptyComponent={
-            <Text style={styles.center}>No orders found</Text>
+            <EmptyState
+              icon="receipt-outline"
+              title="No Orders Yet"
+              message="You haven't placed any orders. Start shopping to see your orders here."
+            />
           }
         />
       )}
-
-      {error && <Text style={styles.error}>{error}</Text>}
     </SafeAreaView>
   );
 };
@@ -222,49 +270,72 @@ const OrderStatusScreen: React.FC = () => {
 /* ================= STYLES ================= */
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F9FAFB' },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background.secondary,
+  },
   header: {
-    padding: 16,
+    padding: theme.spacing.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background.primary,
   },
-  title: { fontSize: 18, fontWeight: '700' },
-  filterBox: { flexDirection: 'row', gap: 8, padding: 12 },
+  filterBox: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+    padding: theme.spacing.md,
+  },
   dateBtn: {
     flex: 1,
-    padding: 10,
-    borderRadius: 8,
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#fff',
+    borderColor: theme.colors.neutral.gray300,
+    backgroundColor: theme.colors.background.primary,
+    justifyContent: 'center',
+    minHeight: 44,
   },
   applyBtn: {
-    paddingHorizontal: 14,
-    justifyContent: 'center',
-    borderRadius: 8,
-    backgroundColor: '#0060AA',
+    paddingHorizontal: theme.spacing.md,
   },
-  applyText: { color: '#fff', fontWeight: '600' },
   orderCard: {
-    margin: 12,
-    padding: 14,
-    borderRadius: 16,
-    backgroundColor: '#fff',
+    margin: theme.spacing.md,
+    padding: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
+    backgroundColor: theme.colors.background.primary,
+    ...theme.shadows.sm,
   },
   orderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.xs,
   },
-  orderId: { fontWeight: '600' },
-  badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
-  badgeText: { fontSize: 12, fontWeight: '600' },
-  row: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 },
-  label: { color: '#6B7280' },
-  amount: { fontWeight: '700' },
-  refresh: { color: '#2563EB', fontWeight: '600' },
-  center: { textAlign: 'center', marginTop: 20 },
-  error: { color: 'red', textAlign: 'center', marginTop: 10 },
+  orderId: {},
+  badge: {
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.round,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: theme.spacing.xs,
+  },
+  label: {
+    color: theme.colors.text.secondary,
+  },
+  amount: {},
+  refresh: {
+    color: theme.colors.primary.main,
+  },
+  shimmerContainer: {
+    padding: theme.spacing.md,
+  },
+  shimmerCard: {
+    marginBottom: theme.spacing.md,
+  },
 });
 
 export default OrderStatusScreen;

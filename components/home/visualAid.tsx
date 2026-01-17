@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import {
   View,
-  Text,
   Image,
   StyleSheet,
   Dimensions,
   Pressable,
   ScrollView,
   Modal,
-  TouchableOpacity,
   SafeAreaView,
-  ActivityIndicator,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import axios from 'axios';
+import { theme } from '@/constants/theme';
+import { H3, Typography, Button, Shimmer, ErrorCard } from '@/components/ui';
 
 const CARD_WIDTH = Dimensions.get('window').width * 0.28;
 const API_URL = 'https://www.melticgroup.com/online/wp-json/wp/v2/visual_aids';
@@ -28,7 +27,7 @@ type VisualAidItem = {
 const VisualAid = () => {
   const [items, setItems] = useState<VisualAidItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [url, setUrl] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<VisualAidItem | null>(null);
@@ -45,6 +44,9 @@ const VisualAid = () => {
     )}`;
 
   const fetchVisualAids = async () => {
+    setLoading(true);
+    setError(null);
+
     try {
       const res = await axios.get(API_URL);
 
@@ -64,8 +66,9 @@ const VisualAid = () => {
       });
 
       setItems(mapped);
-    } catch (e) {
-      console.log('Visual Aid API error', e);
+    } catch (e: any) {
+      console.error('Visual Aid API error', e);
+      setError(e.message || 'Failed to load visual aids');
     } finally {
       setLoading(false);
     }
@@ -85,10 +88,49 @@ const VisualAid = () => {
     setSelectedItem(null);
   };
 
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <H3>Visual Aid</H3>
+        </View>
+        <ErrorCard
+          title="Failed to Load"
+          message={error}
+          onRetry={fetchVisualAids}
+        />
+      </View>
+    );
+  }
+
   if (loading) {
     return (
-      <View style={styles.loader}>
-        <ActivityIndicator size='large' />
+      <View style={styles.container}>
+        <View style={styles.headerRow}>
+          <H3>Visual Aid</H3>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingRight: theme.spacing.lg }}
+        >
+          {[...Array(4)].map((_, index) => (
+            <View key={index} style={styles.card}>
+              <Shimmer
+                width={CARD_WIDTH}
+                height={65}
+                borderRadius={theme.borderRadius.md}
+              />
+              <View style={{ marginTop: theme.spacing.sm }}>
+                <Shimmer
+                  width={CARD_WIDTH * 0.8}
+                  height={14}
+                  borderRadius={4}
+                />
+              </View>
+            </View>
+          ))}
+        </ScrollView>
       </View>
     );
   }
@@ -96,26 +138,31 @@ const VisualAid = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Text style={styles.headerTitle}>Visual Aid</Text>
+        <H3>Visual Aid</H3>
       </View>
 
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingRight: 16 }}
+        contentContainerStyle={{ paddingRight: theme.spacing.lg }}
       >
         {items.map((item) => (
           <Pressable
             key={item.id}
             style={styles.card}
             onPress={() => openModal(item)}
+            accessibilityRole="button"
+            accessibilityLabel={`View ${item.name} visual aid`}
           >
             <Image
               source={{ uri: item.image }}
               style={styles.image}
               resizeMode='contain'
+              accessibilityIgnoresInvertColors
             />
-            <Text style={styles.label}>{item.name}</Text>
+            <Typography variant="caption" style={styles.label}>
+              {item.name}
+            </Typography>
           </Pressable>
         ))}
       </ScrollView>
@@ -130,18 +177,21 @@ const VisualAid = () => {
           <View style={styles.modalContainer}>
             <SafeAreaView style={{ flex: 1 }}>
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>{selectedItem?.name}</Text>
-                <TouchableOpacity
+                <Typography variant="h4" style={styles.modalTitle}>
+                  {selectedItem?.name}
+                </Typography>
+                <Button
+                  variant="danger"
+                  size="small"
                   onPress={closeModal}
-                  style={styles.closeButton}
                 >
-                  <Text style={styles.closeButtonText}>Close ✕</Text>
-                </TouchableOpacity>
+                  Close ✕
+                </Button>
               </View>
 
               {!selectedItem?.pdfUrl ? (
                 <View style={styles.pdfLoader}>
-                  <Text>No PDF available</Text>
+                  <Typography>No PDF available</Typography>
                 </View>
               ) : (
                 <WebView
@@ -165,76 +215,63 @@ export default VisualAid;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
-    paddingHorizontal: 16,
+    marginTop: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.lg,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: theme.spacing.md,
     alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1A1A1A',
   },
   card: {
     width: CARD_WIDTH,
-    marginRight: 12,
+    marginRight: theme.spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
   image: {
-    borderRadius: 10,
+    borderRadius: theme.borderRadius.md,
     width: '100%',
     height: 65,
   },
   label: {
-    marginTop: 8,
-    fontSize: 13,
+    marginTop: theme.spacing.sm,
     fontWeight: '600',
-    color: '#1A1A1A',
     textAlign: 'center',
   },
   loader: {
-    padding: 40,
+    padding: theme.spacing.xxxl,
     alignItems: 'center',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContainer: {
     width: '95%',
     height: '90%',
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: theme.colors.background.primary,
+    borderRadius: theme.borderRadius.xl,
     overflow: 'hidden',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    elevation: 12,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 12,
-    backgroundColor: '#f2f2f2',
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.neutral.gray100,
     alignItems: 'center',
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333',
-  },
-  closeButton: {
-    backgroundColor: '#d9534f',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontWeight: '600',
+    flex: 1,
+    marginRight: theme.spacing.md,
   },
   pdfLoader: {
     flex: 1,

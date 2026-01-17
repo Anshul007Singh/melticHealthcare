@@ -4,7 +4,6 @@ import {
   StyleSheet,
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
@@ -17,6 +16,8 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import CustomModal from '@/components/modal';
 import { getStoredUserInfo, updateStoredUserKyc } from '@/api/auth';
 import { router } from 'expo-router';
+import { theme } from '@/constants/theme';
+import { Button, Input, H3 } from '@/components/ui';
 
 export default function KYCForm() {
   const [companyName, setCompanyName] = useState('');
@@ -207,21 +208,37 @@ export default function KYCForm() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
     >
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          accessibilityHint="Double tap to return to previous screen"
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
+        </TouchableOpacity>
+        <H3 style={styles.headerTitle}>KYC Details</H3>
+        <View style={styles.headerSpacer} />
+      </View>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           keyboardShouldPersistTaps='handled'
           showsVerticalScrollIndicator={false}
         >
           <ScrollView style={styles.container}>
-            <Text style={styles.heading}>Enter your Details</Text>
-            <TextInput
-              placeholder='Company / Firm Name*'
+            <Input
+              label="Company / Firm Name"
+              placeholder='Company / Firm Name'
               value={companyName}
               onChangeText={setCompanyName}
-              style={styles.input}
+              required
+              accessibilityLabel="Company or firm name"
+              accessibilityHint="Enter your registered business name"
             />
-            <TextInput
-              placeholder='Pin Code*'
+            <Input
+              label="Pin Code"
+              placeholder='Pin Code'
               value={pinCode}
               keyboardType='numeric'
               maxLength={6}
@@ -230,11 +247,11 @@ export default function KYCForm() {
                 setPinCode(numeric);
                 setErrors((e) => ({ ...e, pinCode: validatePinCode(numeric) }));
               }}
-              style={[styles.input, errors.pinCode && { borderColor: 'red' }]}
+              error={errors.pinCode}
+              required
+              accessibilityLabel="Pin code"
+              accessibilityHint="Enter 6-digit pin code"
             />
-            {errors.pinCode ? (
-              <Text style={styles.errorText}>{errors.pinCode}</Text>
-            ) : null}
 
             <Text style={styles.subHeading}>Do you have a drug license?</Text>
             <View style={styles.radioRow}>
@@ -243,6 +260,10 @@ export default function KYCForm() {
                   key={v}
                   style={styles.radioOption}
                   onPress={() => setDrugLicense(v as any)}
+                  accessibilityRole="radio"
+                  accessibilityLabel={`Drug license required - ${v}`}
+                  accessibilityState={{ checked: drugLicense === v }}
+                  accessibilityHint={`Double tap to select ${v}`}
                 >
                   <View
                     style={[
@@ -256,15 +277,21 @@ export default function KYCForm() {
             </View>
             {drugLicense === 'Yes' && (
               <>
-                <TextInput
-                  placeholder='20B License No*'
+                <Input
+                  label="20B License Number"
+                  placeholder='20B License No'
                   value={license20B}
                   onChangeText={setLicense20B}
-                  style={styles.input}
+                  required
+                  accessibilityLabel="License 20B number"
+                  accessibilityHint="Enter your 20B license number"
                 />
                 <TouchableOpacity
                   style={styles.uploadBtn}
                   onPress={() => pickDocument(setLicense20BFile)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Upload License 20B document"
+                  accessibilityHint="Double tap to select a PDF or image file"
                 >
                   <Ionicons name='cloud-upload-outline' size={18} />
                   <Text style={styles.uploadText}>
@@ -272,15 +299,21 @@ export default function KYCForm() {
                   </Text>
                 </TouchableOpacity>
 
-                <TextInput
-                  placeholder='21B License No*'
+                <Input
+                  label="21B License Number"
+                  placeholder='21B License No'
                   value={license21B}
                   onChangeText={setLicense21B}
-                  style={styles.input}
+                  required
+                  accessibilityLabel="License 21B number"
+                  accessibilityHint="Enter your 21B license number"
                 />
                 <TouchableOpacity
                   style={styles.uploadBtn}
                   onPress={() => pickDocument(setLicense21BFile)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Upload License 21B document"
+                  accessibilityHint="Double tap to select a PDF or image file"
                 >
                   <Ionicons name='cloud-upload-outline' size={18} />
                   <Text style={styles.uploadText}>
@@ -296,6 +329,10 @@ export default function KYCForm() {
                   key={v}
                   style={styles.radioOption}
                   onPress={() => setGstAvailable(v as any)}
+                  accessibilityRole="radio"
+                  accessibilityLabel={`GST available - ${v}`}
+                  accessibilityState={{ checked: gstAvailable === v }}
+                  accessibilityHint={`Double tap to select ${v}`}
                 >
                   <View
                     style={[
@@ -309,15 +346,21 @@ export default function KYCForm() {
             </View>
             {gstAvailable === 'Yes' && (
               <>
-                <TextInput
-                  placeholder='GST Number*'
+                <Input
+                  label="GST Number"
+                  placeholder='GST Number'
                   value={gstNumber}
                   onChangeText={setGstNumber}
-                  style={styles.input}
+                  required
+                  accessibilityLabel="GST number"
+                  accessibilityHint="Enter your GST registration number"
                 />
                 <TouchableOpacity
                   style={styles.uploadBtn}
                   onPress={() => pickDocument(setGstFile)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Upload GST document"
+                  accessibilityHint="Double tap to select a PDF or image file"
                 >
                   <Ionicons name='cloud-upload-outline' size={18} />
                   <Text style={styles.uploadText}>
@@ -326,8 +369,9 @@ export default function KYCForm() {
                 </TouchableOpacity>
               </>
             )}
-            <TextInput
-              placeholder='Aadhaar Number*'
+            <Input
+              label="Aadhaar Number"
+              placeholder='Aadhaar Number'
               value={aadhaarNumber}
               keyboardType='numeric'
               maxLength={12}
@@ -339,26 +383,27 @@ export default function KYCForm() {
                   aadhaarNumber: validateAadhaar(numeric),
                 }));
               }}
-              style={[
-                styles.input,
-                errors.aadhaarNumber && { borderColor: 'red' },
-              ]}
+              error={errors.aadhaarNumber}
+              required
+              accessibilityLabel="Aadhaar number"
+              accessibilityHint="Enter your 12-digit Aadhaar number"
             />
-            {errors.aadhaarNumber ? (
-              <Text style={styles.errorText}>{errors.aadhaarNumber}</Text>
-            ) : null}
 
             <TouchableOpacity
               style={styles.uploadBtn}
               onPress={() => pickDocument(setAadhaarFile)}
+              accessibilityRole="button"
+              accessibilityLabel="Upload Aadhaar document"
+              accessibilityHint="Double tap to select a PDF or image file"
             >
               <Ionicons name='cloud-upload-outline' size={18} />
               <Text style={styles.uploadText}>
                 {aadhaarFile?.name || 'Upload Aadhaar File'}
               </Text>
             </TouchableOpacity>
-            <TextInput
-              placeholder='PAN Number*'
+            <Input
+              label="PAN Number"
+              placeholder='PAN Number'
               value={panNumber}
               autoCapitalize='characters'
               maxLength={10}
@@ -391,16 +436,18 @@ export default function KYCForm() {
                     formatted.length === 10 ? validatePanNumber(formatted) : '',
                 }));
               }}
-              style={[styles.input, errors.panNumber && { borderColor: 'red' }]}
+              error={errors.panNumber}
+              required
+              accessibilityLabel="PAN card number"
+              accessibilityHint="Enter your 10-character PAN number"
             />
-
-            {errors.panNumber ? (
-              <Text style={styles.errorText}>{errors.panNumber}</Text>
-            ) : null}
 
             <TouchableOpacity
               style={styles.uploadBtn}
               onPress={() => pickDocument(setPanFile)}
+              accessibilityRole="button"
+              accessibilityLabel="Upload PAN card document"
+              accessibilityHint="Double tap to select a PDF or image file"
             >
               <Ionicons name='cloud-upload-outline' size={18} />
               <Text style={styles.uploadText}>
@@ -408,11 +455,13 @@ export default function KYCForm() {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setShowAnniversaryPicker(true)}>
-              <TextInput
+              <Input
+                label="Date of Anniversary"
                 placeholder='Date of Anniversary'
                 value={anniversary ? anniversary.toDateString() : ''}
-                style={styles.plainInput}
                 editable={false}
+                accessibilityLabel="Date of Anniversary"
+                accessibilityHint="Double tap to select date"
               />
             </TouchableOpacity>
             {showAnniversaryPicker && (
@@ -426,18 +475,18 @@ export default function KYCForm() {
                 }}
               />
             )}
-            <TouchableOpacity
-              style={[
-                styles.submitBtn,
-                { backgroundColor: isFormValid ? '#B5DE00' : '#ccc' },
-              ]}
-              disabled={!isFormValid || loading}
+            <Button
+              variant="success"
+              size="large"
               onPress={submitKYC}
+              disabled={!isFormValid}
+              loading={loading}
+              accessibilityLabel="Submit KYC details"
+              fullWidth
+              style={{ marginTop: theme.spacing.xl, marginBottom: theme.spacing.huge + theme.spacing.xxxl }}
             >
-              <Text style={{ fontWeight: 'bold' }}>
-                {loading ? 'Submitting...' : 'Place Order'}
-              </Text>
-            </TouchableOpacity>
+              Place Order
+            </Button>
           </ScrollView>
 
           <CustomModal
@@ -455,57 +504,76 @@ export default function KYCForm() {
 }
 
 const styles = StyleSheet.create({
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginBottom: 8,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.background.primary,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.neutral.gray200,
   },
-
-  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
-  heading: { fontSize: 20, fontWeight: 'bold', marginBottom: 16 },
-  subHeading: { fontSize: 16, fontWeight: 'bold', marginTop: 20 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 12,
+  backButton: {
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
   },
-  plainInput: {
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    fontSize: 16,
+  headerTitle: {
+    flex: 1,
+    textAlign: 'center',
   },
-  radioRow: { flexDirection: 'row', marginVertical: 10 },
-  radioOption: { flexDirection: 'row', alignItems: 'center', marginRight: 20 },
+  headerSpacer: {
+    width: 44,
+  },
+  container: {
+    flex: 1,
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.background.primary,
+  },
+  heading: {
+    ...theme.typography.h3,
+    marginBottom: theme.spacing.lg,
+  },
+  subHeading: {
+    ...theme.typography.bodyBold,
+    marginTop: theme.spacing.xl,
+  },
+  radioRow: {
+    flexDirection: 'row',
+    marginVertical: theme.spacing.sm,
+  },
+  radioOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: theme.spacing.xl,
+    paddingVertical: 13,  // Adds padding to achieve 44px touch target (44-18)/2
+    paddingHorizontal: 13,
+    minHeight: 44,  // WCAG/iOS HIG minimum touch target size
+    minWidth: 44,
+  },
   radioCircle: {
     width: 18,
     height: 18,
     borderRadius: 9,
     borderWidth: 2,
-    borderColor: '#0060AA',
-    marginRight: 6,
+    borderColor: theme.colors.primary.main,
+    marginRight: theme.spacing.xs,
   },
-  radioSelected: { backgroundColor: '#0060AA' },
+  radioSelected: {
+    backgroundColor: theme.colors.primary.main,
+  },
   uploadBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#accff0ff',
-    borderRadius: 5,
-    padding: 12,
-    marginBottom: 12,
+    borderColor: theme.colors.primary.lighter,
+    borderRadius: theme.borderRadius.sm,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
-  uploadText: { marginLeft: 8, fontWeight: '500' },
-  submitBtn: {
-    borderRadius: 55,
-    alignItems: 'center',
-    padding: 15,
-    marginBottom: 70,
+  uploadText: {
+    marginLeft: theme.spacing.sm,
+    fontWeight: '500',
   },
 });

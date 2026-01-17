@@ -12,6 +12,8 @@ import {
   Easing,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { theme } from '@/constants/theme';
+import { Shimmer, H3, Typography } from '@/components/ui';
 
 const placeholderImg = 'https://via.placeholder.com/150';
 
@@ -82,9 +84,15 @@ const CategoryCarousel = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Text style={styles.headerTitle}>Categories</Text>
-        <TouchableOpacity onPress={viewAllHandle}>
-          <Text style={styles.viewAll}>View All</Text>
+        <H3>Categories</H3>
+        <TouchableOpacity
+          onPress={viewAllHandle}
+          accessibilityRole="button"
+          accessibilityLabel="View all categories"
+        >
+          <Typography variant="small" color="link" style={styles.viewAll}>
+            View All
+          </Typography>
         </TouchableOpacity>
       </View>
 
@@ -94,22 +102,9 @@ const CategoryCarousel = () => {
             .fill(0)
             .map((_, index) => (
               <View key={index} style={styles.shimmerCard}>
-                <View style={styles.shimmerImageWrapper}>
-                  <Animated.View
-                    style={[
-                      styles.shimmerEffect,
-                      { transform: [{ translateX }] },
-                    ]}
-                  />
-                </View>
-                <View style={styles.shimmerLabelWrapper}>
-                  <Animated.View
-                    style={[
-                      styles.shimmerEffect,
-                      { transform: [{ translateX }] },
-                    ]}
-                  />
-                </View>
+                <Shimmer width={50} height={50} borderRadius={theme.borderRadius.sm} />
+                <View style={{ height: theme.spacing.sm }} />
+                <Shimmer width={70} height={14} borderRadius={theme.borderRadius.sm} />
               </View>
             ))}
         </ScrollView>
@@ -117,20 +112,25 @@ const CategoryCarousel = () => {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingRight: 16 }}
+          contentContainerStyle={{ paddingRight: theme.spacing.lg }}
         >
           {categories.map((item, index) => (
             <Pressable
               key={index}
               style={styles.card}
               onPress={() => onClickItem(item.slug)}
+              accessibilityRole="button"
+              accessibilityLabel={`Category: ${item.name}`}
             >
               <Image
                 source={{ uri: item.image?.src || placeholderImg }}
                 style={styles.image}
                 resizeMode='contain'
+                accessibilityIgnoresInvertColors
               />
-              <Text style={styles.label}>{item.name}</Text>
+              <Typography variant="caption" style={styles.label}>
+                {item.name}
+              </Typography>
             </Pressable>
           ))}
         </ScrollView>
@@ -145,79 +145,52 @@ const CARD_WIDTH = Dimensions.get('window').width * 0.28;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
-    paddingHorizontal: 16,
+    marginTop: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: theme.spacing.md,
+    alignItems: 'center',
+  },
+  viewAll: {
+    fontWeight: '600',
+  },
+  card: {
+    backgroundColor: theme.colors.primary.light,
+    width: CARD_WIDTH,
+    height: 120,
+    borderRadius: theme.borderRadius.md,
+    borderColor: theme.colors.primary.lighter,
+    borderWidth: 1,
+    marginRight: theme.spacing.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minWidth: theme.layout.minTouchTarget,
+    minHeight: theme.layout.minTouchTarget,
   },
   image: {
     width: 50,
     height: 50,
   },
   label: {
-    marginTop: 8,
-    fontSize: 13,
+    marginTop: theme.spacing.sm,
     textTransform: 'capitalize',
     fontWeight: '600',
-    color: '#1A1A1A',
     textAlign: 'center',
   },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  viewAll: {
-    fontSize: 14,
-    color: '#0060AA',
-    fontWeight: '600',
-  },
-  card: {
-    backgroundColor: '#F5FAFD',
-    width: CARD_WIDTH,
-    height: 120,
-    borderRadius: 10,
-    borderColor: '#C4E0F5',
-    borderWidth: 1,
-    marginRight: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  // Shimmer Styles
   shimmerCard: {
-    backgroundColor: '#F5FAFD',
+    backgroundColor: theme.colors.primary.light,
     width: CARD_WIDTH,
     height: 120,
-    borderRadius: 10,
-    marginRight: 12,
+    borderRadius: theme.borderRadius.md,
+    marginRight: theme.spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-  },
-  shimmerImageWrapper: {
-    width: 50,
-    height: 50,
-    backgroundColor: '#E1E9EE',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  shimmerLabelWrapper: {
-    width: 70,
-    height: 14,
-    marginTop: 8,
-    backgroundColor: '#E1E9EE',
-    borderRadius: 6,
-    overflow: 'hidden',
-  },
-  shimmerEffect: {
-    width: '50%',
-    height: '100%',
-    backgroundColor: '#F2F8FC',
-    opacity: 0.6,
+    borderColor: theme.colors.neutral.gray200,
+    paddingVertical: theme.spacing.lg,
   },
 });

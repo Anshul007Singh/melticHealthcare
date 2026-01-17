@@ -13,6 +13,8 @@ import { placeOrder } from '@/api/orders';
 import { getStoredUserInfo } from '@/api/auth';
 import CustomModal from '@/components/modal';
 import { router } from 'expo-router';
+import { theme } from '@/constants/theme';
+import { Button, Card, Typography, H4, Body } from '@/components/ui';
 
 export default function CartScreen() {
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -172,17 +174,22 @@ export default function CartScreen() {
   };
 
   const renderItem = ({ item }: any) => (
-    <View style={styles.itemCard}>
+    <Card variant="bordered" style={styles.itemCard}>
       <Image
         source={{
           uri:
             item.image || 'https://via.placeholder.com/80x80.png?text=No+Image',
         }}
         style={styles.itemImage}
+        accessibilityIgnoresInvertColors
       />
       <View style={styles.itemDetails}>
-        <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemPrice}>Price: ₹{item.price}</Text>
+        <Typography variant="bodyBold" style={styles.itemName}>
+          {item.name}
+        </Typography>
+        <Typography variant="small" color="secondary">
+          Price: ₹{item.price}
+        </Typography>
         <View style={styles.row}>
           <View style={styles.qtyContainer}>
             <TouchableOpacity
@@ -194,36 +201,51 @@ export default function CartScreen() {
                   removeFromCart(item.id);
                 }
               }}
+              accessibilityRole="button"
+              accessibilityLabel={`Decrease quantity of ${item.name}`}
             >
-              <Text style={styles.qtyText}>−</Text>
+              <Typography variant="bodyBold">−</Typography>
             </TouchableOpacity>
 
-            <Text style={styles.qtyNumber}>{item.quantity}</Text>
+            <Typography variant="body" style={styles.qtyNumber}>
+              {item.quantity}
+            </Typography>
 
             <TouchableOpacity
               style={styles.qtyButton}
               onPress={() => updateQuantity(item.id, item.quantity + 1)}
+              accessibilityRole="button"
+              accessibilityLabel={`Increase quantity of ${item.name}`}
             >
-              <Text style={styles.qtyText}>+</Text>
+              <Typography variant="bodyBold">+</Typography>
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.itemTotal}>₹{item.price * item.quantity}</Text>
+          <Typography variant="bodyBold" style={styles.itemTotal}>
+            ₹{item.price * item.quantity}
+          </Typography>
 
-          <TouchableOpacity onPress={() => removeFromCart(item.id)}>
-            <Ionicons name='trash-outline' size={22} color='#FF4C4C' />
+          <TouchableOpacity
+            onPress={() => removeFromCart(item.id)}
+            accessibilityRole="button"
+            accessibilityLabel={`Remove ${item.name} from cart`}
+            style={styles.deleteButton}
+          >
+            <Ionicons name='trash-outline' size={22} color={theme.colors.semantic.error} />
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </Card>
   );
 
   return (
     <View style={styles.container}>
       {cartItems.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name='cart-outline' size={150} color='#ccc' />
-          <Text style={styles.emptyText}>Your cart is empty</Text>
+          <Ionicons name='cart-outline' size={150} color={theme.colors.neutral.gray300} />
+          <Typography variant="body" color="tertiary" style={styles.emptyText}>
+            Your cart is empty
+          </Typography>
         </View>
       ) : (
         <>
@@ -234,34 +256,41 @@ export default function CartScreen() {
             contentContainerStyle={styles.listContainer}
           />
 
-          <View style={styles.summaryCard}>
+          <Card variant="bordered" style={styles.summaryCard}>
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Subtotals for order</Text>
-              <Text style={styles.summaryValue}>₹ {subtotal.toFixed(2)}</Text>
+              <Typography variant="small" color="secondary">
+                Subtotals for order
+              </Typography>
+              <Typography variant="small">₹ {subtotal.toFixed(2)}</Typography>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Delivery fee</Text>
-              <Text style={styles.summaryValue}>
-                ₹ {deliveryFee.toFixed(2)}
-              </Text>
+              <Typography variant="small" color="secondary">
+                Delivery fee
+              </Typography>
+              <Typography variant="small">₹ {deliveryFee.toFixed(2)}</Typography>
             </View>
             <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Discount</Text>
-              <Text style={styles.summaryValue}>-₹ {discount.toFixed(2)}</Text>
+              <Typography variant="small" color="secondary">
+                Discount
+              </Typography>
+              <Typography variant="small">-₹ {discount.toFixed(2)}</Typography>
             </View>
             <View style={styles.divider} />
             <View style={styles.summaryRow}>
-              <Text style={styles.totalLabel}>Total</Text>
-              <Text style={styles.totalValue}>₹ {total.toFixed(2)}</Text>
+              <Typography variant="bodyBold">Total</Typography>
+              <Typography variant="bodyBold">₹ {total.toFixed(2)}</Typography>
             </View>
-          </View>
+          </Card>
 
-          <TouchableOpacity
-            style={styles.checkoutButton}
+          <Button
+            variant="success"
             onPress={onPlaceOrder}
+            style={styles.checkoutButton}
+            fullWidth
+            accessibilityLabel="Proceed to checkout"
           >
-            <Text style={styles.checkoutText}>Checkout</Text>
-          </TouchableOpacity>
+            Checkout
+          </Button>
         </>
       )}
 
@@ -278,72 +307,87 @@ export default function CartScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  listContainer: { paddingHorizontal: 16, paddingTop: 15 },
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background.primary
+  },
+  listContainer: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.lg
+  },
   itemCard: {
     flexDirection: 'row',
-    backgroundColor: '#F9F9F9',
-    borderRadius: 12,
-    padding: 10,
-    marginBottom: 12,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   itemImage: {
     width: 80,
     height: 80,
-    borderRadius: 10,
-    marginRight: 10,
+    borderRadius: theme.borderRadius.md,
+    marginRight: theme.spacing.md,
   },
   itemDetails: { flex: 1 },
-  itemName: { fontSize: 16, fontWeight: '600' },
-  itemPrice: { color: '#333', marginTop: 2 },
+  itemName: {
+    marginBottom: theme.spacing.xs,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: theme.spacing.sm,
     justifyContent: 'space-between',
   },
   qtyContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    backgroundColor: theme.colors.background.primary,
+    borderRadius: theme.borderRadius.sm,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: theme.colors.neutral.gray300,
   },
-  qtyButton: { paddingHorizontal: 10, paddingVertical: 4 },
-  qtyText: { fontSize: 16, fontWeight: '600' },
-  qtyNumber: { fontSize: 16, fontWeight: '500', paddingHorizontal: 6 },
-  itemTotal: { fontSize: 15, fontWeight: '600' },
+  qtyButton: {
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.xs,
+    minWidth: theme.layout.minTouchTarget,
+    minHeight: theme.layout.minTouchTarget,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  qtyNumber: {
+    paddingHorizontal: theme.spacing.xs,
+  },
+  itemTotal: {
+    marginHorizontal: theme.spacing.sm,
+  },
+  deleteButton: {
+    minWidth: theme.layout.minTouchTarget,
+    minHeight: theme.layout.minTouchTarget,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   summaryCard: {
-    backgroundColor: '#F9F9F9',
-    borderRadius: 10,
-    padding: 16,
-    marginHorizontal: 16,
-    marginTop: 12,
+    marginHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.md,
   },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 3,
+    marginVertical: theme.spacing.xs,
   },
-  summaryLabel: { color: '#555' },
-  summaryValue: { color: '#111', fontWeight: '500' },
   divider: {
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    marginVertical: 6,
+    borderBottomColor: theme.colors.neutral.gray300,
+    marginVertical: theme.spacing.sm,
   },
-  totalLabel: { fontSize: 16, fontWeight: '600' },
-  totalValue: { fontSize: 16, fontWeight: '700' },
   checkoutButton: {
-    backgroundColor: '#28a745',
-    margin: 16,
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginVertical: 50,
+    margin: theme.spacing.lg,
+    marginTop: theme.spacing.xl,
   },
-  checkoutText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  emptyText: { marginTop: 10, color: '#999' },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  emptyText: {
+    marginTop: theme.spacing.md,
+  },
 });

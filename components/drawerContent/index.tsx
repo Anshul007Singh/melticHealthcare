@@ -16,6 +16,7 @@ import { router, useRouter } from 'expo-router';
 import { logoutUser } from '@/api/auth';
 import { getStoredUserInfo } from '@/api/auth';
 import { useAuth } from '@/context/authContext';
+import { theme } from '@/constants/theme';
 
 export default function CustomDrawerContent(props: any) {
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -71,7 +72,7 @@ export default function CustomDrawerContent(props: any) {
       contentContainerStyle={styles.scrollContent}
     >
       <View style={styles.profileSection}>
-        <Ionicons name='person-circle-outline' size={48} color='#0060AA' />
+        <Ionicons name='person-circle-outline' size={48} color={theme.colors.primary.main} />
         <View style={styles.profileText}>
           <Text style={styles.profileName}>
             {userInfo?.name ?? 'Unknown User'}
@@ -156,7 +157,7 @@ function MenuItem({
 
   return (
     <TouchableOpacity style={styles.menuItem} onPress={handlePress}>
-      <MaterialCommunityIcons name={icon} size={22} color='#0060AA' />
+      <MaterialCommunityIcons name={icon} size={22} color={theme.colors.primary.main} />
       <Text style={styles.menuText}>{label}</Text>
     </TouchableOpacity>
   );
@@ -165,59 +166,58 @@ function MenuItem({
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#fff',
-    padding: 16,
-    paddingTop: 20,
+    backgroundColor: theme.colors.background.primary,
+    padding: theme.spacing.lg,
+    paddingTop: theme.spacing.xl,
   },
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
-    gap: 10,
+    marginBottom: theme.spacing.sm,
+    gap: theme.spacing.sm,
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 20,
+    padding: theme.spacing.xl,
   },
   profileText: {
     flex: 1,
   },
   profileName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    ...theme.typography.bodyBold,
+    color: theme.colors.text.primary,
   },
   profilePhone: {
-    fontSize: 14,
-    color: '#555',
+    ...theme.typography.small,
+    color: theme.colors.text.secondary,
   },
   divider: {
-    marginVertical: 8,
+    marginVertical: theme.spacing.sm,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 20,
-    gap: 15,
+    paddingVertical: theme.spacing.xl,
+    gap: theme.spacing.lg,
   },
   menuText: {
-    fontSize: 16,
-    color: '#333',
+    ...theme.typography.body,
+    color: theme.colors.text.primary,
   },
   footer: {
-    marginTop: 40,
+    marginTop: theme.spacing.huge,
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 8,
-    marginBottom: 30,
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.xxxl,
   },
   footerLink: {
-    color: '#0060AA',
-    fontSize: 14,
+    color: theme.colors.primary.main,
+    ...theme.typography.small,
   },
   footerSeparator: {
-    color: '#0060AA',
-    fontSize: 14,
+    color: theme.colors.primary.main,
+    ...theme.typography.small,
   },
 });
 function reloadApp() {

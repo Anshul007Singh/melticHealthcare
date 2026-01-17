@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, View, Dimensions } from 'react-native';
+import { Animated, Dimensions, StyleSheet, View } from 'react-native';
+import { theme } from '@/constants/theme';
 
 export default function SplashScreen({ onFinish }: any) {
   const logos = [
@@ -26,7 +27,7 @@ export default function SplashScreen({ onFinish }: any) {
           duration: 300,
           useNativeDriver: true,
         }),
-        Animated.delay(500),
+        Animated.delay(300),
         Animated.timing(opacity, {
           toValue: 0,
           duration: 300,
@@ -36,7 +37,10 @@ export default function SplashScreen({ onFinish }: any) {
         indexRef.current++;
 
         if (indexRef.current < logos.length) {
-          setIndex(indexRef.current);
+          // Use setTimeout to avoid useInsertionEffect warning
+          setTimeout(() => {
+            setIndex(indexRef.current);
+          }, 0);
           animateLogo();
         } else {
           onFinish?.();
@@ -67,7 +71,7 @@ export default function SplashScreen({ onFinish }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0060AA',
+    backgroundColor: theme.colors.primary.main,
     width: '100%',
   },
   logo: {

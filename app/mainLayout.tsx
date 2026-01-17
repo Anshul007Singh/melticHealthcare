@@ -1,29 +1,29 @@
-import 'react-native-reanimated';
-import React from 'react';
+import CustomDrawerContent from '@/components/drawerContent';
+import { Badge } from '@/components/ui';
+import { theme } from '@/constants/theme';
+import { useCart } from '@/context/cartContext';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { Ionicons } from '@expo/vector-icons';
+import type { DrawerNavigationOptions } from '@react-navigation/drawer';
 import {
-  DarkTheme,
   DefaultTheme,
-  ThemeProvider,
   DrawerActions,
+  ThemeProvider
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
+import { router } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
-import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
 import {
   Dimensions,
   Pressable,
+  StyleSheet,
+  Text,
   TouchableOpacity,
   View,
-  Text,
-  StyleSheet,
 } from 'react-native';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import CustomDrawerContent from '@/components/drawerContent';
-import { router } from 'expo-router';
 import { PaperProvider } from 'react-native-paper';
-import type { DrawerNavigationOptions } from '@react-navigation/drawer';
-import { useCart } from '@/context/cartContext';
-import Home from './(drawer)/(tabs)/home';
+import 'react-native-reanimated';
 
 export default function MainLayout() {
   const colorScheme = useColorScheme();
@@ -42,29 +42,39 @@ export default function MainLayout() {
   // ✅ Header style when Drawer menu is available
   const renderHeaderWithDrawer = (navigation: any) => ({
     headerStyle: {
-      backgroundColor: '#0060AA',
+      backgroundColor: theme.colors.primary.contrast,
+      borderWidth: 0,
     },
-    headerTintColor: 'white',
+    headerTintColor: theme.colors.text.primary,
     headerLeft: () => (
       <Pressable
         onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
-        style={{ marginLeft: 15 }}
+        style={{ marginLeft: theme.spacing.lg }}
+        accessibilityRole="button"
+        accessibilityLabel="Open menu"
       >
-        <Ionicons name='menu' size={30} color='white' />
+        <Ionicons name='menu' size={30} color={theme.colors.primary.main} />
       </Pressable>
     ),
     headerTitle: () => (
-      <View style={{ alignItems: 'center', marginLeft: 60 }}>
         <Text style={styles.brandName}>Meltic Group</Text>
-      </View>
     ),
     headerRight: () => (
-      <Pressable onPress={goToCart} style={{ marginRight: 15, marginTop: 6 }}>
-        <View style={{ position: 'relative' }}>
-          <Ionicons name='cart-outline' size={28} color='white' />
+      <Pressable
+        onPress={goToCart}
+        style={styles.cartButton}
+        accessibilityRole="button"
+        accessibilityLabel={`Shopping cart, ${cartCount} items`}
+      >
+        <View style={styles.cartIconContainer}>
+          <Ionicons
+            name='cart-outline'
+            size={28}
+            color={theme.colors.primary.main}
+          />
           {cartCount > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{cartCount}</Text>
+            <View style={styles.badgePosition}>
+              <Badge count={cartCount} variant="error" />
             </View>
           )}
         </View>
@@ -75,30 +85,40 @@ export default function MainLayout() {
   // ✅ Header style with back button
   const renderHeaderWithBack = () => ({
     headerStyle: {
-      backgroundColor: '#0060AA',
+      backgroundColor: theme.colors.primary.contrast,
     },
-    headerTintColor: '#fff',
+    headerTintColor: theme.colors.primary.main,
     headerTitleAlign: 'center',
     headerTitleStyle: {
-      color: '#fff',
-      fontWeight: 'bold',
-      fontSize: 18,
+      color: theme.colors.text.primary,
+      ...theme.typography.h4,
     },
     headerLeft: () => (
       <TouchableOpacity
         onPress={() => router.back()}
-        style={{ marginLeft: 15 }}
+        style={{ marginLeft: theme.spacing.lg }}
+        accessibilityRole="button"
+        accessibilityLabel="Go back"
       >
-        <Ionicons name='arrow-back' size={24} color='#fff' />
+        <Ionicons name='arrow-back' size={24} color={theme.colors.primary.main} />
       </TouchableOpacity>
     ),
     headerRight: () => (
-      <Pressable onPress={goToCart} style={{ marginRight: 15, marginTop: 6 }}>
-        <View style={{ position: 'relative' }}>
-          <Ionicons name='cart-outline' size={28} color='white' />
+      <Pressable
+        onPress={goToCart}
+        style={styles.cartButton}
+        accessibilityRole="button"
+        accessibilityLabel={`Shopping cart, ${cartCount} items`}
+      >
+        <View style={styles.cartIconContainer}>
+          <Ionicons
+            name='cart-outline'
+            size={28}
+            color={theme.colors.primary.main}
+          />
           {cartCount > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{cartCount}</Text>
+            <View style={styles.badgePosition}>
+              <Badge count={cartCount} variant="error" />
             </View>
           )}
         </View>
@@ -158,26 +178,25 @@ export default function MainLayout() {
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    position: 'absolute',
-    right: -6,
-    top: -4,
-    backgroundColor: 'red',
-    borderRadius: 10,
-    width: 18,
-    height: 18,
+  cartButton: {
+    marginRight: theme.spacing.lg,
+    marginTop: theme.spacing.xs,
+    minWidth: theme.layout.minTouchTarget,
+    minHeight: theme.layout.minTouchTarget,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  badgeText: {
-    color: 'white',
-    fontSize: 10,
-    fontWeight: 'bold',
+  cartIconContainer: {
+    position: 'relative',
+  },
+  badgePosition: {
+    position: 'absolute',
+    right: -6,
+    top: -4,
   },
   brandName: {
-    color: 'white',
-    fontSize: 22,
+    color: theme.colors.text.primary,
+    ...theme.typography.h2,
     fontStyle: 'italic',
-    fontWeight: 'bold',
   },
 });

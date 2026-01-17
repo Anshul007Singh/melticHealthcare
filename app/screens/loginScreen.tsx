@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import {
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  StyleSheet,
+  Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback
 } from 'react-native';
-import { ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 
-import { LinearGradient } from 'expo-linear-gradient';
+import { Button, Input, Typography } from '@/components/ui';
+import { theme } from '@/constants/theme';
+import { useAuth } from '@/context/authContext';
 import { Snackbar } from 'react-native-paper';
 import { loginUser } from '../../api/auth';
-import { useAuth } from '@/context/authContext';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -41,10 +42,19 @@ export default function LoginScreen({
   };
 
   const handleLogin = async () => {
-    if (email.length <= 3 || password.length === 4) {
-      showSnackbar('Please enter valid credentials.', 'error');
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showSnackbar('Please enter a valid email address.', 'error');
       return;
     }
+
+    // Validate password length (minimum 6 characters)
+    if (password.length < 6) {
+      showSnackbar('Password must be at least 6 characters long.', 'error');
+      return;
+    }
+
     try {
       await loginUser(email, password, login);
 
@@ -62,7 +72,7 @@ export default function LoginScreen({
   };
 
   return (
-    <LinearGradient colors={['#0060AA', '#0060AA']} style={styles.container}>
+    <>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -74,40 +84,58 @@ export default function LoginScreen({
             keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.title}>Login</Text>
-            <Text style={styles.subtitle}>Sign in to continue.</Text>
-
-            <Text style={styles.label}>Email</Text>
-            <TextInput
+            <Image source={require('../../assets/images/favicon.png')} style={styles.logoimage}
+             />
+            <Typography variant="h1" color="primary" center style={styles.title}>
+              Welcome to Meltic Group
+            </Typography>
+            <Typography variant="body" color="secondary" style={styles.label}>
+              Email
+            </Typography>
+            <Input
               placeholder='Enter your Email'
-              placeholderTextColor='#ccc'
+              placeholderTextColor={theme.colors.neutral.gray600}
               value={email}
               onChangeText={setEmail}
-              style={styles.input}
               keyboardType='email-address'
               returnKeyType='next'
+              accessibilityLabel="Email address"
+              accessibilityHint="Enter your email address"
             />
 
-            <Text style={styles.label}>Password</Text>
-            <TextInput
+            <Typography variant="body" color="secondary" style={styles.label}>
+              Password
+            </Typography>
+            <Input
               placeholder='Enter your password'
-              placeholderTextColor='#ccc'
+              placeholderTextColor={theme.colors.neutral.gray600}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              style={styles.input}
               returnKeyType='done'
+              accessibilityLabel="Password"
+              accessibilityHint="Enter your password"
             />
 
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-              <Text style={styles.loginButtonText}>Login</Text>
-            </TouchableOpacity>
+            <Button
+              variant="primary"
+              onPress={handleLogin}
+              style={styles.loginButton}
+              accessibilityLabel="Login button">
+              Login
+            </Button>
 
-            <TouchableOpacity onPress={onGoToRegister}>
-              <Text style={styles.registerText}>
-                Don’t have an account?{' '}
-                <Text style={styles.registerLink}>Register</Text>
-              </Text>
+            <TouchableOpacity
+              onPress={onGoToRegister}
+              accessibilityRole="button"
+              accessibilityLabel="Go to registration"
+            >
+              <Typography variant="small" color="secondary" center style={styles.registerText}>
+                Don't have an account?{' '}
+                <Typography variant="smallBold" color="link">
+                  Register
+                </Typography>
+              </Typography>
             </TouchableOpacity>
           </ScrollView>
         </TouchableWithoutFeedback>
@@ -126,7 +154,7 @@ export default function LoginScreen({
       >
         {snackbarMessage}
       </Snackbar>
-    </LinearGradient>
+    </>
   );
 }
 
@@ -137,68 +165,37 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 30,
+    paddingHorizontal: theme.spacing.xxxl,
   },
   title: {
-    fontSize: 42,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 10,
+    marginTop: theme.spacing.lg,
+    marginBottom: theme.spacing.xl,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#cfcfcf',
-    textAlign: 'center',
-    marginBottom: 40,
+    opacity: 0.8,
+    marginBottom: theme.spacing.xxxl,
+  },
+  logoimage: {
+    marginLeft: 'auto',
+    marginRight: 'auto',
   },
   label: {
-    fontSize: 12,
-    color: '#fff',
-    marginBottom: 6,
-    marginTop: 10,
-    letterSpacing: 1,
-  },
-  input: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 10,
-    padding: 14,
-    color: '#fff',
-    marginBottom: 15,
+    marginBottom: theme.spacing.xs,
+    marginTop: theme.spacing.md,
   },
   loginButton: {
-    borderWidth: 1,
-    borderColor: '#fff',
-    borderRadius: 10,
-    paddingVertical: 14,
-    marginTop: 20,
-  },
-  loginButtonText: {
-    textAlign: 'center',
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    marginTop: theme.spacing.xl,
   },
   registerText: {
-    textAlign: 'center',
-    color: '#fff',
-    fontSize: 14,
-    marginTop: 25,
-    opacity: 0.8,
+    marginTop: theme.spacing.xxxl,
   },
-  registerLink: {
-    textDecorationLine: 'underline',
-    color: '#fff',
-    fontWeight: '600',
-  },
-
   snackbar: {
-    marginBottom: 20,
+    marginBottom: theme.spacing.xl,
   },
   successSnackbar: {
-    backgroundColor: '#2ecc71',
+    backgroundColor: theme.colors.semantic.success,
   },
   errorSnackbar: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: theme.colors.semantic.error,
   },
 });

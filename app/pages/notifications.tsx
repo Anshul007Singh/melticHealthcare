@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { fetchProducts } from '@/data/productList';
+import { theme } from '@/constants/theme';
+import { Typography, EmptyState } from '@/components/ui';
 
 type NotificationType = {
   id: string;
@@ -32,7 +34,7 @@ const NotificationScreen = () => {
           date: new Date(prod.date_created).toLocaleString(),
           timestamp: createdAt,
           icon: 'plus-box',
-          color: '#4CAF50',
+          color: theme.colors.semantic.success,
         });
 
         previousProducts.current.add(prod.id);
@@ -63,12 +65,18 @@ const NotificationScreen = () => {
   const renderItem = ({ item }: { item: NotificationType }) => (
     <View style={styles.card}>
       <View style={[styles.iconContainer, { backgroundColor: item.color }]}>
-        <MaterialCommunityIcons name={item.icon} size={22} color='#fff' />
+        <MaterialCommunityIcons name={item.icon} size={22} color={theme.colors.background.primary} />
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.description}>{item.description}</Text>
-        <Text style={styles.date}>{item.date}</Text>
+        <Typography variant="bodyBold" style={styles.title}>
+          {item.title}
+        </Typography>
+        <Typography variant="small" style={styles.description}>
+          {item.description}
+        </Typography>
+        <Typography variant="caption" style={styles.date}>
+          {item.date}
+        </Typography>
       </View>
     </View>
   );
@@ -76,15 +84,17 @@ const NotificationScreen = () => {
   return (
     <View style={styles.container}>
       {notifications.length === 0 ? (
-        <Text style={{ textAlign: 'center', color: '#999', marginTop: 350 }}>
-          No new product added in the last 7 days
-        </Text>
+        <EmptyState
+          icon="notifications-outline"
+          title="No Notifications"
+          message="No new products have been added in the last 7 days. Check back later for updates!"
+        />
       ) : (
         <FlatList
           data={notifications}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ paddingBottom: theme.spacing.xl }}
         />
       )}
     </View>
@@ -94,47 +104,38 @@ const NotificationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 15,
+    backgroundColor: theme.colors.background.primary,
+    padding: theme.spacing.lg,
   },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 15,
-    marginBottom: 15,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
-    elevation: 2,
+    backgroundColor: theme.colors.background.primary,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.lg,
+    borderRadius: theme.borderRadius.md,
+    ...theme.shadows.sm,
   },
   iconContainer: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: theme.borderRadius.round,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 15,
+    marginRight: theme.spacing.lg,
   },
   textContainer: {
     flex: 1,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#000',
-    marginBottom: 3,
+    marginBottom: theme.spacing.xs,
   },
   description: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 3,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.xs,
   },
   date: {
-    fontSize: 12,
-    color: '#999',
+    color: theme.colors.text.tertiary,
   },
 });
 

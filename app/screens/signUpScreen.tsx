@@ -1,19 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { registerUser } from '@/api/auth';
+import CustomModal from '@/components/modal';
+import { Button, Input, Typography } from '@/components/ui';
+import { theme } from '@/constants/theme';
+import React, { useEffect, useState } from 'react';
 import {
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  StyleSheet,
+  Image,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
   TouchableWithoutFeedback,
-  Keyboard,
+  View
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { registerUser } from '@/api/auth';
-import CustomModal from '@/components/modal';
 
 interface RegisterScreenProps {
   onRegistered: () => void;
@@ -112,12 +111,7 @@ export default function RegisterScreen({
   }, [errors, name, email, password, mobile]);
 
   return (
-    <LinearGradient
-      colors={['#001F60', '#0060AA']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.container}
-    >
+    <ScrollView>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -129,93 +123,121 @@ export default function RegisterScreen({
             keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>
+            <Image source={require('../../assets/images/favicon.png')} style={styles.logoimage}
+                         />
+            <Typography variant="h1" color="primary" center style={styles.title}>
+              Create Account
+            </Typography>
+            <Typography variant="small" color="secondary" center>
               Already Registered?{' '}
-              <Text style={styles.link} onPress={onGoToLogin}>
-                Log in here.
-              </Text>
-            </Text>
+              <Typography
+                variant="smallBold"
+                color="link"
+                onPress={onGoToLogin}
+              >
+                Log in here
+              </Typography>
+            </Typography>
 
-            <Text style={styles.label}>FULL NAME</Text>
-            <TextInput
-              placeholder='Enter full name'
-              placeholderTextColor='#ccc'
-              value={name}
-              onChangeText={(t) => {
-                setName(t);
-                setErrors((e) => ({ ...e, name: validateName(t) }));
-              }}
-              style={[styles.input, errors.name && styles.inputError]}
-              returnKeyType='next'
-            />
-            {errors.name ? (
-              <Text style={styles.errorText}>{errors.name}</Text>
-            ) : null}
+            <View style={styles.formgroup}>
+              <Typography variant="body" color="secondary" style={styles.label}>
+                Full Name
+              </Typography>
+              <Input
+                placeholder='Enter full name'
+                placeholderTextColor={theme.colors.neutral.gray300}
+                value={name}
+                onChangeText={(t) => {
+                  setName(t);
+                  setErrors((e) => ({ ...e, name: validateName(t) }));
+                }}
+                returnKeyType='next'
+                accessibilityLabel="Full name"
+              />
+              {errors.name ? (
+                <Typography variant="caption" color="error">
+                  {errors.name}
+                </Typography>
+              ) : null}
+            
+              <Typography variant="body" color="secondary" style={styles.label}>
+                Email
+              </Typography>
+              <Input
+                placeholder='Enter your Email'
+                placeholderTextColor={theme.colors.neutral.gray300}
+                value={email}
+                onChangeText={(t) => {
+                  setEmail(t);
+                  setErrors((e) => ({ ...e, email: validateEmail(t) }));
+                }}
+                keyboardType='email-address'
+                returnKeyType='next'
+                accessibilityLabel="Email address"
+              />
+              {errors.email ? (
+                <Typography variant="caption" color="error">
+                  {errors.email}
+                </Typography>
+              ) : null}
+            
+              <Typography variant="body" color="secondary" style={styles.label}>
+                Password
+              </Typography>
+              <Input
+                placeholder='Enter your password'
+                placeholderTextColor={theme.colors.neutral.gray300}
+                value={password}
+                onChangeText={(t) => {
+                  setPassword(t);
+                  setErrors((e) => ({ ...e, password: validatePassword(t) }));
+                }}
+                secureTextEntry
+                returnKeyType='next'
+                accessibilityLabel="Password"
+              />
+              {errors.password ? (
+                <Typography variant="caption" color="error">
+                  {errors.password}
+                </Typography>
+              ) : null}
+           
+              <Typography variant="body" color="secondary" style={styles.label}>
+                Mobile
+              </Typography>
+              <Input
+                placeholder='Enter mobile number'
+                placeholderTextColor={theme.colors.neutral.gray300}
+                value={mobile}
+                onChangeText={(t) => {
+                  const numeric = t.replace(/[^0-9]/g, '');
+                  setMobile(numeric);
+                  setErrors((e) => ({
+                    ...e,
+                    mobile: validateMobile(numeric),
+                  }));
+                }}
+                keyboardType='numeric'
+                maxLength={10}
+                returnKeyType='done'
+                accessibilityLabel="Mobile number"
+              />
+              {errors.mobile ? (
+                <Typography variant="caption" color="error">
+                  {errors.mobile}
+                </Typography>
+              ) : null}
+            </View>
 
-            <Text style={styles.label}>EMAIL</Text>
-            <TextInput
-              placeholder='Enter your Email'
-              placeholderTextColor='#ccc'
-              value={email}
-              onChangeText={(t) => {
-                setEmail(t);
-                setErrors((e) => ({ ...e, email: validateEmail(t) }));
-              }}
-              keyboardType='email-address'
-              style={[styles.input, errors.email && styles.inputError]}
-              returnKeyType='next'
-            />
-            {errors.email ? (
-              <Text style={styles.errorText}>{errors.email}</Text>
-            ) : null}
-
-            <Text style={styles.label}>PASSWORD</Text>
-            <TextInput
-              placeholder='Enter your password'
-              placeholderTextColor='#ccc'
-              value={password}
-              onChangeText={(t) => {
-                setPassword(t);
-                setErrors((e) => ({ ...e, password: validatePassword(t) }));
-              }}
-              secureTextEntry
-              style={[styles.input, errors.password && styles.inputError]}
-              returnKeyType='next'
-            />
-            {errors.password ? (
-              <Text style={styles.errorText}>{errors.password}</Text>
-            ) : null}
-
-            <Text style={styles.label}>MOBILE</Text>
-            <TextInput
-              placeholder='Enter mobile number'
-              placeholderTextColor='#ccc'
-              value={mobile}
-              onChangeText={(t) => {
-                const numeric = t.replace(/[^0-9]/g, '');
-                setMobile(numeric);
-                setErrors((e) => ({
-                  ...e,
-                  mobile: validateMobile(numeric),
-                }));
-              }}
-              keyboardType='numeric'
-              maxLength={10}
-              style={[styles.input, errors.mobile && styles.inputError]}
-              returnKeyType='done'
-            />
-            {errors.mobile ? (
-              <Text style={styles.errorText}>{errors.mobile}</Text>
-            ) : null}
-
-            <TouchableOpacity
-              style={[styles.signupButton, !isValid && { opacity: 0.5 }]}
+            <Button
+              variant="primary"
               onPress={handleRegister}
               disabled={!isValid}
+              style={styles.signupButton}
+              accessibilityLabel="Sign up button"
             >
-              <Text style={styles.signupButtonText}>Sign up</Text>
-            </TouchableOpacity>
+              Sign up
+            </Button>
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -231,71 +253,38 @@ export default function RegisterScreen({
         }}
         confirmText='OK'
       />
-    </LinearGradient>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
   content: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 30,
+    paddingHorizontal: theme.spacing.xxxl,
   },
   title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
   },
-  subtitle: {
-    fontSize: 14,
-    color: '#cfcfcf',
-    textAlign: 'center',
-    marginBottom: 40,
+  logoimage: {
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: theme.spacing.xxxl,
+    marginBottom: theme.spacing.lg,
   },
-  link: {
-    color: '#fff',
-    textDecorationLine: 'underline',
-    fontWeight: '600',
+  formgroup: {
+    marginTop: theme.spacing.xxl,
   },
   label: {
-    fontSize: 12,
-    color: '#fff',
-    marginBottom: 6,
-    marginTop: 10,
-    letterSpacing: 1,
-  },
-  input: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 10,
-    padding: 14,
-    color: '#fff',
+    marginBottom: theme.spacing.xs,
+    marginTop: theme.spacing.sm,
   },
   inputError: {
-    borderWidth: 1,
-    borderColor: '#ff6b6b',
-  },
-  errorText: {
-    color: '#ff6b6b',
-    fontSize: 12,
-    marginTop: 4,
-    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: theme.colors.semantic.error,
   },
   signupButton: {
-    borderWidth: 1,
-    borderColor: '#fff',
-    borderRadius: 10,
-    paddingVertical: 14,
-    marginTop: 25,
-  },
-  signupButtonText: {
-    textAlign: 'center',
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    marginTop: theme.spacing.xl,
+    marginBottom: theme.spacing.xxl,
   },
 });
