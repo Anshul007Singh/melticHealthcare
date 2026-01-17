@@ -37,7 +37,7 @@ const colors = {
     success: '#28A745',              // Success states, confirmations
     successBackground: '#D4EDDA',    // Success backgrounds
     successLight: '#D4EDDA',         // Alias for backward compatibility
-    error: '#FF4C4C',                // Error states, destructive actions
+    error: '#c63333',                // Error states, destructive actions
     errorBackground: '#F8D7DA',      // Error backgrounds
     errorLight: '#F8D7DA',           // Alias for backward compatibility
     warning: '#FFC107',              // Warning states
@@ -72,7 +72,7 @@ const colors = {
     inverse: '#FFFFFF',      // Text on dark backgrounds
     link: '#0060AA',         // Links
     success: '#28A745',      // Success messages
-    error: '#FF4C4C',        // Error messages
+    error: '#c63333',        // Error messages
     warning: '#FFC107',      // Warning messages
   },
 

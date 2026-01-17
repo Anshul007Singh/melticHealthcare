@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import CustomModal from '@/components/modal';
+import { theme } from '@/constants/theme';
 
 type StoredUserInfo = {
   id: number;
@@ -199,7 +200,7 @@ const Profile = () => {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color='#fff' />
+                <ActivityIndicator color={theme.colors.neutral.white} />
               ) : (
                 <Text style={styles.buttonText}>Update Profile</Text>
               )}
@@ -230,45 +231,34 @@ const Profile = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    padding: theme.spacing.xl,
   },
   title: {
-    fontSize: 22,
-    fontWeight: '600',
-    marginBottom: 20,
+    ...theme.typography.h2,
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.xl,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 15,
-    fontSize: 16,
-    backgroundColor: '#fff',
+    ...theme.components.input.default,
+    marginBottom: theme.spacing.lg,
   },
   disabled: {
-    backgroundColor: '#ebe8e8ff',
+    ...theme.components.input.disabled,
   },
   button: {
-    backgroundColor: '#0060AA',
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
+    ...theme.components.button.primary,
+    marginTop: theme.spacing.md,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...theme.typography.bodyBold,
+    color: theme.colors.primary.contrast,
   },
   cancelButton: {
-    backgroundColor: '#fd6868ff',
-    color: '#fff',
+    backgroundColor: theme.colors.semantic.error,
   },
   cancelButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+    ...theme.typography.bodyBold,
+    color: theme.colors.neutral.white,
   },
 });
 

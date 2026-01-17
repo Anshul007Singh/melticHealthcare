@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Modal, Portal, Text, Button, Divider } from 'react-native-paper';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { theme } from '@/constants/theme';
 
 interface CustomModalProps {
@@ -30,17 +30,17 @@ const CustomModal: React.FC<CustomModalProps> = ({
   const themeStyles = {
     success: {
       color: theme.colors.semantic.success,
-      icon: 'check-circle',
+      icon: 'checkmark-circle',
       bg: theme.colors.semantic.successBackground,
     },
     error: {
       color: theme.colors.semantic.error,
-      icon: 'error',
+      icon: 'alert-circle',
       bg: theme.colors.semantic.errorBackground,
     },
     info: {
       color: theme.colors.semantic.info,
-      icon: 'info',
+      icon: 'information-circle',
       bg: theme.colors.semantic.infoBackground,
     },
   }[type];
@@ -57,7 +57,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
       >
         {/* Icon */}
         <View style={styles.iconWrapper}>
-          <MaterialIcons
+          <Ionicons
             name={themeStyles.icon as any}
             size={48}
             color={themeStyles.color}

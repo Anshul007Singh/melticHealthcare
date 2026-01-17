@@ -11,7 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import { Divider } from 'react-native-paper';
-import { MaterialCommunityIcons, Ionicons, Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { router, useRouter } from 'expo-router';
 import { logoutUser } from '@/api/auth';
 import { getStoredUserInfo } from '@/api/auth';
@@ -87,29 +87,29 @@ export default function CustomDrawerContent(props: any) {
 
       <MenuItem icon='home-outline' label='Home' href='/home' />
       <MenuItem
-        icon='account-outline'
+        icon='person-outline'
         label='My Account'
         href=''
         onPress={myAccountHandler}
       />
       {userInfo?.kyc === false && (
-        <MenuItem icon='percent' label='KYC Details' href='/pages/kycDetails' />
+        <MenuItem icon='pricetag-outline' label='KYC Details' href='/pages/kycDetails' />
       )}
 
       <MenuItem
-        icon='bell-outline'
+        icon='notifications-outline'
         label='Notification'
         href='/notifications'
         onPress={notificationHandler}
       />
       <MenuItem
-        icon='truck-delivery'
+        icon='cube-outline'
         label='Order Details'
         href='/pages/orderDetails'
       />
 
       <MenuItem
-        icon='headset'
+        icon='headset-outline'
         label='Customer Support'
         href='/contact'
         onPress={kycHandler}
@@ -121,12 +121,12 @@ export default function CustomDrawerContent(props: any) {
         href={undefined}
       />
       <MenuItem
-        icon='shield-account'
+        icon='shield-outline'
         label='Privacy Policy'
         href='/pages/privacyPolicy'
       />
       <MenuItem
-        icon='file-document-outline'
+        icon='document-text-outline'
         label='Terms and Conditions'
         href='/pages/termsAndConditions'
       />
@@ -140,7 +140,7 @@ function MenuItem({
   href,
   onPress,
 }: {
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  icon: keyof typeof Ionicons.glyphMap;
   label: string;
   href: any;
   onPress?: () => void;
@@ -157,7 +157,7 @@ function MenuItem({
 
   return (
     <TouchableOpacity style={styles.menuItem} onPress={handlePress}>
-      <MaterialCommunityIcons name={icon} size={22} color={theme.colors.primary.main} />
+      <Ionicons name={icon} size={22} color={theme.colors.primary.main} />
       <Text style={styles.menuText}>{label}</Text>
     </TouchableOpacity>
   );

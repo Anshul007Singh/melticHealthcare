@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   iconsRow: {},
   floatingBtnContainer: {
     position: 'absolute',
-    bottom: theme.spacing.xl,
+    bottom: theme.spacing.lg,
     width: Dimensions.get('window').width,
     paddingHorizontal: theme.spacing.xl,
   },
