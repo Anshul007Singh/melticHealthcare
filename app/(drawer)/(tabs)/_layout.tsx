@@ -1,5 +1,5 @@
 import { theme } from '@/constants/theme';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Ionicons } from '@expo/vector-icons';
 import { router, Tabs } from 'expo-router';
 import { TouchableOpacity } from 'react-native';
 
@@ -28,7 +28,7 @@ export default function TabLayout() {
           title: 'Home',
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome name='home' size={size} color={color} />
+            <Ionicons name='home' size={size} color={color} />
           ),
         }}
       />
@@ -39,7 +39,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <TouchableOpacity onPress={handleProductListPress}>
-              <FontAwesome name='archive' size={size} color={color} />
+              <Ionicons name='archive-outline' size={size} color={color} />
             </TouchableOpacity>
           ),
         }}
@@ -50,7 +50,7 @@ export default function TabLayout() {
           title: 'Contact',
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <FontAwesome name='address-book' size={size} color={color} />
+            <Ionicons name='call-outline' size={size} color={color} />
           ),
         }}
       />

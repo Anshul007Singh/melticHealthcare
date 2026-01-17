@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import CustomModal from '@/components/modal';
 import { getStoredUserInfo, updateStoredUserKyc } from '@/api/auth';
 import { router } from 'expo-router';

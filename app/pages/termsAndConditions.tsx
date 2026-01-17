@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Text, Title } from 'react-native-paper';
+import { theme } from '@/constants/theme';
 
 const TermsAndConditions = () => {
   return (
@@ -186,22 +187,21 @@ const TermsAndConditions = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#fff',
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.background.primary,
   },
   heading: {
-    marginBottom: 20,
+    marginBottom: theme.spacing.xl,
   },
   sectionTitle: {
-    marginTop: 16,
-    fontWeight: 'bold',
-    fontSize: 16,
+    ...theme.typography.bodyBold,
+    marginTop: theme.spacing.lg,
+    color: theme.colors.text.primary,
   },
   paragraph: {
-    marginTop: 6,
-    lineHeight: 20,
-    fontSize: 14,
-    color: '#444',
+    ...theme.typography.small,
+    marginTop: theme.spacing.xs,
+    color: theme.colors.text.secondary,
   },
 });
 
