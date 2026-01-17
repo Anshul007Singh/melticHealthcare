@@ -17,7 +17,7 @@ export default function TabLayout() {
         tabBarInactiveTintColor: theme.colors.neutral.gray600,  // Improved contrast ratio (4.6:1)
         tabBarStyle: {
           backgroundColor: theme.colors.primary.light,  // Changed from #0060AA for theme consistency
-          height: 75,
+          height: 80,
           paddingTop: 10,
         },
       }}

@@ -77,8 +77,8 @@ export default function ProductDetailScreen() {
 
     return data;
   }
-  const descriptionData = parseDescription(shortDescription as string);
-  const descriptionText = parseDescription(description as string);
+  const descriptionData = parseDescription((shortDescription as string) || '');
+  const descriptionText = parseDescription((description as string) || '');
   const sideEffectsText =
     typeof sideEffects === 'string'
       ? sideEffects.replace(/<[^>]+>/g, '')

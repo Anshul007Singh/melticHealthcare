@@ -66,10 +66,15 @@ export const SearchResultItem: React.FC<SearchResultItemProps> = ({
           pathname: '/pages/productDetail',
           params: {
             id: product.id,
-            name: product.name,
+            title: product.name,
+            img: product.images?.[0]?.src || '',
+            category: product.categories?.[0]?.name || '',
             price: product.price,
-            image: product.images?.[0]?.src || '',
-            ...product,
+            sku: product.sku,
+            description: '',
+            shortDescription: '',
+            sideEffects: '',
+            indications: '',
           },
         });
         break;
