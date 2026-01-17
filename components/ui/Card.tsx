@@ -57,7 +57,7 @@ export const Card: React.FC<CardProps> = ({
   return (
     <View
       style={containerStyle}
-      accessibilityRole="group"
+      // accessibilityRole="group"
       accessibilityLabel={accessibilityLabel}
       {...viewProps}
     >
@@ -94,7 +94,7 @@ export const TouchableCard: React.FC<TouchableCardProps> = ({
     <TouchableOpacity
       style={containerStyle}
       activeOpacity={0.8}
-      accessibilityRole="button"
+      accessibilityRole='button'
       accessibilityLabel={accessibilityLabel}
       {...touchableProps}
     >
