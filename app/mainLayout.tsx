@@ -193,9 +193,9 @@ const styles = StyleSheet.create({
     // position: 'relative',
   },
   badgePosition: {
-    // position: 'absolute',
-    // right: -6,
-    // top: -4,
+    position: 'absolute',
+    right: -6,
+    top: -4,
   },
   brandName: {
     color: theme.colors.text.primary,

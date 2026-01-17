@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface CartItem {
   id: string;
@@ -13,13 +14,47 @@ type CartContextType = {
   addToCart: (item: CartItem) => void;
   removeFromCart: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
-  emptyCart: () => void; // 👈 new function
+  emptyCart: () => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_STORAGE_KEY = '@CART_ITEMS';
+
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadCart = async () => {
+      try {
+        const storedCart = await AsyncStorage.getItem(CART_STORAGE_KEY);
+        if (storedCart) {
+          setCartItems(JSON.parse(storedCart));
+        }
+      } catch (error) {
+        console.error('Failed to load cart', error);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+
+    loadCart();
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    const saveCart = async () => {
+      try {
+        await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
+      } catch (error) {
+        console.error('Failed to save cart', error);
+      }
+    };
+
+    saveCart();
+  }, [cartItems, isLoaded]);
 
   const addToCart = (item: CartItem) => {
     setCartItems((prev) => {
@@ -28,9 +63,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         return prev.map((i) =>
           i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
         );
-      } else {
-        return [...prev, { ...item, quantity: 1 }];
       }
+      return [...prev, { ...item, quantity: 1 }];
     });
   };
 
@@ -44,9 +78,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     );
   };
 
-  // 👇 new emptyCart function
-  const emptyCart = () => {
+  const emptyCart = async () => {
     setCartItems([]);
+    await AsyncStorage.removeItem(CART_STORAGE_KEY);
   };
 
   return (
@@ -66,6 +100,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) throw new Error('useCart must be used within a CartProvider');
+  if (!context) throw new Error('useCart must be used within CartProvider');
   return context;
 };
