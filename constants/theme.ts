@@ -146,7 +146,7 @@ const typography = {
 
   // Caption / Labels
   caption: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '400' as TextStyle['fontWeight'],
     lineHeight: 18,
     letterSpacing: 0,
@@ -368,7 +368,7 @@ const components = {
   // Input/Form Styles
   input: {
     default: {
-      backgroundColor: colors.neutral.white,
+      backgroundColor: colors.neutral.gray50,
       borderWidth: 1,
       borderColor: colors.neutral.gray300,
       borderRadius: borderRadius.sm,
@@ -390,7 +390,7 @@ const components = {
     } as ViewStyle,
 
     disabled: {
-      backgroundColor: colors.neutral.gray100,
+      backgroundColor: colors.neutral.gray200,
       borderColor: colors.neutral.gray200,
       color: colors.text.tertiary,
     } as TextStyle & ViewStyle,

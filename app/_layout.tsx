@@ -1,20 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import SignUpScreen from './screens/signUpScreen';
-import LoginScreen from './screens/loginScreen';
-import MainLayout from './mainLayout';
-import SplashScreen from './screens/splashscreen';
-import { CartProvider } from '@/context/cartContext';
-import { getStoredToken } from '@/api/auth';
+import theme from '@/constants/theme';
 import { AuthProvider, useAuth } from '@/context/authContext';
+import { CartProvider } from '@/context/cartContext';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
+import MainLayout from './mainLayout';
+import LoginScreen from './screens/loginScreen';
+import SignUpScreen from './screens/signUpScreen';
+import SplashScreen from './screens/splashscreen';
 
 export default function App() {
   return (
-    <PaperProvider>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </PaperProvider>
+    <View style={styles.rootContainer}>
+      <PaperProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </PaperProvider>
+    </View>
   );
 }
 function AppContent() {
@@ -39,25 +42,38 @@ function AppContent() {
 
   if (!isLoggedIn && screen === 'signup') {
     return (
-      <SignUpScreen
-        onRegistered={() => setScreen('login')}
-        onGoToLogin={() => setScreen('login')}
-      />
+      <View style={styles.rootContainer}>
+        <SignUpScreen
+          onRegistered={() => setScreen('login')}
+          onGoToLogin={() => setScreen('login')}
+        />
+      </View>
     );
   }
 
   if (!isLoggedIn && screen === 'login') {
     return (
-      <LoginScreen
-        onLoginSuccess={() => setScreen('home')}
-        onGoToRegister={() => setScreen('signup')}
-      />
+      <View style={styles.rootContainer}>
+        <LoginScreen
+          onLoginSuccess={() => setScreen('home')}
+          onGoToRegister={() => setScreen('signup')}
+        />
+      </View>
     );
   }
 
   return (
-    <CartProvider>
-      <MainLayout />
-    </CartProvider>
+    <View style={styles.rootContainer}>
+      <CartProvider>
+        <MainLayout />
+      </CartProvider>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  rootContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.background.primary,
+  },
+});

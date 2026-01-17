@@ -1,19 +1,18 @@
-import React, { useEffect, useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  Pressable,
-  Image,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  ScrollView,
-  Animated,
-  Easing,
-} from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { H3, Shimmer, Typography } from '@/components/ui';
 import { theme } from '@/constants/theme';
-import { Shimmer, H3, Typography } from '@/components/ui';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  Easing,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
 const placeholderImg = 'https://via.placeholder.com/150';
 
@@ -141,11 +140,12 @@ const CategoryCarousel = () => {
 
 export default CategoryCarousel;
 
-const CARD_WIDTH = Dimensions.get('window').width * 0.28;
+const CARD_WIDTH = Dimensions.get('window').width * 0.29;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: theme.spacing.xl,
+    marginTop: theme.spacing.xxxl,
+    marginBottom: theme.spacing.xl,
     paddingHorizontal: theme.spacing.lg,
   },
   headerRow: {
@@ -160,22 +160,22 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: theme.colors.primary.light,
     width: CARD_WIDTH,
-    height: 120,
+    height: 110,
     borderRadius: theme.borderRadius.md,
     borderColor: theme.colors.primary.lighter,
     borderWidth: 1,
-    marginRight: theme.spacing.md,
+    marginRight: theme.spacing.sm,
     justifyContent: 'center',
     alignItems: 'center',
     minWidth: theme.layout.minTouchTarget,
     minHeight: theme.layout.minTouchTarget,
   },
   image: {
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
   },
   label: {
-    marginTop: theme.spacing.sm,
+    padding: theme.spacing.sm,
     textTransform: 'capitalize',
     fontWeight: '600',
     textAlign: 'center',
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   shimmerCard: {
     backgroundColor: theme.colors.primary.light,
     width: CARD_WIDTH,
-    height: 120,
+    height: 110,
     borderRadius: theme.borderRadius.md,
     marginRight: theme.spacing.md,
     justifyContent: 'center',

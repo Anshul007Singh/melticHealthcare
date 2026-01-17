@@ -115,7 +115,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
             >
               <Ionicons
                 name="close"
-                color={theme.colors.text.primary}
+                size={20}
+                color={theme.colors.text.inverse}
               />
             </Pressable>
           </View>
@@ -168,13 +169,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    backgroundColor: theme.colors.primary.main,
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: theme.spacing.sm,
     paddingRight: theme.spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.neutral.gray200,
-    backgroundColor: theme.colors.background.primary,
   },
   searchBar: {
     flex: 1,
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
     height: theme.layout.minTouchTarget,
   },
   closeButtonPressed: {
-    backgroundColor: theme.colors.neutral.gray100,
+    backgroundColor: theme.colors.primary.dark,
   },
   content: {
     flex: 1,

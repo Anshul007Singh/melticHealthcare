@@ -82,7 +82,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         onFocus={onFocus}
         onBlur={onBlur}
         placeholder={placeholder}
-        placeholderTextColor={theme.colors.neutral.gray400}
+        placeholderTextColor={theme.colors.neutral.gray50}
         style={styles.input}
         autoFocus={autoFocus}
         editable={editable}
@@ -121,24 +121,23 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.background.secondary,
     borderRadius: theme.borderRadius.md,
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
     marginHorizontal: theme.spacing.lg,
     marginVertical: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.neutral.gray200,
+    borderWidth: 0,
     minHeight: theme.layout.minTouchTarget,
   },
   searchIcon: {
     marginRight: theme.spacing.sm,
+    fontSize: 20,
+    color: theme.colors.primary.contrast,
   },
   input: {
     flex: 1,
     ...theme.typography.body,
-    color: theme.colors.text.primary,
-    paddingVertical: 0, // Remove default padding
+    color: theme.colors.text.inverse,
   },
   clearButton: {
     padding: theme.spacing.xs,
@@ -146,7 +145,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.round,
   },
   clearButtonPressed: {
-    backgroundColor: theme.colors.neutral.gray100,
+    color: theme.colors.primary.contrast,
   },
 });
 

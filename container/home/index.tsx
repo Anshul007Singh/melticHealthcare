@@ -5,7 +5,6 @@ import Divsions from '@/components/home/division/divsion';
 import HighQualityProducts from '@/components/home/featureProducts';
 import VisualAid from '@/components/home/visualAid';
 import { SearchBar, SearchModal } from '@/components/search';
-import { SectionDivider } from '@/components/ui';
 import { theme } from '@/constants/theme';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
@@ -21,16 +20,17 @@ const Home = () => {
     <ErrorBoundary>
       <View style={styles.container}>
         {/* Search Bar */}
-        <SearchBar
-          value=""
-          onChangeText={() => {}}
-          onFocus={handleSearchFocus}
-          editable={true
-            
-          }
-          placeholder="Search products, categories, brands..."
-        />
-
+        <View style={styles.search}>
+          <SearchBar
+            value=""
+            onChangeText={() => {}}
+            onFocus={handleSearchFocus}
+            editable={true
+              
+            }
+            placeholder="Search products, categories, brands..."
+          />
+        </View>
         {/* Home Content */}
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -38,19 +38,11 @@ const Home = () => {
         >
           <Carousel />
 
-          <SectionDivider spacing="xl" />
-
           <VisualAid />
-
-          <SectionDivider spacing="xl" />
 
           <PremiumProducts />
 
-          <SectionDivider spacing="xl" />
-
           <HighQualityProducts />
-
-          <SectionDivider spacing="xl" />
 
           <Divsions />
         </ScrollView>
@@ -69,6 +61,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background.primary,
+  },
+  search: {
+    backgroundColor: theme.colors.primary.main,
   },
   scrollContent: {
     paddingBottom: theme.spacing.huge,

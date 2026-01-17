@@ -42,10 +42,10 @@ export default function MainLayout() {
   // ✅ Header style when Drawer menu is available
   const renderHeaderWithDrawer = (navigation: any) => ({
     headerStyle: {
-      backgroundColor: theme.colors.primary.contrast,
+      backgroundColor: theme.colors.primary.main,
       borderWidth: 0,
     },
-    headerTintColor: theme.colors.text.primary,
+    headerTintColor: theme.colors.text.inverse,
     headerLeft: () => (
       <Pressable
         onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
@@ -53,7 +53,7 @@ export default function MainLayout() {
         accessibilityRole='button'
         accessibilityLabel='Open menu'
       >
-        <Ionicons name='menu' size={30} color={theme.colors.primary.main} />
+        <Ionicons name='menu' size={30} color={theme.colors.primary.contrast} />
       </Pressable>
     ),
     headerTitleAlign: 'center',
@@ -69,7 +69,7 @@ export default function MainLayout() {
           <Ionicons
             name='cart-outline'
             size={28}
-            color={theme.colors.primary.main}
+            color={theme.colors.primary.contrast}
           />
           {cartCount > 0 && (
             <View style={styles.badgePosition}>
@@ -80,16 +80,15 @@ export default function MainLayout() {
       </Pressable>
     ),
   });
-
   // ✅ Header style with back button
   const renderHeaderWithBack = () => ({
     headerStyle: {
-      backgroundColor: theme.colors.primary.contrast,
+      backgroundColor: theme.colors.primary.main,
     },
-    headerTintColor: theme.colors.primary.main,
+    headerTintColor: theme.colors.primary.contrast,
     headerTitleAlign: 'center',
     headerTitleStyle: {
-      color: theme.colors.text.primary,
+      color: theme.colors.text.inverse,
       ...theme.typography.h4,
     },
     headerLeft: () => (
@@ -102,7 +101,7 @@ export default function MainLayout() {
         <Ionicons
           name='arrow-back'
           size={24}
-          color={theme.colors.primary.main}
+          color={theme.colors.primary.contrast}
         />
       </TouchableOpacity>
     ),
@@ -117,7 +116,7 @@ export default function MainLayout() {
           <Ionicons
             name='cart-outline'
             size={28}
-            color={theme.colors.primary.main}
+            color={theme.colors.primary.contrast}
           />
           {cartCount > 0 && (
             <View style={styles.badgePosition}>
@@ -198,7 +197,7 @@ const styles = StyleSheet.create({
     top: -4,
   },
   brandName: {
-    color: theme.colors.text.primary,
+    color: theme.colors.text.inverse,
     ...theme.typography.h2,
     fontStyle: 'italic',
     // textAlign: 'center',

@@ -1,5 +1,5 @@
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
 const BASE_URL = 'https://www.melticgroup.com/online';
@@ -74,6 +74,7 @@ export const registerUser = async (
   return response.data;
 };
 
+
 export const getStoredToken = async (): Promise<string | null> => {
   return await AsyncStorage.getItem('userToken');
 };
@@ -114,3 +115,4 @@ export const getAuthHeader = async () => {
     Authorization: `Bearer ${token}`,
   };
 };
+
