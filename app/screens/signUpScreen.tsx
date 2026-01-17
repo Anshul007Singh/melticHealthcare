@@ -4,7 +4,6 @@ import { Button, Input, Typography } from '@/components/ui';
 import { theme } from '@/constants/theme';
 import React, { useEffect, useState } from 'react';
 import {
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -122,14 +121,12 @@ export default function RegisterScreen({
             contentContainerStyle={styles.content}
             keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
-          >
-            <Image source={require('../../assets/images/favicon.png')} style={styles.logoimage}
-                         />
+          >  
             <Typography variant="h1" color="primary" center style={styles.title}>
               Create Account
             </Typography>
             <Typography variant="small" color="secondary" center>
-              Already Registered?{' '}
+              Already Sign Up?{' '}
               <Typography
                 variant="smallBold"
                 color="link"
@@ -145,7 +142,7 @@ export default function RegisterScreen({
               </Typography>
               <Input
                 placeholder='Enter full name'
-                placeholderTextColor={theme.colors.neutral.gray300}
+                placeholderTextColor={theme.colors.neutral.gray600}
                 value={name}
                 onChangeText={(t) => {
                   setName(t);
@@ -165,7 +162,7 @@ export default function RegisterScreen({
               </Typography>
               <Input
                 placeholder='Enter your Email'
-                placeholderTextColor={theme.colors.neutral.gray300}
+                placeholderTextColor={theme.colors.neutral.gray600}
                 value={email}
                 onChangeText={(t) => {
                   setEmail(t);
@@ -186,7 +183,7 @@ export default function RegisterScreen({
               </Typography>
               <Input
                 placeholder='Enter your password'
-                placeholderTextColor={theme.colors.neutral.gray300}
+                placeholderTextColor={theme.colors.neutral.gray600}
                 value={password}
                 onChangeText={(t) => {
                   setPassword(t);
@@ -207,7 +204,7 @@ export default function RegisterScreen({
               </Typography>
               <Input
                 placeholder='Enter mobile number'
-                placeholderTextColor={theme.colors.neutral.gray300}
+                placeholderTextColor={theme.colors.neutral.gray600}
                 value={mobile}
                 onChangeText={(t) => {
                   const numeric = t.replace(/[^0-9]/g, '');
@@ -265,12 +262,7 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: theme.spacing.sm,
-  },
-  logoimage: {
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginTop: theme.spacing.xxxl,
-    marginBottom: theme.spacing.lg,
+    marginTop: 60,
   },
   formgroup: {
     marginTop: theme.spacing.xxl,

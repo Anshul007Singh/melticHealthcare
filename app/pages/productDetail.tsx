@@ -1,3 +1,5 @@
+import { Accordion, Button, H3, Typography } from '@/components/ui';
+import { theme } from '@/constants/theme';
 import { useCart } from '@/context/cartContext';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -10,9 +12,6 @@ import {
   View,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { Ionicons } from '@expo/vector-icons';
-import { theme } from '@/constants/theme';
-import { Button, Typography, H3, Accordion } from '@/components/ui';
 
 export default function ProductDetailScreen() {
   const {
@@ -146,19 +145,6 @@ export default function ProductDetailScreen() {
   }
   return (
     <View style={{ flex: 1 }}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          accessibilityHint="Double tap to return to previous screen"
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
-        </TouchableOpacity>
-        <H3 style={styles.headerTitle}>Product Details</H3>
-        <View style={styles.headerSpacer} />
-      </View>
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 100 }}

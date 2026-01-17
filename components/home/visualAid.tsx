@@ -1,18 +1,19 @@
+import { ErrorCard, H3, Shimmer, Typography } from '@/components/ui';
+import { theme } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Image,
-  StyleSheet,
   Dimensions,
-  Pressable,
-  ScrollView,
+  Image,
   Modal,
+  Pressable,
   SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import axios from 'axios';
-import { theme } from '@/constants/theme';
-import { H3, Typography, Button, Shimmer, ErrorCard } from '@/components/ui';
 
 const CARD_WIDTH = Dimensions.get('window').width * 0.28;
 const API_URL = 'https://www.melticgroup.com/online/wp-json/wp/v2/visual_aids';
@@ -180,13 +181,7 @@ const VisualAid = () => {
                 <Typography variant="h4" style={styles.modalTitle}>
                   {selectedItem?.name}
                 </Typography>
-                <Button
-                  variant="danger"
-                  size="small"
-                  onPress={closeModal}
-                >
-                  Close ✕
-                </Button>
+                  <Ionicons onPress={closeModal} name='close' size={24} color={theme.colors.primary.main} />
               </View>
 
               {!selectedItem?.pdfUrl ? (
@@ -234,9 +229,10 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.md,
     width: '100%',
     height: 65,
+    resizeMode: 'cover',
   },
   label: {
-    marginTop: theme.spacing.sm,
+    marginTop: theme.spacing.xs,
     fontWeight: '600',
     textAlign: 'center',
   },

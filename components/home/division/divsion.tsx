@@ -133,7 +133,7 @@ const OurDivisions = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingLeft: theme.spacing.sm }}
+          contentContainerStyle={{ paddingLeft: theme.spacing.lg, paddingVertical: theme.spacing.md, }}
         />
       )}
 
@@ -142,6 +142,7 @@ const OurDivisions = () => {
         style={{
           width: '92%',
           margin: theme.spacing.lg,
+          marginBottom: 0,
           borderRadius: theme.borderRadius.xl,
         }}
         accessibilityLabel="Promotional offer banner"
@@ -163,7 +164,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: theme.spacing.lg,
     paddingHorizontal: theme.spacing.lg,
   },
   logoContainer: {
@@ -174,8 +174,6 @@ const styles = StyleSheet.create({
     marginRight: theme.spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.neutral.gray200,
     ...theme.shadows.sm,
   },
   logo: {

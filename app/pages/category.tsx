@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Image,
-  Pressable,
-  Dimensions,
-} from 'react-native';
+import { Card, Shimmer, Typography } from '@/components/ui';
+import { theme } from '@/constants/theme';
 import { fetchProducts } from '@/data/productList';
 import { router, useLocalSearchParams } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { Card, Typography, Shimmer } from '@/components/ui';
+import React, { useEffect, useState } from 'react';
+import {
+  Dimensions,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 
-const placeholderImg = 'https://via.placeholder.com/150';
+const placeholderImg = '@/assets/images/img-box.svg';
 const { width } = Dimensions.get('window');
 
 const DynamicListScreen = () => {
@@ -106,16 +106,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    padding: theme.spacing.lg,
+    padding: theme.spacing.md,
     backgroundColor: theme.colors.background.secondary,
   },
   card: {
-    width: '30%',
-    aspectRatio: 1,
-    justifyContent: 'center',
+    width: 110,
+    height:120,
+    padding: theme.spacing.xs,
     alignItems: 'center',
-    marginVertical: theme.spacing.md,
-    overflow: 'hidden',
+    justifyContent: 'center',
   },
   image: {
     width: 50,
