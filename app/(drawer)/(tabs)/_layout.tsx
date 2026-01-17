@@ -13,12 +13,12 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.primary.main,  // Changed from #fff for theme consistency
-        tabBarInactiveTintColor: theme.colors.neutral.gray600,  // Improved contrast ratio (4.6:1)
+        tabBarActiveTintColor: theme.colors.primary.main, // Changed from #fff for theme consistency
+        tabBarInactiveTintColor: theme.colors.neutral.gray600, // Improved contrast ratio (4.6:1)
         tabBarStyle: {
-          backgroundColor: theme.colors.primary.light,  // Changed from #0060AA for theme consistency
-          height: 80,
-          paddingTop: 10,
+          backgroundColor: theme.colors.primary.light, // Changed from #0060AA for theme consistency
+          height: 85,
+          paddingTop: 5,
         },
       }}
     >
