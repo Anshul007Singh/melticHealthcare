@@ -208,19 +208,6 @@ export default function KYCForm() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
     >
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          accessibilityHint="Double tap to return to previous screen"
-          style={styles.backButton}
-        >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text.primary} />
-        </TouchableOpacity>
-        <H3 style={styles.headerTitle}>KYC Details</H3>
-        <View style={styles.headerSpacer} />
-      </View>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           keyboardShouldPersistTaps='handled'
@@ -228,16 +215,16 @@ export default function KYCForm() {
         >
           <ScrollView style={styles.container}>
             <Input
-              label="Company / Firm Name"
+              label='Company / Firm Name'
               placeholder='Company / Firm Name'
               value={companyName}
               onChangeText={setCompanyName}
               required
-              accessibilityLabel="Company or firm name"
-              accessibilityHint="Enter your registered business name"
+              accessibilityLabel='Company or firm name'
+              accessibilityHint='Enter your registered business name'
             />
             <Input
-              label="Pin Code"
+              label='Pin Code'
               placeholder='Pin Code'
               value={pinCode}
               keyboardType='numeric'
@@ -249,8 +236,8 @@ export default function KYCForm() {
               }}
               error={errors.pinCode}
               required
-              accessibilityLabel="Pin code"
-              accessibilityHint="Enter 6-digit pin code"
+              accessibilityLabel='Pin code'
+              accessibilityHint='Enter 6-digit pin code'
             />
 
             <Text style={styles.subHeading}>Do you have a drug license?</Text>
@@ -260,7 +247,7 @@ export default function KYCForm() {
                   key={v}
                   style={styles.radioOption}
                   onPress={() => setDrugLicense(v as any)}
-                  accessibilityRole="radio"
+                  accessibilityRole='radio'
                   accessibilityLabel={`Drug license required - ${v}`}
                   accessibilityState={{ checked: drugLicense === v }}
                   accessibilityHint={`Double tap to select ${v}`}
@@ -278,20 +265,20 @@ export default function KYCForm() {
             {drugLicense === 'Yes' && (
               <>
                 <Input
-                  label="20B License Number"
+                  label='20B License Number'
                   placeholder='20B License No'
                   value={license20B}
                   onChangeText={setLicense20B}
                   required
-                  accessibilityLabel="License 20B number"
-                  accessibilityHint="Enter your 20B license number"
+                  accessibilityLabel='License 20B number'
+                  accessibilityHint='Enter your 20B license number'
                 />
                 <TouchableOpacity
                   style={styles.uploadBtn}
                   onPress={() => pickDocument(setLicense20BFile)}
-                  accessibilityRole="button"
-                  accessibilityLabel="Upload License 20B document"
-                  accessibilityHint="Double tap to select a PDF or image file"
+                  accessibilityRole='button'
+                  accessibilityLabel='Upload License 20B document'
+                  accessibilityHint='Double tap to select a PDF or image file'
                 >
                   <Ionicons name='cloud-upload-outline' size={18} />
                   <Text style={styles.uploadText}>
@@ -300,20 +287,20 @@ export default function KYCForm() {
                 </TouchableOpacity>
 
                 <Input
-                  label="21B License Number"
+                  label='21B License Number'
                   placeholder='21B License No'
                   value={license21B}
                   onChangeText={setLicense21B}
                   required
-                  accessibilityLabel="License 21B number"
-                  accessibilityHint="Enter your 21B license number"
+                  accessibilityLabel='License 21B number'
+                  accessibilityHint='Enter your 21B license number'
                 />
                 <TouchableOpacity
                   style={styles.uploadBtn}
                   onPress={() => pickDocument(setLicense21BFile)}
-                  accessibilityRole="button"
-                  accessibilityLabel="Upload License 21B document"
-                  accessibilityHint="Double tap to select a PDF or image file"
+                  accessibilityRole='button'
+                  accessibilityLabel='Upload License 21B document'
+                  accessibilityHint='Double tap to select a PDF or image file'
                 >
                   <Ionicons name='cloud-upload-outline' size={18} />
                   <Text style={styles.uploadText}>
@@ -329,7 +316,7 @@ export default function KYCForm() {
                   key={v}
                   style={styles.radioOption}
                   onPress={() => setGstAvailable(v as any)}
-                  accessibilityRole="radio"
+                  accessibilityRole='radio'
                   accessibilityLabel={`GST available - ${v}`}
                   accessibilityState={{ checked: gstAvailable === v }}
                   accessibilityHint={`Double tap to select ${v}`}
@@ -347,20 +334,20 @@ export default function KYCForm() {
             {gstAvailable === 'Yes' && (
               <>
                 <Input
-                  label="GST Number"
+                  label='GST Number'
                   placeholder='GST Number'
                   value={gstNumber}
                   onChangeText={setGstNumber}
                   required
-                  accessibilityLabel="GST number"
-                  accessibilityHint="Enter your GST registration number"
+                  accessibilityLabel='GST number'
+                  accessibilityHint='Enter your GST registration number'
                 />
                 <TouchableOpacity
                   style={styles.uploadBtn}
                   onPress={() => pickDocument(setGstFile)}
-                  accessibilityRole="button"
-                  accessibilityLabel="Upload GST document"
-                  accessibilityHint="Double tap to select a PDF or image file"
+                  accessibilityRole='button'
+                  accessibilityLabel='Upload GST document'
+                  accessibilityHint='Double tap to select a PDF or image file'
                 >
                   <Ionicons name='cloud-upload-outline' size={18} />
                   <Text style={styles.uploadText}>
@@ -370,7 +357,7 @@ export default function KYCForm() {
               </>
             )}
             <Input
-              label="Aadhaar Number"
+              label='Aadhaar Number'
               placeholder='Aadhaar Number'
               value={aadhaarNumber}
               keyboardType='numeric'
@@ -385,16 +372,16 @@ export default function KYCForm() {
               }}
               error={errors.aadhaarNumber}
               required
-              accessibilityLabel="Aadhaar number"
-              accessibilityHint="Enter your 12-digit Aadhaar number"
+              accessibilityLabel='Aadhaar number'
+              accessibilityHint='Enter your 12-digit Aadhaar number'
             />
 
             <TouchableOpacity
               style={styles.uploadBtn}
               onPress={() => pickDocument(setAadhaarFile)}
-              accessibilityRole="button"
-              accessibilityLabel="Upload Aadhaar document"
-              accessibilityHint="Double tap to select a PDF or image file"
+              accessibilityRole='button'
+              accessibilityLabel='Upload Aadhaar document'
+              accessibilityHint='Double tap to select a PDF or image file'
             >
               <Ionicons name='cloud-upload-outline' size={18} />
               <Text style={styles.uploadText}>
@@ -402,7 +389,7 @@ export default function KYCForm() {
               </Text>
             </TouchableOpacity>
             <Input
-              label="PAN Number"
+              label='PAN Number'
               placeholder='PAN Number'
               value={panNumber}
               autoCapitalize='characters'
@@ -438,16 +425,16 @@ export default function KYCForm() {
               }}
               error={errors.panNumber}
               required
-              accessibilityLabel="PAN card number"
-              accessibilityHint="Enter your 10-character PAN number"
+              accessibilityLabel='PAN card number'
+              accessibilityHint='Enter your 10-character PAN number'
             />
 
             <TouchableOpacity
               style={styles.uploadBtn}
               onPress={() => pickDocument(setPanFile)}
-              accessibilityRole="button"
-              accessibilityLabel="Upload PAN card document"
-              accessibilityHint="Double tap to select a PDF or image file"
+              accessibilityRole='button'
+              accessibilityLabel='Upload PAN card document'
+              accessibilityHint='Double tap to select a PDF or image file'
             >
               <Ionicons name='cloud-upload-outline' size={18} />
               <Text style={styles.uploadText}>
@@ -456,12 +443,16 @@ export default function KYCForm() {
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setShowAnniversaryPicker(true)}>
               <Input
-                label="Date of Anniversary"
+                label='Date of Anniversary'
                 placeholder='Date of Anniversary'
                 value={anniversary ? anniversary.toDateString() : ''}
                 editable={false}
-                accessibilityLabel="Date of Anniversary"
-                accessibilityHint="Double tap to select date"
+                accessibilityLabel='Date of Anniversary'
+                accessibilityHint='Double tap to select date'
+                style={{
+                  backgroundColor: theme.colors.neutral.gray50,
+                  padding: 20,
+                }}
               />
             </TouchableOpacity>
             {showAnniversaryPicker && (
@@ -476,16 +467,19 @@ export default function KYCForm() {
               />
             )}
             <Button
-              variant="success"
-              size="large"
+              variant='success'
+              size='large'
               onPress={submitKYC}
               disabled={!isFormValid}
               loading={loading}
-              accessibilityLabel="Submit KYC details"
+              accessibilityLabel='Submit KYC details'
               fullWidth
-              style={{ marginTop: theme.spacing.xl, marginBottom: theme.spacing.huge + theme.spacing.xxxl }}
+              style={{
+                marginTop: theme.spacing.xl,
+                marginBottom: theme.spacing.huge + theme.spacing.xxxl,
+              }}
             >
-              Place Order
+              Submit
             </Button>
           </ScrollView>
 
@@ -546,9 +540,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: theme.spacing.xl,
-    paddingVertical: 13,  // Adds padding to achieve 44px touch target (44-18)/2
+    paddingVertical: 13, // Adds padding to achieve 44px touch target (44-18)/2
     paddingHorizontal: 13,
-    minHeight: 44,  // WCAG/iOS HIG minimum touch target size
+    minHeight: 44, // WCAG/iOS HIG minimum touch target size
     minWidth: 44,
   },
   radioCircle: {

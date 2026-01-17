@@ -1,142 +1,232 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Pressable,
+  Image,
+} from 'react-native';
+import { router } from 'expo-router';
 import { fetchProducts } from '@/data/productList';
 import { theme } from '@/constants/theme';
-import { Typography, EmptyState } from '@/components/ui';
 
 type NotificationType = {
   id: string;
+  product: any;
   title: string;
-  description: string;
-  date: string; // formatted
-  timestamp: number; // for filtering
-  icon: keyof typeof MaterialCommunityIcons.glyphMap;
-  color: string;
+  message: string;
+  date: string;
+  timestamp: number;
 };
+
+const DAYS_7 = 7;
+const DAYS_30 = 30;
 
 const NotificationScreen = () => {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
-  const previousProducts = useRef<Set<number>>(new Set()); // track seen product IDs
-
-  const detectNewProducts = (newProducts: any[]) => {
-    const newNotifs: NotificationType[] = [];
-    const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-
-    newProducts.forEach((prod) => {
-      const createdAt = new Date(prod.date_created).getTime();
-
-      if (createdAt >= oneWeekAgo && !previousProducts.current.has(prod.id)) {
-        newNotifs.push({
-          id: `${prod.id}-new`,
-          title: 'New product added',
-          description: prod.name,
-          date: new Date(prod.date_created).toLocaleString(),
-          timestamp: createdAt,
-          icon: 'plus-box',
-          color: theme.colors.semantic.success,
-        });
-
-        previousProducts.current.add(prod.id);
-      }
-    });
-
-    if (newNotifs.length > 0) {
-      setNotifications((prev) => {
-        const merged = [...newNotifs, ...prev];
-        return merged.slice(0, 10); // ✅ keep only the latest 10
-      });
-    }
-  };
+  const [days, setDays] = useState(DAYS_7);
 
   useEffect(() => {
-    const fetchAndCheck = async () => {
-      const products = await fetchProducts();
-      if (products) {
-        detectNewProducts(products);
-      }
-    };
+    loadNotifications(days);
+  }, [days]);
 
-    fetchAndCheck();
-    const interval = setInterval(fetchAndCheck, 300000); // every 5 mins
-    return () => clearInterval(interval);
-  }, []);
+  const loadNotifications = async (range: number) => {
+    const products = await fetchProducts();
+    const fromDate = Date.now() - range * 24 * 60 * 60 * 1000;
+    const list: NotificationType[] = products
+      .filter((p: any) => new Date(p.date_created).getTime() >= fromDate)
+      .map((p: any) => ({
+        id: `product-${p.id}`,
+        product: p,
+        title: p.name,
+        date: new Date(p.date_created).toDateString(),
+        timestamp: new Date(p.date_created).getTime(),
+      }))
+      .sort(
+        (a: NotificationType, b: NotificationType) => b.timestamp - a.timestamp,
+      );
+    setNotifications(list);
+  };
 
-  const renderItem = ({ item }: { item: NotificationType }) => (
-    <View style={styles.card}>
-      <View style={[styles.iconContainer, { backgroundColor: item.color }]}>
-        <MaterialCommunityIcons name={item.icon} size={22} color={theme.colors.background.primary} />
-      </View>
-      <View style={styles.textContainer}>
-        <Typography variant="bodyBold" style={styles.title}>
-          {item.title}
-        </Typography>
-        <Typography variant="small" style={styles.description}>
-          {item.description}
-        </Typography>
-        <Typography variant="caption" style={styles.date}>
-          {item.date}
-        </Typography>
-      </View>
-    </View>
-  );
+  const onPressNotification = (item: NotificationType) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== item.id));
+    const p = item.product;
+
+    router.push({
+      pathname: '/pages/productDetail',
+      params: {
+        id: p.id,
+        title: p.name,
+        img: p.images?.[0]?.src || '',
+        category: p.categories?.[0]?.name || '',
+        description: p.description,
+        price: p.price,
+        sku: p.sku,
+        shortDescription: p.short_description,
+        sideEffects: p.side_effects,
+        indications: p.indications,
+      },
+    });
+  };
+
+  const renderItem = ({ item }: { item: NotificationType }) => {
+    const image = item.product?.images?.[0]?.src;
+
+    return (
+      <Pressable onPress={() => onPressNotification(item)}>
+        <View style={styles.card}>
+          <View style={styles.imageWrapper}>
+            {image ? (
+              <Image source={{ uri: image }} style={styles.image} />
+            ) : (
+              <View style={styles.fallbackCircle}>
+                <Text style={styles.fallbackText}>V.</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Text */}
+          <View style={styles.content}>
+            <View style={styles.headerRow}>
+              <Text style={styles.title} numberOfLines={1}>
+                {item.title}
+              </Text>
+              <Text style={styles.date}>{item.date}</Text>
+            </View>
+
+            <Text style={styles.message} numberOfLines={2}>
+              {item.message}
+            </Text>
+          </View>
+
+          {/* Unread Dot */}
+          <View style={styles.unreadDot} />
+        </View>
+      </Pressable>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      {notifications.length === 0 ? (
-        <EmptyState
-          icon="notifications-outline"
-          title="No Notifications"
-          message="No new products have been added in the last 7 days. Check back later for updates!"
-        />
-      ) : (
-        <FlatList
-          data={notifications}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: theme.spacing.xl }}
-        />
+      <FlatList
+        data={notifications}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No notifications available</Text>
+        }
+      />
+
+      {days === DAYS_7 && (
+        <Pressable
+          style={styles.missingContainer}
+          onPress={() => setDays(DAYS_30)}
+        >
+          <Text style={styles.missingText}>Missing notifications?</Text>
+          <Text style={styles.missingLink}>
+            Go to historical notifications.
+          </Text>
+        </Pressable>
       )}
     </View>
   );
 };
 
+export default NotificationScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background.primary,
-    padding: theme.spacing.lg,
+    backgroundColor: '#f6f6f6',
+    padding: 14,
   },
+
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.background.primary,
-    padding: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
-    borderRadius: theme.borderRadius.md,
-    ...theme.shadows.sm,
+    backgroundColor: '#fff',
+    padding: 14,
+    borderRadius: 16,
+    marginBottom: 12,
   },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: theme.borderRadius.round,
+
+  imageWrapper: {
+    marginRight: 12,
+  },
+
+  image: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+  },
+
+  fallbackCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#f4b6c2',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: theme.spacing.lg,
   },
-  textContainer: {
+
+  fallbackText: {
+    fontWeight: '700',
+  },
+
+  content: {
     flex: 1,
   },
+
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+
   title: {
-    marginBottom: theme.spacing.xs,
+    fontWeight: '700',
+    fontSize: 14,
+    maxWidth: '75%',
   },
-  description: {
-    color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.xs,
-  },
+
   date: {
-    color: theme.colors.text.tertiary,
+    fontSize: 12,
+    color: '#666',
+  },
+
+  message: {
+    marginTop: 4,
+    fontSize: 13,
+    color: '#444',
+  },
+
+  unreadDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#1da1f2',
+    marginLeft: 8,
+  },
+
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 120,
+    color: '#999',
+  },
+
+  missingContainer: {
+    paddingVertical: 18,
+    alignItems: 'center',
+  },
+
+  missingText: {
+    color: '#666',
+    fontSize: 13,
+  },
+
+  missingLink: {
+    color: '#1da1f2',
+    fontWeight: '600',
+    marginTop: 4,
   },
 });
-
-export default NotificationScreen;

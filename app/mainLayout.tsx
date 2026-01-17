@@ -8,7 +8,7 @@ import type { DrawerNavigationOptions } from '@react-navigation/drawer';
 import {
   DefaultTheme,
   DrawerActions,
-  ThemeProvider
+  ThemeProvider,
 } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { router } from 'expo-router';
@@ -50,20 +50,19 @@ export default function MainLayout() {
       <Pressable
         onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
         style={{ marginLeft: theme.spacing.lg }}
-        accessibilityRole="button"
-        accessibilityLabel="Open menu"
+        accessibilityRole='button'
+        accessibilityLabel='Open menu'
       >
         <Ionicons name='menu' size={30} color={theme.colors.primary.main} />
       </Pressable>
     ),
-    headerTitle: () => (
-        <Text style={styles.brandName}>Meltic Group</Text>
-    ),
+    headerTitleAlign: 'center',
+    headerTitle: () => <Text style={styles.brandName}>Meltic Group</Text>,
     headerRight: () => (
       <Pressable
         onPress={goToCart}
         style={styles.cartButton}
-        accessibilityRole="button"
+        accessibilityRole='button'
         accessibilityLabel={`Shopping cart, ${cartCount} items`}
       >
         <View style={styles.cartIconContainer}>
@@ -74,7 +73,7 @@ export default function MainLayout() {
           />
           {cartCount > 0 && (
             <View style={styles.badgePosition}>
-              <Badge count={cartCount} variant="error" />
+              <Badge count={cartCount} variant='error' />
             </View>
           )}
         </View>
@@ -97,17 +96,21 @@ export default function MainLayout() {
       <TouchableOpacity
         onPress={() => router.back()}
         style={{ marginLeft: theme.spacing.lg }}
-        accessibilityRole="button"
-        accessibilityLabel="Go back"
+        accessibilityRole='button'
+        accessibilityLabel='Go back'
       >
-        <Ionicons name='arrow-back' size={24} color={theme.colors.primary.main} />
+        <Ionicons
+          name='arrow-back'
+          size={24}
+          color={theme.colors.primary.main}
+        />
       </TouchableOpacity>
     ),
     headerRight: () => (
       <Pressable
         onPress={goToCart}
         style={styles.cartButton}
-        accessibilityRole="button"
+        accessibilityRole='button'
         accessibilityLabel={`Shopping cart, ${cartCount} items`}
       >
         <View style={styles.cartIconContainer}>
@@ -118,7 +121,7 @@ export default function MainLayout() {
           />
           {cartCount > 0 && (
             <View style={styles.badgePosition}>
-              <Badge count={cartCount} variant="error" />
+              <Badge count={cartCount} variant='error' />
             </View>
           )}
         </View>
@@ -187,16 +190,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cartIconContainer: {
-    position: 'relative',
+    // position: 'relative',
   },
   badgePosition: {
-    position: 'absolute',
-    right: -6,
-    top: -4,
+    // position: 'absolute',
+    // right: -6,
+    // top: -4,
   },
   brandName: {
     color: theme.colors.text.primary,
     ...theme.typography.h2,
     fontStyle: 'italic',
+    // textAlign: 'center',
   },
 });

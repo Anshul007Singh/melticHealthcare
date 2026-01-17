@@ -12,7 +12,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { Card, Typography, Shimmer } from '@/components/ui';
 
-const placeholderImg = 'https://via.placeholder.com/150';
+const placeholderImg = '';
 const { width } = Dimensions.get('window');
 
 const DynamicListScreen = () => {
@@ -22,14 +22,13 @@ const DynamicListScreen = () => {
 
   const { query } = useLocalSearchParams<{ query?: string }>();
 
-  // Simulate 2-second delay before loading data
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       setShowShimmer(true);
 
       try {
-        await new Promise((resolve) => setTimeout(resolve, 2000)); // ⏳ 2 sec delay
+        await new Promise((resolve) => setTimeout(resolve, 2000));
         const data = await fetchProducts(query);
         if (data && Array.isArray(data)) {
           setDataList(data);
@@ -51,13 +50,17 @@ const DynamicListScreen = () => {
     });
   };
 
-  // Shimmer placeholder component
   const ShimmerCard = () => {
     return (
-      <Card variant="light" style={styles.card}>
+      <Card variant='light' style={styles.card}>
         <Shimmer width={50} height={50} borderRadius={theme.borderRadius.sm} />
+
         <View style={{ marginTop: theme.spacing.sm }}>
-          <Shimmer width="60%" height={12} borderRadius={theme.borderRadius.sm} />
+          <Shimmer
+            width='60%'
+            height={12}
+            borderRadius={theme.borderRadius.sm}
+          />
         </View>
       </Card>
     );
@@ -74,23 +77,25 @@ const DynamicListScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background.secondary }}>
+    <View
+      style={{ flex: 1, backgroundColor: theme.colors.background.secondary }}
+    >
       <ScrollView contentContainerStyle={styles.container}>
         {dataList.map((item, index) => (
           <Pressable
             key={index}
             onPress={() => onClickItem(item.slug)}
-            accessibilityRole="button"
+            accessibilityRole='button'
             accessibilityLabel={`Category: ${item.name}`}
           >
-            <Card variant="light" style={styles.card}>
+            <Card variant='light' style={styles.card}>
               <Image
                 source={{ uri: item.image?.src || placeholderImg }}
                 style={styles.image}
                 resizeMode='contain'
                 accessibilityLabel={`${item.name} icon`}
               />
-              <Typography variant="caption" style={styles.label} center>
+              <Typography variant='caption' style={styles.label} center>
                 {item.name}
               </Typography>
             </Card>
