@@ -139,24 +139,33 @@ export default NotificationScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f6f6f6',
-    padding: 14,
+    backgroundColor: theme.colors.background.secondary,
+    padding: theme.spacing.md,
   },
 
   card: {
     flexDirection: 'row',
     alignItems: 'center',
+<<<<<<< HEAD
     backgroundColor: theme.colors.neutral.white,
     padding: 14,
     borderRadius: 16,
     marginBottom: 12,
+=======
+    backgroundColor: theme.colors.background.primary,
+    padding: theme.spacing.md,
+    borderRadius: theme.borderRadius.lg,
+    marginBottom: theme.spacing.md,
+    ...theme.shadows.sm,
+>>>>>>> b0f4c6396da0de5714d773a6b0cd09e7da450097
   },
 
   imageWrapper: {
-    marginRight: 12,
+    marginRight: theme.spacing.md,
   },
 
   image: {
+<<<<<<< HEAD
     width: 60,
     height: 60,
     borderRadius: 8,
@@ -167,12 +176,25 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 22,
     backgroundColor: '#f4b6c2',
+=======
+    width: theme.layout.minTouchTarget,
+    height: theme.layout.minTouchTarget,
+    borderRadius: theme.layout.minTouchTarget / 2,
+  },
+
+  fallbackCircle: {
+    width: theme.layout.minTouchTarget,
+    height: theme.layout.minTouchTarget,
+    borderRadius: theme.layout.minTouchTarget / 2,
+    backgroundColor: theme.colors.primary.lighter,
+>>>>>>> b0f4c6396da0de5714d773a6b0cd09e7da450097
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   fallbackText: {
-    fontWeight: '700',
+    ...theme.typography.bodyBold,
+    color: theme.colors.text.primary,
   },
 
   headerRow: {
@@ -184,49 +206,50 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontWeight: '700',
-    fontSize: 14,
+    ...theme.typography.smallBold,
+    color: theme.colors.text.primary,
     maxWidth: '75%',
   },
 
   date: {
-    fontSize: 12,
-    color: '#666',
+    ...theme.typography.caption,
+    color: theme.colors.text.secondary,
   },
 
   message: {
-    marginTop: 4,
-    fontSize: 13,
-    color: '#444',
+    marginTop: theme.spacing.xs,
+    ...theme.typography.small,
+    color: theme.colors.text.secondary,
   },
 
   unreadDot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#1da1f2',
-    marginLeft: 8,
+    backgroundColor: theme.colors.semantic.info,
+    marginLeft: theme.spacing.sm,
   },
 
   emptyText: {
+    ...theme.typography.body,
     textAlign: 'center',
     marginTop: 120,
-    color: '#999',
+    color: theme.colors.text.tertiary,
   },
 
   missingContainer: {
-    paddingVertical: 18,
+    paddingVertical: theme.spacing.lg,
     alignItems: 'center',
   },
 
   missingText: {
-    color: '#666',
-    fontSize: 13,
+    ...theme.typography.small,
+    color: theme.colors.text.secondary,
   },
 
   missingLink: {
-    color: '#1da1f2',
-    fontWeight: '600',
-    marginTop: 4,
+    ...theme.typography.smallBold,
+    color: theme.colors.text.link,
+    marginTop: theme.spacing.xs,
   },
 });

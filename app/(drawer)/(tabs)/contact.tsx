@@ -1,6 +1,7 @@
 import CustomModal from '@/components/modal';
 import { Button, Card, H3, H4, Input, Typography } from '@/components/ui';
 import { theme } from '@/constants/theme';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import {
@@ -10,9 +11,9 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
   TouchableWithoutFeedback
 } from 'react-native';
-import { IconButton } from 'react-native-paper';
 
 const Contact = () => {
   const [form, setForm] = useState({
@@ -133,13 +134,16 @@ const Contact = () => {
               Nanhera Road Kuldeep Nagar, Ambala Cantt, India 133004
             </Typography>
 
-            <IconButton
-              icon='whatsapp'
-              iconColor='#25D366'
-              size={55}
+            <TouchableOpacity
               style={styles.whatsappButton}
               onPress={handleWhatsApp}
-            />
+            >
+              <Ionicons
+                name='logo-whatsapp'
+                color={theme.colors.semantic.success}
+                size={55}
+              />
+            </TouchableOpacity>
           </Card>
 
           {/* Form */}
@@ -224,7 +228,7 @@ const styles = StyleSheet.create({
   },
   whatsappButton: {
     position: 'absolute',
-    top: 0,
+    top: theme.spacing.lg,
     right: 0,
     width: 100,
   },

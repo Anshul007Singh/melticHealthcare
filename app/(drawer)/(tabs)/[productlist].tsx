@@ -1,23 +1,29 @@
 import { Card, EmptyState, Shimmer, TouchableCard, Typography } from '@/components/ui';
 import { theme } from '@/constants/theme';
 import { fetchProducts } from '@/data/productList';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   FlatList,
   Image,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
+type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
+type ViewMode = 'grid' | 'list';
+
 const ProductListScreen = () => {
-  const { query } = useLocalSearchParams<{ query?: string }>();
+  const params = useLocalSearchParams();
+  const query = (params.query || params.productlist) as string | undefined;
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [featuredFilter, setFeaturedFilter] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedBrand, setSelectedBrand] = useState('all');
@@ -25,32 +31,39 @@ const ProductListScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showBrandDropdown, setShowBrandDropdown] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>('default');
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [showSortMenu, setShowSortMenu] = useState(false);
 
   const router = useRouter();
 
-  useEffect(() => {
-    return () => {
-      router.replace({
-        pathname: '/[productlist]',
-        params: { query: 'productlist', productlist: 'productlist' },
-      });
-    };
-  }, []);
-
-  useEffect(() => {
-    const loadProducts = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchProducts();
-        if (data && Array.isArray(data)) {
-          setProducts(data);
-        }
-      } catch (error) {
-        console.error('Error fetching products:', error);
+  const loadProducts = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchProducts();
+      if (data && Array.isArray(data)) {
+        setProducts(data);
       }
-      setLoading(false);
-    };
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+    setLoading(false);
+  };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const data = await fetchProducts();
+      if (data && Array.isArray(data)) {
+        setProducts(data);
+      }
+    } catch (error) {
+      console.error('Error refreshing products:', error);
+    }
+    setRefreshing(false);
+  };
+
+  useEffect(() => {
     loadProducts();
   }, []);
 
@@ -109,20 +122,88 @@ const ProductListScreen = () => {
     }
   }, [loading, products, query, categories, brands]);
 
+  const filteredAndSortedProducts = useMemo(() => {
+    // Filter products
+    const filtered = products.filter((item) => {
+      // Search filter
+      const matchSearch =
+        searchQuery === '' ||
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.categories.some((cat: any) =>
+          cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+        ) ||
+        (item.brands &&
+          item.brands.some((brand: any) =>
+            brand.name.toLowerCase().includes(searchQuery.toLowerCase())
+          ));
+
+      if (!matchSearch) {
+        return false;
+      }
+
+      if (featuredFilter) {
+        return item.featured === true;
+      }
+
+      const matchCategory =
+        selectedCategory === 'all' ||
+        item.categories.some((cat: any) => cat.name === selectedCategory);
+
+      const matchBrand =
+        selectedBrand === 'all' ||
+        (item.brands &&
+          item.brands.some((brand: any) => brand.name === selectedBrand));
+
+      return matchCategory && matchBrand;
+    });
+
+    // Sort products
+    const sorted = [...filtered];
+    switch (sortBy) {
+      case 'price-asc':
+        sorted.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+        break;
+      case 'price-desc':
+        sorted.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+        break;
+      case 'name-asc':
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name-desc':
+        sorted.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      default:
+        // Keep original order
+        break;
+    }
+
+    return sorted;
+  }, [products, searchQuery, featuredFilter, selectedCategory, selectedBrand, sortBy]);
+
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (selectedCategory !== 'all') count++;
+    if (selectedBrand !== 'all') count++;
+    if (featuredFilter) count++;
+    return count;
+  }, [selectedCategory, selectedBrand, featuredFilter]);
+
   if (loading) {
     return (
       <FlatList
         data={[1, 2, 3, 4, 5, 6]}
         keyExtractor={(item) => item.toString()}
         numColumns={2}
-        contentContainerStyle={styles.listContainer}
+        contentContainerStyle={styles.gridContainer}
         renderItem={() => (
-          <Card variant="default" style={styles.itemContainer}>
-            <Shimmer width="100%" height={120} borderRadius={theme.borderRadius.sm} />
+          <Card variant="default" style={styles.gridItemContainer}>
+            <Shimmer width="100%" height={160} borderRadius={theme.borderRadius.sm} />
             <View style={{ height: theme.spacing.sm }} />
             <Shimmer width="100%" height={16} borderRadius={theme.borderRadius.sm} />
             <View style={{ height: theme.spacing.xs }} />
-            <Shimmer width="50%" height={16} borderRadius={theme.borderRadius.sm} />
+            <Shimmer width="60%" height={16} borderRadius={theme.borderRadius.sm} />
+            <View style={{ height: theme.spacing.xs }} />
+            <Shimmer width="40%" height={18} borderRadius={theme.borderRadius.sm} />
           </Card>
         )}
       />
@@ -140,39 +221,6 @@ const ProductListScreen = () => {
       </View>
     );
   }
-
-  const filteredProducts = products.filter((item) => {
-    // Search filter
-    const matchSearch =
-      searchQuery === '' ||
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.categories.some((cat: any) =>
-        cat.name.toLowerCase().includes(searchQuery.toLowerCase())
-      ) ||
-      (item.brands &&
-        item.brands.some((brand: any) =>
-          brand.name.toLowerCase().includes(searchQuery.toLowerCase())
-        ));
-
-    if (!matchSearch) {
-      return false;
-    }
-
-    if (featuredFilter) {
-      return item.featured === true;
-    }
-
-    const matchCategory =
-      selectedCategory === 'all' ||
-      item.categories.some((cat: any) => cat.name === selectedCategory);
-
-    const matchBrand =
-      selectedBrand === 'all' ||
-      (item.brands &&
-        item.brands.some((brand: any) => brand.name === selectedBrand));
-
-    return matchCategory && matchBrand;
-  });
 
   const imageHandler = (item: any) => {
     const data = item.meta_data[0];
@@ -220,34 +268,98 @@ const ProductListScreen = () => {
     }
   };
 
-  const renderItem = ({ item }: any) => (
+  const clearFilter = (type: 'category' | 'brand' | 'featured') => {
+    if (type === 'category') {
+      setSelectedCategory('all');
+    } else if (type === 'brand') {
+      setSelectedBrand('all');
+    } else if (type === 'featured') {
+      setFeaturedFilter(false);
+    }
+  };
+
+  const clearAllFilters = () => {
+    setSelectedCategory('all');
+    setSelectedBrand('all');
+    setFeaturedFilter(false);
+  };
+
+  const renderGridItem = ({ item }: any) => (
     <TouchableCard
-      variant="default"
-      style={styles.itemContainer}
+      variant="elevated"
+      style={styles.gridItemContainer}
+      onPress={() => imageHandler(item)}
+      accessibilityLabel={`View ${item.name}`}
+    >
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: item.images[0]?.src || '' }}
+          style={styles.gridImage}
+          resizeMode='cover'
+          accessibilityIgnoresInvertColors
+        />
+        {item.featured && (
+          <View style={styles.featuredBadge}>
+            <Ionicons name="star" size={12} color={theme.colors.primary.light} />
+            <Typography variant="tiny" style={styles.featuredText}>Featured</Typography>
+          </View>
+        )}
+      </View>
+      <View style={styles.productInfo}>
+        <Typography variant="caption" style={styles.title} numberOfLines={2}>
+          {item.name}
+        </Typography>
+        <Typography variant="caption" color="secondary" style={styles.titleCategory}>
+          {item.categories?.[0]?.name || 'No Category'}
+        </Typography>
+        <View style={styles.priceRow}>
+          <Typography variant="bodyBold" color="primary" style={styles.priceText}>
+            ₹{item.price}
+          </Typography>
+        </View>
+      </View>
+    </TouchableCard>
+  );
+
+  const renderListItem = ({ item }: any) => (
+    <TouchableCard
+      variant="elevated"
+      style={styles.listItemContainer}
       onPress={() => imageHandler(item)}
       accessibilityLabel={`View ${item.name}`}
     >
       <Image
         source={{ uri: item.images[0]?.src || '' }}
-        style={styles.image}
-        resizeMode='contain'
+        style={styles.listImage}
+        resizeMode='cover'
         accessibilityIgnoresInvertColors
       />
-      <Typography variant="caption" style={styles.title} numberOfLines={2}>
-        {item.name}
-      </Typography>
-      <Typography variant="caption" color="secondary" style={styles.titleCategory}>
-        {item.categories?.[0]?.name || 'No Category'}
-      </Typography>
-      <Typography variant="smallBold" color="primary" style={styles.priceText}>
-        ₹ {item.price}
-      </Typography>
+      <View style={styles.listContent}>
+        <View style={styles.listHeader}>
+          <Typography variant="bodyBold" style={styles.listTitle} numberOfLines={2}>
+            {item.name}
+          </Typography>
+          {item.featured && (
+            <View style={styles.featuredBadge}>
+              <Ionicons name="star" size={12} color={theme.colors.primary.light} />
+            </View>
+          )}
+        </View>
+        <Typography variant="small" color="secondary">
+          {item.categories?.[0]?.name || 'No Category'}
+        </Typography>
+        <View style={styles.listFooter}>
+          <Typography variant="h4" color="primary" style={styles.listPrice}>
+            ₹{item.price}
+          </Typography>
+        </View>
+      </View>
     </TouchableCard>
   );
 
   return (
     <>
-    <View style={styles.searchContainer}>
+      <View style={styles.searchContainer}>
         <View style={styles.searchInputWrapper}>
           <Ionicons
             name="search"
@@ -276,30 +388,146 @@ const ProductListScreen = () => {
           )}
         </View>
       </View>
+
+      {/* Header with controls */}
       <View style={styles.headerContainer}>
         <Typography variant="h4" style={styles.headerText}>
-          {selectedCategory === 'all'
-            ? `All Products${
-                selectedBrand !== 'all' ? ` - ${selectedBrand}` : ''
-              }`
-            : `${selectedCategory}${
-                selectedBrand !== 'all' ? ` - ${selectedBrand}` : ''
-              }`}
+          {filteredAndSortedProducts.length} Products
         </Typography>
-        <TouchableOpacity
-          onPress={toggleFilters}
-          style={styles.iconWrapper}
-          accessibilityRole="button"
-          accessibilityLabel="Toggle filters"
-          accessibilityHint="Double tap to show or hide filter options"
-        >
-          <Feather
-            name={showCategoryDropdown || showBrandDropdown ? 'x' : 'filter'}
-            size={24}
-            color={theme.colors.primary.main}
-          />
-        </TouchableOpacity>
+        <View style={styles.headerControls}>
+          {/* Sort Button */}
+          <TouchableOpacity
+            onPress={() => setShowSortMenu(!showSortMenu)}
+            style={styles.controlButton}
+            accessibilityRole="button"
+            accessibilityLabel="Sort products"
+          >
+            <Ionicons name="swap-vertical" size={20} color={theme.colors.primary.main} />
+          </TouchableOpacity>
+
+          {/* View Toggle */}
+          <TouchableOpacity
+            onPress={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+            style={styles.controlButton}
+            accessibilityRole="button"
+            accessibilityLabel={`Switch to ${viewMode === 'grid' ? 'list' : 'grid'} view`}
+          >
+            <Ionicons
+              name={viewMode === 'grid' ? 'list' : 'grid'}
+              size={20}
+              color={theme.colors.primary.main}
+            />
+          </TouchableOpacity>
+
+          {/* Filter Button with Badge */}
+          <TouchableOpacity
+            onPress={toggleFilters}
+            style={styles.controlButton}
+            accessibilityRole="button"
+            accessibilityLabel="Toggle filters"
+          >
+            <Ionicons
+              name={showCategoryDropdown || showBrandDropdown ? 'close' : 'filter-outline'}
+              size={20}
+              color={theme.colors.primary.main}
+            />
+            {activeFiltersCount > 0 && (
+              <View style={styles.filterBadge}>
+                <Typography variant="tiny" style={styles.filterBadgeText}>
+                  {activeFiltersCount}
+                </Typography>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
+
+      {/* Sort Menu */}
+      {showSortMenu && (
+        <View style={styles.sortMenu}>
+          {[
+            { label: 'Default', value: 'default' },
+            { label: 'Price: Low to High', value: 'price-asc' },
+            { label: 'Price: High to Low', value: 'price-desc' },
+            { label: 'Name: A to Z', value: 'name-asc' },
+            { label: 'Name: Z to A', value: 'name-desc' },
+          ].map((option) => (
+            <TouchableOpacity
+              key={option.value}
+              onPress={() => {
+                setSortBy(option.value as SortOption);
+                setShowSortMenu(false);
+              }}
+              style={[
+                styles.sortOption,
+                sortBy === option.value && styles.sortOptionSelected,
+              ]}
+            >
+              <Typography
+                variant="body"
+                style={sortBy === option.value ? styles.sortOptionTextSelected : styles.sortOptionText}
+              >
+                {option.label}
+              </Typography>
+              {sortBy === option.value && (
+                <Ionicons name="checkmark" size={20} color={theme.colors.primary.main} />
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {/* Active Filters Chips */}
+      {activeFiltersCount > 0 && (
+        <View style={styles.activeFiltersContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterChips}>
+            {selectedCategory !== 'all' && (
+              <View style={styles.filterChip}>
+                <Typography variant="small" style={styles.filterChipText}>
+                  {selectedCategory}
+                </Typography>
+                <TouchableOpacity
+                  onPress={() => clearFilter('category')}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons name="close" size={16} color={theme.colors.text.primary} />
+                </TouchableOpacity>
+              </View>
+            )}
+            {selectedBrand !== 'all' && (
+              <View style={styles.filterChip}>
+                <Typography variant="small" style={styles.filterChipText}>
+                  {selectedBrand}
+                </Typography>
+                <TouchableOpacity
+                  onPress={() => clearFilter('brand')}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons name="close" size={16} color={theme.colors.text.primary} />
+                </TouchableOpacity>
+              </View>
+            )}
+            {featuredFilter && (
+              <View style={styles.filterChip}>
+                <Typography variant="small" style={styles.filterChipText}>
+                  Featured
+                </Typography>
+                <TouchableOpacity
+                  onPress={() => clearFilter('featured')}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons name="close" size={16} color={theme.colors.text.primary} />
+                </TouchableOpacity>
+              </View>
+            )}
+            <TouchableOpacity onPress={clearAllFilters} style={styles.clearAllChip}>
+              <Typography variant="small" style={styles.clearAllText}>
+                Clear All
+              </Typography>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      )}
 
       {/* Filter Dropdowns */}
       {(showCategoryDropdown || showBrandDropdown) && (
@@ -431,11 +659,20 @@ const ProductListScreen = () => {
       )}
 
       <FlatList
-        data={filteredProducts}
-        renderItem={renderItem}
+        data={filteredAndSortedProducts}
+        renderItem={viewMode === 'grid' ? renderGridItem : renderListItem}
         keyExtractor={(item) => item.id.toString()}
-        numColumns={2}
-        contentContainerStyle={styles.listContainer}
+        key={viewMode} // Force re-render when view mode changes
+        numColumns={viewMode === 'grid' ? 2 : 1}
+        contentContainerStyle={viewMode === 'grid' ? styles.gridContainer : styles.listContainerStyle}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[theme.colors.primary.main]}
+            tintColor={theme.colors.primary.main}
+          />
+        }
         ListEmptyComponent={
           <EmptyState
             icon="search-outline"
@@ -459,33 +696,58 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    display: 'flex',
-    padding: theme.spacing.lg,
-    backgroundColor: theme.colors.neutral.gray100,
-  },
-  iconWrapper: {
-    marginRight: theme.spacing.md,
-    minWidth: theme.layout.minTouchTarget,
-    minHeight: theme.layout.minTouchTarget,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+    backgroundColor: theme.colors.background.primary,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.neutral.gray200,
   },
   headerText: {
     ...theme.typography.h4,
     color: theme.colors.text.primary,
+    flex: 1,
+  },
+  headerControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  controlButton: {
+    width: 40,
+    height: 40,
+    borderRadius: theme.borderRadius.md,
+    backgroundColor: theme.colors.primary.light,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  filterBadge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    backgroundColor: theme.colors.semantic.error,
+    borderRadius: theme.borderRadius.round,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  filterBadgeText: {
+    color: theme.colors.neutral.white,
+    fontWeight: '700',
   },
   searchContainer: {
-    marginTop: theme.spacing.xl,
     paddingHorizontal: theme.spacing.lg,
-    backgroundColor: theme.colors.neutral.gray100,
+    paddingVertical: theme.spacing.md,
+    backgroundColor: theme.colors.background.primary,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.neutral.gray200,
   },
   searchInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: theme.colors.background.primary,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.neutral.gray300,
     paddingHorizontal: theme.spacing.md,
   },
   searchIcon: {
@@ -505,34 +767,170 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  listContainer: {
+  // Sort Menu
+  sortMenu: {
+    backgroundColor: theme.colors.background.primary,
+    marginHorizontal: theme.spacing.lg,
+    marginVertical: theme.spacing.sm,
+    borderRadius: theme.borderRadius.md,
+    ...theme.shadows.md,
+    overflow: 'hidden',
+  },
+  sortOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.neutral.gray200,
+  },
+  sortOptionSelected: {
+    backgroundColor: theme.colors.primary.lighter,
+  },
+  sortOptionText: {
+    ...theme.typography.body,
+    color: theme.colors.text.primary,
+  },
+  sortOptionTextSelected: {
+    ...theme.typography.bodyBold,
+    color: theme.colors.primary.main,
+  },
+
+  // Active Filters
+  activeFiltersContainer: {
+    backgroundColor: theme.colors.background.primary,
+    paddingVertical: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.neutral.gray200,
+  },
+  filterChips: {
+    paddingHorizontal: theme.spacing.lg,
+    gap: theme.spacing.sm,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+    backgroundColor: theme.colors.primary.lighter,
+    borderRadius: theme.borderRadius.round,
+    borderWidth: 1,
+    borderColor: theme.colors.primary.main,
+  },
+  filterChipText: {
+    color: theme.colors.primary.main,
+    fontWeight: '600',
+  },
+  clearAllChip: {
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+    backgroundColor: theme.colors.semantic.error,
+    borderRadius: theme.borderRadius.round,
+  },
+  clearAllText: {
+    color: theme.colors.neutral.white,
+    fontWeight: '600',
+  },
+
+  // Grid View
+  gridContainer: {
     padding: theme.spacing.sm,
   },
-  itemContainer: {
-    width: '45%',
-    margin: theme.spacing.sm,
+  gridItemContainer: {
+    width: '47%',
+    margin: theme.spacing.xs,
+    padding: theme.spacing.sm,
+    overflow: 'hidden',
+  },
+  imageContainer: {
+    position: 'relative',
+    backgroundColor: theme.colors.neutral.gray100,
+    borderRadius: theme.borderRadius.sm,
+    overflow: 'hidden',
+  },
+  gridImage: {
+    width: '100%',
+    height: 160,
+  },
+  featuredBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    backgroundColor: theme.colors.semantic.error,
+    paddingHorizontal: theme.spacing.xs,
+    paddingVertical: 2,
+    borderRadius: theme.borderRadius.sm,
+  },
+  featuredText: {
+    color: theme.colors.text.inverse,
+    fontWeight: '700',
+  },
+  productInfo: {
     padding: theme.spacing.xs,
   },
-  image: {
-    width: '100%',
-    height: 150,
-    marginBottom: 8,
-    borderRadius: 8,
-  },
   title: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#000',
-    marginTop: 5,
+    ...theme.typography.smallBold,
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.xs,
   },
   titleCategory: {
-    fontSize: 11,
-    color: '#333',
+    ...theme.typography.caption,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.xs,
+  },
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: theme.spacing.xs,
   },
   priceText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#0060AA',
+    ...theme.typography.bodyBold,
+    color: theme.colors.primary.main,
+  },
+
+  // List View
+  listContainerStyle: {
+    padding: theme.spacing.sm,
+  },
+  listItemContainer: {
+    flexDirection: 'row',
+    marginBottom: theme.spacing.sm,
+    padding: theme.spacing.sm,
+    gap: theme.spacing.md,
+  },
+  listImage: {
+    width: 80,
+    height: 80,
+    borderRadius: theme.borderRadius.sm,
+    backgroundColor: theme.colors.neutral.gray100,
+  },
+  listContent: {
+    flex: 1,
+  },
+  listHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: theme.spacing.xs,
+  },
+  listTitle: {
+    flex: 1,
+    color: theme.colors.text.primary,
+  },
+  listFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: theme.spacing.xs,
+  },
+  listPrice: {
+    color: theme.colors.primary.main,
   },
   filterContainer: {
     backgroundColor: theme.colors.background.primary,

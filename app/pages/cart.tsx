@@ -1,20 +1,19 @@
+import { getStoredUserInfo } from '@/api/auth';
+import { placeOrder } from '@/api/orders';
+import CustomModal from '@/components/modal';
+import { Button, Card, Typography } from '@/components/ui';
+import { theme } from '@/constants/theme';
+import { useCart } from '@/context/cartContext';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
   FlatList,
-  TouchableOpacity,
-  StyleSheet,
   Image,
+  StyleSheet,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useCart } from '@/context/cartContext';
-import { placeOrder } from '@/api/orders';
-import { getStoredUserInfo } from '@/api/auth';
-import CustomModal from '@/components/modal';
-import { router } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { Button, Card, Typography, H4, Body } from '@/components/ui';
 
 export default function CartScreen() {
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -283,10 +282,9 @@ export default function CartScreen() {
           </Card>
 
           <Button
-            variant="success"
+            variant="primary"
             onPress={onPlaceOrder}
             style={styles.checkoutButton}
-            fullWidth
             accessibilityLabel="Proceed to checkout"
           >
             Checkout

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
+import { theme } from '@/constants/theme';
 
 export default function SplashScreen({ onFinish }: any) {
   const logos = [
@@ -57,7 +58,7 @@ export default function SplashScreen({ onFinish }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0060AA',
+    backgroundColor: theme.colors.primary.main,
     justifyContent: 'center',
     alignItems: 'center',
   },

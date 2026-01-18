@@ -8,7 +8,9 @@ import {
   Dimensions,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { Drawer, Icon } from 'react-native-paper';
+import { Drawer } from 'react-native-paper';
+import { Ionicons } from '@expo/vector-icons';
+import { theme } from '@/constants/theme';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -51,13 +53,13 @@ const SideDrawer = () => {
         <TouchableWithoutFeedback onPress={closeDrawer}>
           <View style={styles.overlay}>
             <Animated.View style={[styles.drawer, { left: drawerAnimation }]}>
-              <Icon source='camera' size={40} />
+              <Ionicons name='camera-outline' size={40} />
               <Text>Camera</Text>
-              <Icon source='delete' size={40} />
+              <Ionicons name='trash-outline' size={40} />
               <Text>Delete</Text>
-              <Icon source='email' size={40} />
+              <Ionicons name='mail-outline' size={40} />
               <Text>Contact</Text>
-              <Icon source='inbox' size={40} />
+              <Ionicons name='file-tray-outline' size={40} />
               <Text>Inbox</Text>
             </Animated.View>
           </View>
@@ -70,18 +72,18 @@ const SideDrawer = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background.primary,
   },
   hamburger: {
-    padding: 15,
+    padding: theme.spacing.lg,
     alignSelf: 'flex-end',
-    marginRight: 20,
+    marginRight: theme.spacing.xl,
   },
   line: {
     width: 30,
     height: 3,
-    backgroundColor: '#000',
-    marginVertical: 4,
+    backgroundColor: theme.colors.text.primary,
+    marginVertical: theme.spacing.xs,
   },
   overlay: {
     position: 'absolute',
@@ -89,26 +91,22 @@ const styles = StyleSheet.create({
     left: 0,
     width: screenWidth,
     height: screenHeight,
-    backgroundColor: 'rgba(240, 234, 249, 0.89)',
+    backgroundColor: theme.colors.background.overlay,
   },
   drawer: {
     position: 'absolute',
     top: 0,
     bottom: 0,
     width: screenWidth * 0.75,
-    backgroundColor: 'rgba(227, 210, 252, 0.89)',
-    padding: 20,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: -2, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    gap: 20,
+    backgroundColor: theme.colors.background.primary,
+    padding: theme.spacing.xl,
+    ...theme.shadows.lg,
+    gap: theme.spacing.xl,
   },
   drawerText: {
-    fontSize: 18,
-    marginVertical: 15,
-    color: '#333',
+    ...theme.typography.body,
+    marginVertical: theme.spacing.lg,
+    color: theme.colors.text.secondary,
   },
 });
 
