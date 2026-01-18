@@ -10,6 +10,7 @@ import {
 import { router } from 'expo-router';
 import { fetchProducts } from '@/data/productList';
 import { theme } from '@/constants/theme';
+import { Card } from '@/components/ui';
 
 type NotificationType = {
   id: string;
@@ -75,7 +76,7 @@ const NotificationScreen = () => {
 
     return (
       <Pressable onPress={() => onPressNotification(item)}>
-        <View style={styles.card}>
+        <Card variant='default' style={styles.card}>
           <View style={styles.imageWrapper}>
             {image ? (
               <Image source={{ uri: image }} style={styles.image} />
@@ -102,7 +103,7 @@ const NotificationScreen = () => {
 
           {/* Unread Dot */}
           <View style={styles.unreadDot} />
-        </View>
+        </Card>
       </Pressable>
     );
   };
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.neutral.white,
     padding: 14,
     borderRadius: 16,
     marginBottom: 12,
@@ -156,14 +157,14 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 60,
+    height: 60,
+    borderRadius: 8,
   },
 
   fallbackCircle: {
-    width: 44,
-    height: 44,
+    width: 60,
+    height: 60,
     borderRadius: 22,
     backgroundColor: '#f4b6c2',
     justifyContent: 'center',
@@ -174,13 +175,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
+  headerRow: {
+    flexDirection: 'column',
+  },
   content: {
     flex: 1,
-  },
-
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    paddingTop: 10,
   },
 
   title: {
