@@ -19,19 +19,15 @@ const Home = () => {
   return (
     <ErrorBoundary>
       <View style={styles.container}>
-        {/* Search Bar */}
         <View style={styles.search}>
           <SearchBar
-            value=""
+            value=''
             onChangeText={() => {}}
             onFocus={handleSearchFocus}
-            editable={true
-              
-            }
-            placeholder="Search products, categories, brands..."
+            editable={true}
+            placeholder='Search products, categories, brands...'
           />
         </View>
-        {/* Home Content */}
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -47,7 +43,6 @@ const Home = () => {
           <Divsions />
         </ScrollView>
 
-        {/* Search Modal */}
         <SearchModal
           visible={searchModalVisible}
           onClose={() => setSearchModalVisible(false)}

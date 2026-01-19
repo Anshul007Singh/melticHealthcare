@@ -146,18 +146,11 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-<<<<<<< HEAD
-    backgroundColor: theme.colors.neutral.white,
-    padding: 14,
-    borderRadius: 16,
-    marginBottom: 12,
-=======
     backgroundColor: theme.colors.background.primary,
     padding: theme.spacing.md,
     borderRadius: theme.borderRadius.lg,
     marginBottom: theme.spacing.md,
     ...theme.shadows.sm,
->>>>>>> b0f4c6396da0de5714d773a6b0cd09e7da450097
   },
 
   imageWrapper: {
@@ -165,18 +158,6 @@ const styles = StyleSheet.create({
   },
 
   image: {
-<<<<<<< HEAD
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-  },
-
-  fallbackCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 22,
-    backgroundColor: '#f4b6c2',
-=======
     width: theme.layout.minTouchTarget,
     height: theme.layout.minTouchTarget,
     borderRadius: theme.layout.minTouchTarget / 2,
@@ -187,7 +168,6 @@ const styles = StyleSheet.create({
     height: theme.layout.minTouchTarget,
     borderRadius: theme.layout.minTouchTarget / 2,
     backgroundColor: theme.colors.primary.lighter,
->>>>>>> b0f4c6396da0de5714d773a6b0cd09e7da450097
     justifyContent: 'center',
     alignItems: 'center',
   },
