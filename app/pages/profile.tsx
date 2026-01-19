@@ -252,6 +252,7 @@ const styles = StyleSheet.create({
   buttonText: {
     ...theme.typography.bodyBold,
     color: theme.colors.primary.contrast,
+    textAlign: 'center',
   },
   cancelButton: {
     backgroundColor: theme.colors.semantic.error,
@@ -259,6 +260,7 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     ...theme.typography.bodyBold,
     color: theme.colors.neutral.white,
+    textAlign: 'center',
   },
 });
 

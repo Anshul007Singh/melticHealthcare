@@ -1,11 +1,25 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Text, Title } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { theme } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const PrivacyPolicy = () => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        {
+          paddingBottom: Math.max(
+            insets.bottom,
+            theme.spacing.xxl, // minimum safe area for Android gesture bar
+          ),
+        },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
       <Text style={styles.sectionTitle}>1. Introduction</Text>
       <Text style={styles.paragraph}>
         Welcome to the Meltic Group mobile application (the “App”), owned and
@@ -152,19 +166,16 @@ const PrivacyPolicy = () => {
         By using the App, you confirm that you have read this Privacy Policy and
         agree to the collection, use, and processing of your information.
       </Text>
-
-      <View style={{ height: 30 }} />
+      <View style={{ height: theme.spacing.md }} />
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.lg,
     backgroundColor: theme.colors.background.primary,
-  },
-  heading: {
-    marginBottom: theme.spacing.xl,
   },
   sectionTitle: {
     ...theme.typography.bodyBold,

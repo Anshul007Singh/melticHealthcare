@@ -1,3 +1,4 @@
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getStoredUserInfo } from '@/api/auth';
 import { placeOrder } from '@/api/orders';
 import CustomModal from '@/components/modal';
@@ -12,7 +13,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 
 export default function CartScreen() {
@@ -23,6 +24,7 @@ export default function CartScreen() {
     message: '',
     type: 'success' as 'success' | 'error',
   });
+  const insets = useSafeAreaInsets();
 
   const { cartItems, removeFromCart, updateQuantity, emptyCart } = useCart();
   const [promoCode, setPromoCode] = useState('');
@@ -173,7 +175,7 @@ export default function CartScreen() {
   };
 
   const renderItem = ({ item }: any) => (
-    <Card variant="bordered" style={styles.itemCard}>
+    <Card variant='bordered' style={styles.itemCard}>
       <Image
         source={{
           uri:
@@ -183,10 +185,10 @@ export default function CartScreen() {
         accessibilityIgnoresInvertColors
       />
       <View style={styles.itemDetails}>
-        <Typography variant="bodyBold" style={styles.itemName}>
+        <Typography variant='bodyBold' style={styles.itemName}>
           {item.name}
         </Typography>
-        <Typography variant="small" color="secondary">
+        <Typography variant='small' color='secondary'>
           Price: ₹{item.price}
         </Typography>
         <View style={styles.row}>
@@ -200,37 +202,41 @@ export default function CartScreen() {
                   removeFromCart(item.id);
                 }
               }}
-              accessibilityRole="button"
+              accessibilityRole='button'
               accessibilityLabel={`Decrease quantity of ${item.name}`}
             >
-              <Typography variant="bodyBold">−</Typography>
+              <Typography variant='bodyBold'>−</Typography>
             </TouchableOpacity>
 
-            <Typography variant="body" style={styles.qtyNumber}>
+            <Typography variant='body' style={styles.qtyNumber}>
               {item.quantity}
             </Typography>
 
             <TouchableOpacity
               style={styles.qtyButton}
               onPress={() => updateQuantity(item.id, item.quantity + 1)}
-              accessibilityRole="button"
+              accessibilityRole='button'
               accessibilityLabel={`Increase quantity of ${item.name}`}
             >
-              <Typography variant="bodyBold">+</Typography>
+              <Typography variant='bodyBold'>+</Typography>
             </TouchableOpacity>
           </View>
 
-          <Typography variant="bodyBold" style={styles.itemTotal}>
+          <Typography variant='bodyBold' style={styles.itemTotal}>
             ₹{item.price * item.quantity}
           </Typography>
 
           <TouchableOpacity
             onPress={() => removeFromCart(item.id)}
-            accessibilityRole="button"
+            accessibilityRole='button'
             accessibilityLabel={`Remove ${item.name} from cart`}
             style={styles.deleteButton}
           >
-            <Ionicons name='trash-outline' size={22} color={theme.colors.semantic.error} />
+            <Ionicons
+              name='trash-outline'
+              size={22}
+              color={theme.colors.semantic.error}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -238,11 +244,22 @@ export default function CartScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingBottom: insets.bottom > 0 ? insets.bottom : theme.spacing.md,
+        },
+      ]}
+    >
       {cartItems.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name='cart-outline' size={150} color={theme.colors.neutral.gray300} />
-          <Typography variant="body" color="tertiary" style={styles.emptyText}>
+          <Ionicons
+            name='cart-outline'
+            size={150}
+            color={theme.colors.neutral.gray300}
+          />
+          <Typography variant='body' color='tertiary' style={styles.emptyText}>
             Your cart is empty
           </Typography>
         </View>
@@ -255,37 +272,39 @@ export default function CartScreen() {
             contentContainerStyle={styles.listContainer}
           />
 
-          <Card variant="bordered" style={styles.summaryCard}>
+          <Card variant='bordered' style={styles.summaryCard}>
             <View style={styles.summaryRow}>
-              <Typography variant="small" color="secondary">
+              <Typography variant='small' color='secondary'>
                 Subtotals for order
               </Typography>
-              <Typography variant="small">₹ {subtotal.toFixed(2)}</Typography>
+              <Typography variant='small'>₹ {subtotal.toFixed(2)}</Typography>
             </View>
             <View style={styles.summaryRow}>
-              <Typography variant="small" color="secondary">
+              <Typography variant='small' color='secondary'>
                 Delivery fee
               </Typography>
-              <Typography variant="small">₹ {deliveryFee.toFixed(2)}</Typography>
+              <Typography variant='small'>
+                ₹ {deliveryFee.toFixed(2)}
+              </Typography>
             </View>
             <View style={styles.summaryRow}>
-              <Typography variant="small" color="secondary">
+              <Typography variant='small' color='secondary'>
                 Discount
               </Typography>
-              <Typography variant="small">-₹ {discount.toFixed(2)}</Typography>
+              <Typography variant='small'>-₹ {discount.toFixed(2)}</Typography>
             </View>
             <View style={styles.divider} />
             <View style={styles.summaryRow}>
-              <Typography variant="bodyBold">Total</Typography>
-              <Typography variant="bodyBold">₹ {total.toFixed(2)}</Typography>
+              <Typography variant='bodyBold'>Total</Typography>
+              <Typography variant='bodyBold'>₹ {total.toFixed(2)}</Typography>
             </View>
           </Card>
 
           <Button
-            variant="primary"
+            variant='primary'
             onPress={onPlaceOrder}
             style={styles.checkoutButton}
-            accessibilityLabel="Proceed to checkout"
+            accessibilityLabel='Proceed to checkout'
           >
             Checkout
           </Button>
@@ -307,11 +326,11 @@ export default function CartScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background.primary
+    backgroundColor: theme.colors.background.primary,
   },
   listContainer: {
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.lg
+    paddingTop: theme.spacing.lg,
   },
   itemCard: {
     flexDirection: 'row',
@@ -383,7 +402,7 @@ const styles = StyleSheet.create({
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   emptyText: {
     marginTop: theme.spacing.md,

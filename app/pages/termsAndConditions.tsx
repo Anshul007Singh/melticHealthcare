@@ -1,16 +1,30 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Text, Title } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { theme } from '@/constants/theme';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TermsAndConditions = () => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        {
+          paddingBottom: Math.max(
+            insets.bottom,
+            theme.spacing.xxl, // minimum safe space for Android nav bar
+          ),
+        },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
       <Text style={styles.paragraph}>
         Welcome to the Meltic Group Mobile App (“App”), owned and operated by
         Meltic Group (“Company”, “we”, “us”, or “our”). By downloading,
         installing, or using this App, you agree to be bound by these Terms &
-        Conditions (“Terms”). If you do not agree, please do not use the App.
+        Conditions (“Terms”).
       </Text>
 
       {/* Section 1 */}
@@ -179,19 +193,16 @@ const TermsAndConditions = () => {
       <Text style={styles.paragraph}>
         Address: Nanhera Road Kuldeep Nagar, Ambala Cantt, India 133004
       </Text>
-
-      <View style={{ height: 30 }} />
+      <View style={{ height: theme.spacing.md }} />
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.lg,
     backgroundColor: theme.colors.background.primary,
-  },
-  heading: {
-    marginBottom: theme.spacing.xl,
   },
   sectionTitle: {
     ...theme.typography.bodyBold,

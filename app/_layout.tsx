@@ -8,16 +8,17 @@ import MainLayout from './mainLayout';
 import LoginScreen from './screens/loginScreen';
 import SignUpScreen from './screens/signUpScreen';
 import SplashScreen from './screens/splashscreen';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function App() {
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaProvider style={styles.rootContainer}>
       <PaperProvider>
         <AuthProvider>
           <AppContent />
         </AuthProvider>
       </PaperProvider>
-    </View>
+    </SafeAreaProvider>
   );
 }
 function AppContent() {
@@ -63,11 +64,11 @@ function AppContent() {
   }
 
   return (
-    <View style={styles.rootContainer}>
+    <SafeAreaProvider style={styles.rootContainer}>
       <CartProvider>
         <MainLayout />
       </CartProvider>
-    </View>
+    </SafeAreaProvider>
   );
 }
 

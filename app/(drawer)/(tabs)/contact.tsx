@@ -1,5 +1,6 @@
 import CustomModal from '@/components/modal';
 import { Button, Card, H3, H4, Input, Typography } from '@/components/ui';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,11 +10,12 @@ import {
   KeyboardAvoidingView,
   Linking,
   Platform,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const Contact = () => {
   const [form, setForm] = useState({
@@ -31,7 +33,7 @@ const Contact = () => {
   const [modalMessage, setModalMessage] = useState('');
 
   const handleChange = (key: string, value: string) => {
-    setForm({ ...form, [key]: value });
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   useEffect(() => {
@@ -71,14 +73,14 @@ const Contact = () => {
       );
 
       const data = await response.json();
+
       if (response.ok) {
         showModal('Success', 'Contact form submitted successfully!');
         setForm({ name: '', email: '', phone: '', message: '' });
       } else {
         showModal('Error', data.message || 'Submission failed.');
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
       showModal('Error', 'Something went wrong. Please try again later.');
     } finally {
       setLoading(false);
@@ -99,38 +101,40 @@ const Contact = () => {
       } else {
         showModal('Error', 'WhatsApp is not installed on your device.');
       }
-    } catch (error) {
+    } catch {
       showModal('Error', 'Unable to open WhatsApp.');
     }
   };
-
-  const fields = ['name', 'email', 'phone', 'message'];
+  const insets = useSafeAreaInsets();
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      style={[
+        styles.container,
+        {
+          paddingBottom: insets.bottom > 0 ? insets.bottom : theme.spacing.lg,
+        },
+      ]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView
+        <KeyboardAwareScrollView
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps='handled'
+          enableOnAndroid
+          extraScrollHeight={140}
         >
           {/* Contact Info */}
-          <Card variant="light" style={styles.contactInfo}>
-            <H4 style={styles.label1}>Phone</H4>
-            <Typography variant="small" style={styles.text}>
-              +91 9504600000
-            </Typography>
+          <Card variant='light' style={styles.contactInfo}>
+            <H4 style={styles.label}>Phone</H4>
+            <Typography variant='small'>+91 9504600000</Typography>
 
-            <H4 style={styles.label1}>Email</H4>
-            <Typography variant="small" style={styles.text}>
-              info@meltichealth.com
-            </Typography>
+            <H4 style={styles.label}>Email</H4>
+            <Typography variant='small'>info@meltichealth.com</Typography>
 
-            <H4 style={styles.label1}>Address</H4>
-            <Typography variant="small" style={styles.text}>
+            <H4 style={styles.label}>Address</H4>
+            <Typography variant='small'>
               Nanhera Road Kuldeep Nagar, Ambala Cantt, India 133004
             </Typography>
 
@@ -140,8 +144,8 @@ const Contact = () => {
             >
               <Ionicons
                 name='logo-whatsapp'
-                color={theme.colors.semantic.success}
                 size={55}
+                color={theme.colors.semantic.success}
               />
             </TouchableOpacity>
           </Card>
@@ -150,53 +154,54 @@ const Contact = () => {
           <H3 style={styles.formTitle}>Leave your message</H3>
 
           <Input
-            label="Name"
+            label='Name'
             value={form.name}
             onChangeText={(value) => handleChange('name', value)}
-            placeholder="Enter your Name"
+            placeholder='Enter your Name'
             required
           />
 
           <Input
-            label="Email"
+            label='Email'
             value={form.email}
             onChangeText={(value) => handleChange('email', value)}
-            placeholder="Enter your Email"
-            keyboardType="email-address"
+            placeholder='Enter your Email'
+            keyboardType='email-address'
             required
           />
 
           <Input
-            label="Phone"
+            label='Phone'
             value={form.phone}
             onChangeText={(value) => handleChange('phone', value)}
-            placeholder="Enter your Phone"
-            keyboardType="numeric"
+            placeholder='Enter your Phone'
+            keyboardType='numeric'
             maxLength={10}
             required
           />
 
           <Input
-            label="Message"
+            label='Message'
             value={form.message}
             onChangeText={(value) => handleChange('message', value)}
-            placeholder="Enter your Message"
+            placeholder='Enter your Message'
             multiline
             numberOfLines={4}
+            blurOnSubmit={false}
             required
           />
 
           <Button
-            variant="primary"
+            variant='primary'
             onPress={handleSubmit}
             disabled={!isValid || loading}
             loading={loading}
-            style={styles.submitButton}
             fullWidth
+            style={styles.submitButton}
           >
             Submit
           </Button>
-        </ScrollView>
+        </KeyboardAwareScrollView>
       </TouchableWithoutFeedback>
 
       <CustomModal
@@ -212,19 +217,15 @@ const Contact = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: theme.spacing.xl,
+    padding: theme.spacing.sm,
     backgroundColor: theme.colors.background.primary,
   },
   contactInfo: {
     marginBottom: theme.spacing.xxxl,
     position: 'relative',
   },
-  label1: {
+  label: {
     marginTop: theme.spacing.md,
-  },
-  text: {
-    marginTop: theme.spacing.xs,
-    marginBottom: theme.spacing.sm,
   },
   whatsappButton: {
     position: 'absolute',
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: theme.spacing.xl,
-    marginBottom: theme.spacing.xl,
+    marginBottom: theme.spacing.xxl,
   },
 });
 

@@ -2,23 +2,33 @@ import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router, Tabs } from 'expo-router';
 import { TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+
   const handleProductListPress = () => {
     router.push({
       pathname: '/[productlist]',
       params: { query: 'productlist', productlist: 'productlist' },
     });
   };
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: theme.colors.primary.main, // Changed from #fff for theme consistency
-        tabBarInactiveTintColor: theme.colors.neutral.gray600, // Improved contrast ratio (4.6:1)
+        tabBarActiveTintColor: theme.colors.primary.main,
+        tabBarInactiveTintColor: theme.colors.neutral.gray600,
+
         tabBarStyle: {
-          backgroundColor: theme.colors.primary.light, // Changed from #0060AA for theme consistency
-          height: 85,
-          paddingTop: 5,
+          backgroundColor: theme.colors.primary.light,
+          paddingTop: 6,
+          paddingBottom: Math.max(insets.bottom, 12), // 🔥 KEY FIX
+          height: 56 + Math.max(insets.bottom, 12), // 🔥 AUTO HEIGHT
+        },
+
+        tabBarLabelStyle: {
+          paddingBottom: 4,
         },
       }}
     >
@@ -32,6 +42,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name='[productlist]'
         options={{
@@ -44,6 +55,7 @@ export default function TabLayout() {
           ),
         }}
       />
+
       <Tabs.Screen
         name='contact'
         options={{
