@@ -3,22 +3,26 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, View } from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
-
+const imageMap: { [key: string]: any } = {
+  banner1: require('../../assets/images/banner.png'),
+  banner2: require('../../assets/images/banner2.png'),
+  banner3: require('../../assets/images/banner3.png'),
+};
 const data = [
   {
     title: 'First Slide',
     description: 'This is the first slide description.',
-    image: '../../assets/images/banner.png',
+    image: 'banner1',
   },
   {
     title: 'Second Slide',
     description: 'This is the second slide description.',
-    image: '../../assets/images/banner1.png',
+    image: 'banner2',
   },
   {
     title: 'Third Slide',
     description: 'This is the third slide description.',
-    image: '../../assets/images/banner2.png',
+    image: 'banner3',
   },
 ];
 
@@ -90,32 +94,15 @@ const Home = () => {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Banner 1 */}
-        <View style={styles.slide}>
-          <Image
-            source={require('../../assets/images/banner.png')}
-            style={styles.image}
-            accessibilityLabel='Banner 1'
-          />
-        </View>
-
-        {/* Banner 2 */}
-        <View style={styles.slide}>
-          <Image
-            source={require('../../assets/images/banner1.png')}
-            style={styles.image}
-            accessibilityLabel='Banner 2'
-          />
-        </View>
-
-        {/* Banner 3 */}
-        <View style={styles.slide}>
-          <Image
-            source={require('../../assets/images/banner2.png')}
-            style={styles.image}
-            accessibilityLabel='Banner 3'
-          />
-        </View>
+        {data.map((item, index) => (
+          <View key={index} style={styles.slide}>
+            <Image
+              source={imageMap[item.image]}
+              style={styles.image}
+              accessibilityLabel={item.title}
+            />
+          </View>
+        ))}
       </ScrollView>
 
       {/* Pagination Dots */}
@@ -136,7 +123,7 @@ const Home = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.background.secondary,
+    backgroundColor: theme.colors.background.primary,
   },
   slide: {
     width: screenWidth,
@@ -145,7 +132,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 120,
+    height: 175,
     resizeMode: 'cover',
   },
   paginationContainer: {
@@ -156,13 +143,13 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   paginationDot: {
-    width: 8,
-    height: 8,
+    width: 4,
+    height: 4,
     borderRadius: 4,
     backgroundColor: theme.colors.neutral.gray300,
   },
   paginationDotActive: {
-    width: 24,
+    width: 16,
     backgroundColor: theme.colors.primary.main,
   },
 });

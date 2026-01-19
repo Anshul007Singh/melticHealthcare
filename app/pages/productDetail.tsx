@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.sm,
     paddingVertical: theme.spacing.sm,
     backgroundColor: theme.colors.primary.main,
-    marginVertical: theme.spacing.xxl,
+    marginVertical: theme.spacing.xl,
   },
   ribbon: {
     position: 'absolute',

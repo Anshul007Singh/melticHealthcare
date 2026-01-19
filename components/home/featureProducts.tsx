@@ -191,8 +191,10 @@ const styles = StyleSheet.create({
   },
   cardInner: {
     padding: 0,
+    paddingTop: theme.spacing.md,
     overflow: 'hidden',
-    backgroundColor: theme.colors.neutral.white,
+    borderWidth: 1,
+    borderColor:theme.colors.primary.lighter,
   },
   image: {
     width: '100%',

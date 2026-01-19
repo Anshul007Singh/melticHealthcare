@@ -1,16 +1,16 @@
+import Card from '@/components/ui/Card';
+import { theme } from '@/constants/theme';
+import { fetchProducts } from '@/data/productList';
+import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   FlatList,
-  Pressable,
   Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import { router } from 'expo-router';
-import { fetchProducts } from '@/data/productList';
-import { theme } from '@/constants/theme';
-import { Card } from '@/components/ui';
 
 type NotificationType = {
   id: string;
@@ -82,7 +82,7 @@ const NotificationScreen = () => {
               <Image source={{ uri: image }} style={styles.image} />
             ) : (
               <View style={styles.fallbackCircle}>
-                <Text style={styles.fallbackText}>V.</Text>
+                <Text style={styles.fallbackText}>V</Text>
               </View>
             )}
           </View>
@@ -150,7 +150,8 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
     borderRadius: theme.borderRadius.lg,
     marginBottom: theme.spacing.md,
-    ...theme.shadows.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.primary.lighter,
   },
 
   imageWrapper: {
@@ -158,9 +159,9 @@ const styles = StyleSheet.create({
   },
 
   image: {
-    width: theme.layout.minTouchTarget,
-    height: theme.layout.minTouchTarget,
-    borderRadius: theme.layout.minTouchTarget / 2,
+    width: theme.layout.bottomTabHeight,
+    height: theme.layout.bottomTabHeight,
+    borderRadius: theme.borderRadius.md,
   },
 
   fallbackCircle: {
@@ -182,7 +183,12 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 10,
+  },
+
+  headerRow: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    paddingTop: theme.spacing.sm,
   },
 
   title: {

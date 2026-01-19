@@ -1,3 +1,8 @@
+import { getStoredUserInfo } from '@/api/auth';
+import { Button, EmptyState, ErrorCard, H3, Shimmer, Typography } from '@/components/ui';
+import { theme } from '@/constants/theme';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import axios from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
@@ -6,11 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import axios from 'axios';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { getStoredUserInfo } from '@/api/auth';
-import { theme } from '@/constants/theme';
-import { Button, Typography, H3, EmptyState, ErrorCard, Shimmer } from '@/components/ui';
 
 /* ================= CONFIG ================= */
 
@@ -304,7 +304,6 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
     borderRadius: theme.borderRadius.lg,
     backgroundColor: theme.colors.background.primary,
-    ...theme.shadows.sm,
   },
   orderHeader: {
     flexDirection: 'row',
