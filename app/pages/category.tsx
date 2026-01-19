@@ -110,16 +110,18 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    gap: theme.spacing.md,
     padding: theme.spacing.md,
     backgroundColor: theme.colors.background.secondary,
   },
   card: {
-    width: 110,
+    width: '30%',
+    aspectRatio: 0.9,
     height: 120,
     padding: theme.spacing.xs,
     alignItems: 'center',
     justifyContent: 'center',
+    flexDirection: 'column'
   },
   image: {
     width: 50,
