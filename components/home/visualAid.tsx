@@ -222,11 +222,12 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
     marginRight: theme.spacing.md,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.primary.lighter,
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.xs,
   },
   image: {
-    borderRadius: theme.borderRadius.md,
     width: '100%',
     height: 65,
     resizeMode: 'cover',

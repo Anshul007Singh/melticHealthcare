@@ -39,7 +39,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <TouchableOpacity onPress={handleProductListPress}>
-              <Ionicons name='archive-outline' size={size} color={color} />
+              <Ionicons name='bookmarks' size={size} color={color} />
             </TouchableOpacity>
           ),
         }}
@@ -50,7 +50,7 @@ export default function TabLayout() {
           title: 'Contact',
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name='call-outline' size={size} color={color} />
+            <Ionicons name='id-card-sharp' size={size} color={color} />
           ),
         }}
       />

@@ -9,22 +9,26 @@ import {
 } from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
-
+const imageMap: { [key: string]: any } = {
+  banner1: require('../../assets/images/banner.png'),
+  banner2: require('../../assets/images/banner2.png'),
+  banner3: require('../../assets/images/banner3.png'),
+};
 const data = [
   {
     title: 'First Slide',
     description: 'This is the first slide description.',
-    image: 'https://picsum.photos/600/400?random=1',
+    image: 'banner1',
   },
   {
     title: 'Second Slide',
     description: 'This is the second slide description.',
-    image: 'https://picsum.photos/600/400?random=2',
+    image: 'banner2',
   },
   {
     title: 'Third Slide',
     description: 'This is the third slide description.',
-    image: 'https://picsum.photos/600/300?random=3',
+    image: 'banner3',
   },
 ];
 
@@ -99,7 +103,7 @@ const Home = () => {
         {data.map((item, index) => (
           <View key={index} style={styles.slide}>
             <Image
-              source={require('../../assets/images/banner.png')}
+              source={imageMap[item.image]}
               style={styles.image}
               accessibilityLabel={item.title}
             />
@@ -125,7 +129,7 @@ const Home = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.background.secondary,
+    backgroundColor: theme.colors.background.primary,
   },
   slide: {
     width: screenWidth,
@@ -134,7 +138,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 120,
+    height: 175,
     resizeMode: 'cover',
   },
   paginationContainer: {
@@ -145,13 +149,13 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   paginationDot: {
-    width: 8,
-    height: 8,
+    width: 4,
+    height: 4,
     borderRadius: 4,
     backgroundColor: theme.colors.neutral.gray300,
   },
   paginationDotActive: {
-    width: 24,
+    width: 16,
     backgroundColor: theme.colors.primary.main,
   },
 });
