@@ -1,42 +1,40 @@
-import { Card, Shimmer, Typography } from '@/components/ui';
-import { theme } from '@/constants/theme';
-import { fetchProducts } from '@/data/productList';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  Dimensions,
+  FlatList,
   Image,
   Pressable,
-  ScrollView,
   StyleSheet,
+  useWindowDimensions,
   View,
 } from 'react-native';
 
+import { Card, Shimmer, Typography } from '@/components/ui';
+import { theme } from '@/constants/theme';
+import { fetchProducts } from '@/data/productList';
+
 const placeholderImg = '@/assets/images/img-box.svg';
-const { width } = Dimensions.get('window');
 
 const DynamicListScreen = () => {
   const [dataList, setDataList] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showShimmer, setShowShimmer] = useState(true);
 
   const { query } = useLocalSearchParams<{ query?: string }>();
+  const { width } = useWindowDimensions();
+
+  // 📱 Mobile → 2 | 📲 Tablet → 4
+  const numColumns = width >= 768 ? 4 : 3;
 
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true);
       setShowShimmer(true);
-
       try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await new Promise((r) => setTimeout(r, 2000));
         const data = await fetchProducts(query);
-        if (data && Array.isArray(data)) {
-          setDataList(data);
-        }
-      } catch (error) {
-        console.error('Error loading data:', error);
+        if (Array.isArray(data)) setDataList(data);
+      } catch (e) {
+        console.error(e);
       } finally {
-        setLoading(false);
         setShowShimmer(false);
       }
     };
@@ -50,78 +48,73 @@ const DynamicListScreen = () => {
     });
   };
 
-  const ShimmerCard = () => {
-    return (
-      <Card variant='light' style={styles.card}>
-        <Shimmer width={50} height={50} borderRadius={theme.borderRadius.sm} />
-
-        <View style={{ marginTop: theme.spacing.sm }}>
-          <Shimmer
-            width='60%'
-            height={12}
-            borderRadius={theme.borderRadius.sm}
-          />
-        </View>
-      </Card>
-    );
-  };
+  const ShimmerCard = () => (
+    <Card variant="light" style={styles.card}>
+      <Shimmer width={50} height={50} borderRadius={theme.borderRadius.sm} />
+      <View style={{ marginTop: theme.spacing.sm }}>
+        <Shimmer width="60%" height={12} />
+      </View>
+    </Card>
+  );
 
   if (showShimmer) {
     return (
-      <ScrollView contentContainerStyle={styles.container}>
-        {Array.from({ length: 9 }).map((_, i) => (
-          <ShimmerCard key={i} />
-        ))}
-      </ScrollView>
+      <FlatList
+        data={Array.from({ length: 8 })}
+        numColumns={numColumns}
+        key={numColumns} // 🔥 important
+        keyExtractor={(_, i) => i.toString()}
+        renderItem={() => <ShimmerCard />}
+        contentContainerStyle={styles.container}
+      />
     );
   }
 
   return (
-    <View
-      style={{ flex: 1, backgroundColor: theme.colors.background.secondary }}
-    >
-      <ScrollView contentContainerStyle={styles.container}>
-        {dataList.map((item, index) => (
+    <View style={{ flex: 1, backgroundColor: theme.colors.background.secondary }}>
+      <FlatList
+        data={dataList}
+        numColumns={numColumns}
+        key={numColumns} // 🔥 important
+        keyExtractor={(_, i) => i.toString()}
+        contentContainerStyle={styles.container}
+        renderItem={({ item }) => (
           <Pressable
-            key={index}
+            style={{ flex: 1 }}
             onPress={() => onClickItem(item.slug)}
-            accessibilityRole='button'
-            accessibilityLabel={`Category: ${item.name}`}
+            accessibilityRole="button"
+            accessibilityLabel={`Category ${item.name}`}
           >
-            <Card variant='light' style={styles.card}>
+            <Card variant="light" style={styles.card}>
               <Image
                 source={{ uri: item.image?.src || placeholderImg }}
                 style={styles.image}
-                resizeMode='contain'
-                accessibilityLabel={`${item.name} icon`}
+                resizeMode="contain"
               />
-              <Typography variant='caption' style={styles.label} center>
+              <Typography variant="caption" style={styles.label} center>
                 {item.name}
               </Typography>
             </Card>
           </Pressable>
-        ))}
-      </ScrollView>
+        )}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing.md,
     padding: theme.spacing.md,
     backgroundColor: theme.colors.background.secondary,
   },
   card: {
-    width: '30%',
-    aspectRatio: 0.9,
+    flex: 1, // 🔑 required for grid
+    margin: theme.spacing.sm,
     height: 120,
-    padding: theme.spacing.xs,
+    padding: theme.spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'column'
+    borderRadius: theme.borderRadius.md,
   },
   image: {
     width: 50,

@@ -147,7 +147,7 @@ export default function ProductDetailScreen() {
     <View style={{ flex: 1 }}>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: 120 }}
       >
         <View style={styles.imageCard}>
           <Image
@@ -278,18 +278,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.neutral.gray200,
   },
-  backButton: {
-    minWidth: 44,
-    minHeight: 44,
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-  },
-  headerSpacer: {
-    width: 44,
-  },
   container: {
     flex: 1,
     padding: theme.spacing.md,
@@ -362,7 +350,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.sm,
     paddingVertical: theme.spacing.sm,
     backgroundColor: theme.colors.primary.main,
-    marginVertical: theme.spacing.xl,
+    marginVertical: theme.spacing.xxl,
   },
   ribbon: {
     position: 'absolute',
@@ -387,11 +375,10 @@ const styles = StyleSheet.create({
   },
   accordionContent: {
     maxHeight: 200,
-    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
   },
   accordionContentLast: {
     maxHeight: 200,
-    paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.xl,
+    paddingVertical: theme.spacing.md,
   },
 });

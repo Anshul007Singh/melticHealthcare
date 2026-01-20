@@ -1,35 +1,32 @@
 import { theme } from '@/constants/theme';
 import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 
-const { width: screenWidth } = Dimensions.get('window');
 const imageMap: { [key: string]: any } = {
   banner1: require('../../assets/images/banner.png'),
   banner2: require('../../assets/images/banner2.png'),
   banner3: require('../../assets/images/banner3.png'),
 };
+
 const data = [
-  {
-    title: 'First Slide',
-    description: 'This is the first slide description.',
-    image: 'banner1',
-  },
-  {
-    title: 'Second Slide',
-    description: 'This is the second slide description.',
-    image: 'banner2',
-  },
-  {
-    title: 'Third Slide',
-    description: 'This is the third slide description.',
-    image: 'banner3',
-  },
+  { title: 'First Slide', description: 'This is the first slide', image: 'banner1' },
+  { title: 'Second Slide', description: 'This is the second slide', image: 'banner2' },
+  { title: 'Third Slide', description: 'This is the third slide', image: 'banner3' },
 ];
 
 const Home = () => {
+  const { width: screenWidth } = useWindowDimensions();
+  const imageHeight = screenWidth * 9 / 16; // 16:9 ratio
+
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollView>(null);
   const pauseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleScroll = (event: any) => {
@@ -40,52 +37,35 @@ const Home = () => {
 
   const handleTouchStart = () => {
     setIsPaused(true);
-    // Clear existing timeout
-    if (pauseTimeoutRef.current) {
-      clearTimeout(pauseTimeoutRef.current);
-    }
+    if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
   };
 
   const handleTouchEnd = () => {
-    // Resume auto-scroll after 3 seconds of inactivity
-    pauseTimeoutRef.current = setTimeout(() => {
-      setIsPaused(false);
-    }, 3000);
+    pauseTimeoutRef.current = setTimeout(() => setIsPaused(false), 3000);
   };
-  const TOTAL_SLIDES = 3;
-  // Auto-slide effect
+
+  // Auto-slide
   useEffect(() => {
     if (isPaused) return;
-
     const interval = setInterval(() => {
-      setActiveIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % TOTAL_SLIDES;
-
-        scrollViewRef.current?.scrollTo({
-          x: nextIndex * screenWidth,
-          animated: true,
-        });
-
-        return nextIndex;
-      });
+      const nextIndex = (activeIndex + 1) % data.length;
+      scrollRef.current?.scrollTo({ x: nextIndex * screenWidth, animated: true });
+      setActiveIndex(nextIndex);
     }, 3000);
-
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [activeIndex, isPaused, screenWidth]);
 
-  // Cleanup timeout on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (pauseTimeoutRef.current) {
-        clearTimeout(pauseTimeoutRef.current);
-      }
+      if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current);
     };
   }, []);
 
   return (
     <View style={styles.container}>
       <ScrollView
-        ref={scrollViewRef}
+        ref={scrollRef}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -95,19 +75,20 @@ const Home = () => {
         onTouchEnd={handleTouchEnd}
       >
         {data.map((item, index) => (
-          <View key={index} style={styles.slide}>
+          <View key={index} style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center' }}>
             <Image
               source={imageMap[item.image]}
-              style={styles.image}
+              style={{ width: screenWidth, height: imageHeight }}
+              resizeMode="cover"
               accessibilityLabel={item.title}
             />
           </View>
         ))}
       </ScrollView>
 
-      {/* Pagination Dots */}
+      {/* Pagination */}
       <View style={styles.paginationContainer}>
-        {[0, 1, 2].map((index) => (
+        {data.map((_, index) => (
           <View
             key={index}
             style={[
@@ -124,16 +105,6 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.background.primary,
-  },
-  slide: {
-    width: screenWidth,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
   },
   paginationContainer: {
     flexDirection: 'row',

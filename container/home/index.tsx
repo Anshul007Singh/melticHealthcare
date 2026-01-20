@@ -7,7 +7,7 @@ import VisualAid from '@/components/home/visualAid';
 import { SearchBar, SearchModal } from '@/components/search';
 import { theme } from '@/constants/theme';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 const Home = () => {
   const [searchModalVisible, setSearchModalVisible] = useState(false);
@@ -19,15 +19,14 @@ const Home = () => {
   return (
     <ErrorBoundary>
       <View style={styles.container}>
-        <View style={styles.search}>
+        <Pressable onPress={handleSearchFocus} style={styles.search}>
           <SearchBar
             value=''
             onChangeText={() => {}}
-            onFocus={handleSearchFocus}
-            editable={true}
+            editable={false}
             placeholder='Search products, categories, brands...'
           />
-        </View>
+        </Pressable>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}

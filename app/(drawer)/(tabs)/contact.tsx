@@ -1,6 +1,5 @@
 import CustomModal from '@/components/modal';
 import { Button, Card, H3, H4, Input, Typography } from '@/components/ui';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { theme } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,10 +11,10 @@ import {
   Platform,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
+  TouchableWithoutFeedback
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Contact = () => {
   const [form, setForm] = useState({

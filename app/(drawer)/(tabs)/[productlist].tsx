@@ -3,7 +3,7 @@ import { theme } from '@/constants/theme';
 import { fetchProducts } from '@/data/productList';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -35,14 +35,31 @@ const ProductListScreen = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [showSortMenu, setShowSortMenu] = useState(false);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
   const router = useRouter();
+
+  // Ref to prevent race conditions in pagination
+  const loadingRef = useRef(false);
 
   const loadProducts = async () => {
     setLoading(true);
+    setCurrentPage(1);
     try {
-      const data = await fetchProducts();
-      if (data && Array.isArray(data)) {
-        setProducts(data);
+      const data = await fetchProducts(undefined, 1, 50);
+      if (data && data.products && Array.isArray(data.products)) {
+        // Deduplicate in case API returns duplicates in a single page
+        const uniqueProducts = Array.from(
+          new Map(data.products.map(p => [p.id, p])).values()
+        );
+        setProducts(uniqueProducts);
+        setTotalPages(data.totalPages);
+        setHasMore(data.currentPage < data.totalPages);
+        setCurrentPage(1);
       }
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -52,15 +69,59 @@ const ProductListScreen = () => {
 
   const handleRefresh = async () => {
     setRefreshing(true);
+    setCurrentPage(1);
     try {
-      const data = await fetchProducts();
-      if (data && Array.isArray(data)) {
-        setProducts(data);
+      const data = await fetchProducts(undefined, 1, 50);
+      if (data && data.products && Array.isArray(data.products)) {
+        // Deduplicate in case API returns duplicates in a single page
+        const uniqueProducts = Array.from(
+          new Map(data.products.map(p => [p.id, p])).values()
+        );
+        setProducts(uniqueProducts);
+        setTotalPages(data.totalPages);
+        setHasMore(data.currentPage < data.totalPages);
+        setCurrentPage(1);
       }
     } catch (error) {
       console.error('Error refreshing products:', error);
     }
     setRefreshing(false);
+  };
+
+  const loadMoreProducts = async () => {
+    // Check both state and ref to prevent race conditions
+    if (loadingMore || !hasMore || loadingRef.current) return;
+
+    loadingRef.current = true;
+    setLoadingMore(true);
+    const nextPage = currentPage + 1;
+    try {
+      const data = await fetchProducts(undefined, nextPage, 50);
+      if (data && data.products && Array.isArray(data.products)) {
+        setProducts(prevProducts => {
+          // Create a Set of existing product IDs
+          const existingIds = new Set(prevProducts.map(p => p.id));
+
+          // Filter out products that already exist
+          const newProducts = data.products.filter(p => !existingIds.has(p.id));
+
+          // Log if duplicates were found (helps debug backend pagination issues)
+          const duplicateCount = data.products.length - newProducts.length;
+          if (duplicateCount > 0) {
+            console.warn(`Filtered out ${duplicateCount} duplicate products from page ${nextPage}`);
+          }
+
+          // Only append truly new products
+          return [...prevProducts, ...newProducts];
+        });
+        setCurrentPage(nextPage);
+        setHasMore(nextPage < data.totalPages);
+      }
+    } catch (error) {
+      console.error('Error loading more products:', error);
+    }
+    setLoadingMore(false);
+    loadingRef.current = false;
   };
 
   useEffect(() => {
@@ -673,6 +734,24 @@ const ProductListScreen = () => {
             tintColor={theme.colors.primary.main}
           />
         }
+        onEndReached={loadMoreProducts}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          loadingMore ? (
+            <View style={styles.loadingFooter}>
+              <Shimmer width={150} height={20} borderRadius={theme.borderRadius.sm} />
+              <Typography variant="small" color="secondary" style={styles.loadingText}>
+                Loading more products...
+              </Typography>
+            </View>
+          ) : hasMore === false && products.length > 0 ? (
+            <View style={styles.loadingFooter}>
+              <Typography variant="small" color="secondary" style={styles.loadingText}>
+                All products loaded
+              </Typography>
+            </View>
+          ) : null
+        }
         ListEmptyComponent={
           <EmptyState
             icon="search-outline"
@@ -1003,6 +1082,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingFooter: {
+    paddingVertical: theme.spacing.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: theme.spacing.sm,
+    textAlign: 'center',
   },
 });
 
