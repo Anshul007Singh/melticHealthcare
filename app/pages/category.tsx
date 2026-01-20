@@ -105,6 +105,7 @@ const DynamicListScreen = () => {
 const styles = StyleSheet.create({
   container: {
     padding: theme.spacing.md,
+    paddingBottom: theme.spacing.xl,
     backgroundColor: theme.colors.background.secondary,
   },
   card: {

@@ -4,6 +4,7 @@ import { fetchProducts } from '@/data/productList';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
+  Dimensions,
   FlatList,
   Image,
   StyleSheet,
@@ -12,8 +13,11 @@ import {
   View,
 } from 'react-native';
 
+
+const LOGO_SIZE = Dimensions.get('window').width * 0.25;
+
 /* ---------------------------------------------------
-   BRAND ORDER
+   BRAND ORDER (based on API slug)
 --------------------------------------------------- */
 const BRAND_ORDER = [
   'meltic',
@@ -21,28 +25,38 @@ const BRAND_ORDER = [
   'dalcon',
   'cardiever-pharmaceuticals',
   'melvet-animal-health',
-  'mivika-wellness',
+  'mivika-wellness', // optional (future brand)
 ];
 
+
+/* ---------------------------------------------------
+   MAIN COMPONENT
+--------------------------------------------------- */
 const OurDivisions = () => {
   const { width: screenWidth } = useWindowDimensions();
-  const LOGO_SIZE = screenWidth * 0.25;
-
   const [brands, setBrands] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadBrands = async () => {
       setLoading(true);
+
       const data = await fetchProducts('brands');
 
       if (Array.isArray(data)) {
-        setBrands(
-          [...data].sort(
-            (a, b) =>
-              BRAND_ORDER.indexOf(a.slug) - BRAND_ORDER.indexOf(b.slug)
-          )
-        );
+        const sortedBrands = [...data].sort((a, b) => {
+          const aIndex = BRAND_ORDER.indexOf(a.slug);
+          const bIndex = BRAND_ORDER.indexOf(b.slug);
+
+          // Push unknown brands to the end
+          if (aIndex === -1 && bIndex === -1) return 0;
+          if (aIndex === -1) return 1;
+          if (bIndex === -1) return -1;
+
+          return aIndex - bIndex;
+        });
+
+        setBrands(sortedBrands);
       } else {
         setBrands([]);
       }
@@ -62,80 +76,74 @@ const OurDivisions = () => {
 
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
-      style={[
-        styles.logoContainer,
-        {
-          width: LOGO_SIZE,
-          height: LOGO_SIZE,
-          borderRadius: LOGO_SIZE / 2,
-        },
-      ]}
+      style={styles.logoContainer}
       onPress={() => onClickHandler(item)}
       accessibilityRole="button"
+      accessibilityLabel={`${item.name} division`}
     >
       <Image
         source={{ uri: item?.image?.src }}
-        resizeMode="contain"
-        style={{
-          width: LOGO_SIZE * 0.9,
-          height: LOGO_SIZE * 0.9,
-          borderRadius: LOGO_SIZE / 2,
-        }}
+        style={styles.logo}
+        resizeMode='contain'
+        accessibilityLabel={`${item.name} logo`}
       />
     </TouchableOpacity>
   );
 
-  const renderShimmer = () => (
-    <View
-      style={[
-        styles.logoContainer,
-        {
-          width: LOGO_SIZE,
-          height: LOGO_SIZE,
-          borderRadius: LOGO_SIZE / 2,
-        },
-      ]}
-    >
-      <Shimmer
-        width={LOGO_SIZE * 0.9}
-        height={LOGO_SIZE * 0.9}
-        borderRadius={LOGO_SIZE / 2}
-      />
-    </View>
-  );
-
+  const onViewAllHandler = () => {
+    router.push({
+      pathname: '/pages/divisions',
+      params: { query: 'brands' },
+    });
+  };
   const bannerWidth = screenWidth - 2 * theme.spacing.lg;
-  const bannerHeight = (bannerWidth * 9) / 21;
-
+  const bannerHeight = (bannerWidth * 9) / 21; // 21:9 ratio
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.headerRow}>
         <H3>Our Divisions</H3>
-        <TouchableOpacity onPress={() => router.push('/pages/divisions')}>
+        <TouchableOpacity
+          onPress={onViewAllHandler}
+          accessibilityRole="button"
+          accessibilityLabel="View all divisions"
+        >
           <Typography variant="smallBold" color="link">
             View All
           </Typography>
         </TouchableOpacity>
       </View>
 
-      {/* Brand List */}
-      <FlatList
-        horizontal
-        data={loading ? [1, 2, 3, 4, 5] : brands}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={loading ? renderShimmer : renderItem}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingLeft: theme.spacing.lg,
-          paddingVertical: theme.spacing.md,
-        }}
-      />
+      {loading ? (
+        <FlatList
+          horizontal
+          data={[1, 2, 3, 4, 5]}
+          keyExtractor={(item) => item.toString()}
+          renderItem={() => (
+            <View style={styles.logoContainer}>
+              <Shimmer
+                width={LOGO_SIZE * 0.9}
+                height={LOGO_SIZE * 0.9}
+                borderRadius={LOGO_SIZE / 2}
+              />
+            </View>
+          )}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingLeft: theme.spacing.sm }}
+        />
+      ) : (
+        <FlatList
+          horizontal
+          data={brands}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingLeft: theme.spacing.lg, paddingVertical: theme.spacing.md, }}
+        />
+      )}
 
-      {/* Banner */}
+      {/* Banner Image */}
       <Image
         source={require('../../../assets/images/home_offer_image_section.png')}
-        resizeMode="cover"
         style={{
           width: bannerWidth,
           height: bannerHeight,
@@ -143,6 +151,8 @@ const OurDivisions = () => {
           marginHorizontal: theme.spacing.lg,
           marginTop: theme.spacing.xl,
         }}
+        resizeMode="cover"
+        accessibilityLabel="Promotional offer banner"
       />
     </View>
   );
@@ -164,10 +174,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.lg,
   },
   logoContainer: {
+    borderWidth: 0.5,
+    borderColor: theme.colors.primary.lighter,
+    width: LOGO_SIZE,
+    height: LOGO_SIZE,
+    borderRadius: LOGO_SIZE / 2,
     backgroundColor: theme.colors.background.primary,
     marginRight: theme.spacing.lg,
     alignItems: 'center',
     justifyContent: 'center',
     ...theme.shadows.sm,
+  },
+  logo: {
+    width: LOGO_SIZE * 0.9,
+    height: LOGO_SIZE * 0.9,
+    borderRadius: 50,
   },
 });

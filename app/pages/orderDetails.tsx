@@ -303,6 +303,8 @@ const styles = StyleSheet.create({
     margin: theme.spacing.md,
     padding: theme.spacing.md,
     borderRadius: theme.borderRadius.lg,
+    borderWidth: 0.5,
+    borderColor: theme.colors.primary.lighter,
     backgroundColor: theme.colors.background.primary,
   },
   orderHeader: {

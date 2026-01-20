@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Image,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { Typography } from '@/components/ui';
+import { theme } from '@/constants/theme';
 import { fetchProducts } from '@/data/productList';
 import { router, useLocalSearchParams } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { Typography } from '@/components/ui';
+import React, { useEffect, useState } from 'react';
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 const LOGO_SIZE = Dimensions.get('window').width * 0.25;
 
@@ -125,8 +125,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: theme.colors.neutral.gray200,
+    borderWidth: 0.5,
+    borderColor: theme.colors.primary.lighter,
     ...theme.shadows.sm,
   },
   logo: {

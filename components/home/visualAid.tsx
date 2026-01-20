@@ -118,13 +118,13 @@ const VisualAid = () => {
           {[...Array(4)].map((_, index) => (
             <View key={index} style={styles.card}>
               <Shimmer
-                width={CARD_WIDTH}
+                width={CARD_WIDTH * 0.9}
                 height={65}
                 borderRadius={theme.borderRadius.md}
               />
               <View style={{ marginTop: theme.spacing.sm }}>
                 <Shimmer
-                  width={CARD_WIDTH * 0.8}
+                  width={CARD_WIDTH * 0.3}
                   height={14}
                   borderRadius={4}
                 />

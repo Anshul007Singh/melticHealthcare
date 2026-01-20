@@ -40,11 +40,49 @@ const ProductListScreen = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [allProductsLoaded, setAllProductsLoaded] = useState(false);
 
   const router = useRouter();
 
   // Ref to prevent race conditions in pagination
   const loadingRef = useRef(false);
+  // Ref to track if initial filter setup from URL is complete
+  const initialFilterSetupComplete = useRef(false);
+
+  const loadAllProducts = async () => {
+    setLoading(true);
+    try {
+      const allProducts: any[] = [];
+      let page = 1;
+      let hasMorePages = true;
+
+      // Load all pages
+      while (hasMorePages) {
+        const data = await fetchProducts(undefined, page, 50);
+        if (data && data.products && Array.isArray(data.products)) {
+          // Deduplicate and append
+          const existingIds = new Set(allProducts.map(p => p.id));
+          const newProducts = data.products.filter((p: any) => !existingIds.has(p.id));
+          allProducts.push(...newProducts);
+
+          // Check if there are more pages
+          hasMorePages = page < data.totalPages;
+          page++;
+        } else {
+          hasMorePages = false;
+        }
+      }
+
+      setProducts(allProducts);
+      setCurrentPage(page - 1);
+      setTotalPages(1); // All products loaded, no more pages
+      setHasMore(false);
+      setAllProductsLoaded(true);
+    } catch (error) {
+      console.error('Error loading all products:', error);
+    }
+    setLoading(false);
+  };
 
   const loadProducts = async () => {
     setLoading(true);
@@ -54,7 +92,7 @@ const ProductListScreen = () => {
       if (data && data.products && Array.isArray(data.products)) {
         // Deduplicate in case API returns duplicates in a single page
         const uniqueProducts = Array.from(
-          new Map(data.products.map(p => [p.id, p])).values()
+          new Map(data.products.map((p: any) => [p.id, p])).values()
         );
         setProducts(uniqueProducts);
         setTotalPages(data.totalPages);
@@ -75,7 +113,7 @@ const ProductListScreen = () => {
       if (data && data.products && Array.isArray(data.products)) {
         // Deduplicate in case API returns duplicates in a single page
         const uniqueProducts = Array.from(
-          new Map(data.products.map(p => [p.id, p])).values()
+          new Map(data.products.map((p: any) => [p.id, p])).values()
         );
         setProducts(uniqueProducts);
         setTotalPages(data.totalPages);
@@ -103,7 +141,7 @@ const ProductListScreen = () => {
           const existingIds = new Set(prevProducts.map(p => p.id));
 
           // Filter out products that already exist
-          const newProducts = data.products.filter(p => !existingIds.has(p.id));
+          const newProducts = data.products.filter((p: any) => !existingIds.has(p.id));
 
           // Log if duplicates were found (helps debug backend pagination issues)
           const duplicateCount = data.products.length - newProducts.length;
@@ -143,7 +181,8 @@ const ProductListScreen = () => {
   }, [products]);
 
   useEffect(() => {
-    if (!loading && products.length > 0) {
+    // Only run initial filter setup once from URL query params
+    if (!loading && products.length > 0 && !initialFilterSetupComplete.current) {
       if (query && typeof query === 'string') {
         if (query.toLowerCase() === 'productlist') {
           setSelectedCategory('all');
@@ -176,12 +215,16 @@ const ProductListScreen = () => {
             setNoMatch(true);
           }
         }
-      } else {
-        setFeaturedFilter(false);
-        setNoMatch(false);
       }
+      // Mark initial setup as complete to prevent re-running
+      initialFilterSetupComplete.current = true;
     }
-  }, [loading, products, query, categories, brands]);
+  }, [loading, products.length, query, categories, brands]);
+
+  // Reset the flag when query param changes (new navigation)
+  useEffect(() => {
+    initialFilterSetupComplete.current = false;
+  }, [query]);
 
   const filteredAndSortedProducts = useMemo(() => {
     // Filter products
@@ -309,12 +352,20 @@ const ProductListScreen = () => {
       },
     });
   };
-  const handleCategorySelect = (cat: string) => {
+  const handleCategorySelect = async (cat: string) => {
+    // Load all products first if applying a filter
+    if (!allProductsLoaded && cat !== 'all') {
+      await loadAllProducts();
+    }
     setSelectedCategory(cat);
     setShowCategoryDropdown(false);
   };
 
-  const handleBrandSelect = (brand: string) => {
+  const handleBrandSelect = async (brand: string) => {
+    // Load all products first if applying a filter
+    if (!allProductsLoaded && brand !== 'all') {
+      await loadAllProducts();
+    }
     setSelectedBrand(brand);
     setShowBrandDropdown(false);
   };
@@ -343,6 +394,12 @@ const ProductListScreen = () => {
     setSelectedCategory('all');
     setSelectedBrand('all');
     setFeaturedFilter(false);
+
+    // Reset to paginated mode
+    if (allProductsLoaded) {
+      setAllProductsLoaded(false);
+      loadProducts(); // Reload first page
+    }
   };
 
   const renderGridItem = ({ item }: any) => (
@@ -734,14 +791,20 @@ const ProductListScreen = () => {
             tintColor={theme.colors.primary.main}
           />
         }
-        onEndReached={loadMoreProducts}
-        onEndReachedThreshold={0.5}
+        onEndReached={allProductsLoaded ? undefined : loadMoreProducts}
+        onEndReachedThreshold={allProductsLoaded ? undefined : 0.5}
         ListFooterComponent={
-          loadingMore ? (
+          loadingMore && !allProductsLoaded ? (
             <View style={styles.loadingFooter}>
               <Shimmer width={150} height={20} borderRadius={theme.borderRadius.sm} />
               <Typography variant="small" color="secondary" style={styles.loadingText}>
                 Loading more products...
+              </Typography>
+            </View>
+          ) : allProductsLoaded ? (
+            <View style={styles.loadingFooter}>
+              <Typography variant="small" color="secondary" style={styles.loadingText}>
+                Showing {filteredAndSortedProducts.length} of {products.length} products
               </Typography>
             </View>
           ) : hasMore === false && products.length > 0 ? (
@@ -922,6 +985,8 @@ const styles = StyleSheet.create({
     margin: theme.spacing.xs,
     padding: theme.spacing.sm,
     overflow: 'hidden',
+    borderWidth: 0.5,
+    borderColor: theme.colors.primary.lighter,
   },
   imageContainer: {
     position: 'relative',
