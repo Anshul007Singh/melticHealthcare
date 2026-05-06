@@ -74,15 +74,17 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     onClose();
   };
 
-  const showRecentSearches = query.trim().length < 2 && recentSearches.length > 0;
-  const showEmptySearch = query.trim().length < 2 && recentSearches.length === 0;
+  const showRecentSearches =
+    query.trim().length < 2 && recentSearches.length > 0;
+  const showEmptySearch =
+    query.trim().length < 2 && recentSearches.length === 0;
   const showResults = query.trim().length >= 2;
 
   return (
     <Modal
       visible={visible}
-      animationType="slide"
-      presentationStyle="fullScreen"
+      animationType='slide'
+      presentationStyle='fullScreen'
       onRequestClose={onClose}
     >
       <SafeAreaView style={styles.safeArea}>
@@ -98,7 +100,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
               value={query}
               onChangeText={setQuery}
               autoFocus={true}
-              placeholder="Search products, categories, brands..."
+              placeholder='Search products, categories, brands...'
               containerStyle={styles.searchBar}
             />
 
@@ -109,12 +111,12 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 styles.closeButton,
                 pressed && styles.closeButtonPressed,
               ]}
-              accessibilityRole="button"
-              accessibilityLabel="Close search"
-              accessibilityHint="Double tap to close search modal"
+              accessibilityRole='button'
+              accessibilityLabel='Close search'
+              accessibilityHint='Double tap to close search modal'
             >
               <Ionicons
-                name="close"
+                name='close'
                 size={20}
                 color={theme.colors.text.inverse}
               />
@@ -140,14 +142,16 @@ export const SearchModal: React.FC<SearchModalProps> = ({
             {/* Search Results */}
             {showResults && (
               <SearchResults
-                results={results || {
-                  products: [],
-                  categories: [],
-                  brands: [],
-                  visualAids: [],
-                  query: '',
-                  timestamp: Date.now(),
-                }}
+                results={
+                  results || {
+                    products: [],
+                    categories: [],
+                    brands: [],
+                    visualAids: [],
+                    query: '',
+                    timestamp: Date.now(),
+                  }
+                }
                 query={query}
                 loading={loading}
                 onResultPress={handleResultPress}

@@ -65,12 +65,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <View
       style={[styles.container, containerStyle]}
-      accessibilityRole="search"
-      accessibilityLabel="Search bar"
+      accessibilityRole='search'
+      accessibilityLabel='Search bar'
     >
       {/* Search Icon */}
       <Ionicons
-        name="search-outline"
+        name='search-outline'
         color={theme.colors.neutral.gray500}
         style={styles.searchIcon}
       />
@@ -86,11 +86,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         style={styles.input}
         autoFocus={autoFocus}
         editable={editable}
-        autoCapitalize="none"
+        autoCapitalize='none'
         autoCorrect={false}
-        returnKeyType="search"
-        accessibilityLabel="Search input"
-        accessibilityHint="Enter search query to find products, categories, or brands"
+        returnKeyType='search'
+        accessibilityLabel='Search input'
+        accessibilityHint='Enter search query to find products, categories, or brands'
         {...textInputProps}
       />
 
@@ -102,15 +102,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             styles.clearButton,
             pressed && styles.clearButtonPressed,
           ]}
-          accessibilityRole="button"
-          accessibilityLabel="Clear search"
-          accessibilityHint="Double tap to clear search text"
+          accessibilityRole='button'
+          accessibilityLabel='Clear search'
+          accessibilityHint='Double tap to clear search text'
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons
-            name="close-circle"
-            color={theme.colors.neutral.gray400}
-          />
+          <Ionicons name='close-circle' color={theme.colors.neutral.gray400} />
         </Pressable>
       )}
     </View>

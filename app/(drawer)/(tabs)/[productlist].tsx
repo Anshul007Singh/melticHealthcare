@@ -1,4 +1,10 @@
-import { Card, EmptyState, Shimmer, TouchableCard, Typography } from '@/components/ui';
+import {
+  Card,
+  EmptyState,
+  Shimmer,
+  TouchableCard,
+  Typography,
+} from '@/components/ui';
 import { theme } from '@/constants/theme';
 import { fetchProducts } from '@/data/productList';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,10 +18,15 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 
-type SortOption = 'default' | 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc';
+type SortOption =
+  | 'default'
+  | 'price-asc'
+  | 'price-desc'
+  | 'name-asc'
+  | 'name-desc';
 type ViewMode = 'grid' | 'list';
 
 const ProductListScreen = () => {
@@ -61,8 +72,10 @@ const ProductListScreen = () => {
         const data = await fetchProducts(undefined, page, 50);
         if (data && data.products && Array.isArray(data.products)) {
           // Deduplicate and append
-          const existingIds = new Set(allProducts.map(p => p.id));
-          const newProducts = data.products.filter((p: any) => !existingIds.has(p.id));
+          const existingIds = new Set(allProducts.map((p) => p.id));
+          const newProducts = data.products.filter(
+            (p: any) => !existingIds.has(p.id),
+          );
           allProducts.push(...newProducts);
 
           // Check if there are more pages
@@ -92,7 +105,7 @@ const ProductListScreen = () => {
       if (data && data.products && Array.isArray(data.products)) {
         // Deduplicate in case API returns duplicates in a single page
         const uniqueProducts = Array.from(
-          new Map(data.products.map((p: any) => [p.id, p])).values()
+          new Map(data.products.map((p: any) => [p.id, p])).values(),
         );
         setProducts(uniqueProducts);
         setTotalPages(data.totalPages);
@@ -113,7 +126,7 @@ const ProductListScreen = () => {
       if (data && data.products && Array.isArray(data.products)) {
         // Deduplicate in case API returns duplicates in a single page
         const uniqueProducts = Array.from(
-          new Map(data.products.map((p: any) => [p.id, p])).values()
+          new Map(data.products.map((p: any) => [p.id, p])).values(),
         );
         setProducts(uniqueProducts);
         setTotalPages(data.totalPages);
@@ -136,17 +149,21 @@ const ProductListScreen = () => {
     try {
       const data = await fetchProducts(undefined, nextPage, 50);
       if (data && data.products && Array.isArray(data.products)) {
-        setProducts(prevProducts => {
+        setProducts((prevProducts) => {
           // Create a Set of existing product IDs
-          const existingIds = new Set(prevProducts.map(p => p.id));
+          const existingIds = new Set(prevProducts.map((p) => p.id));
 
           // Filter out products that already exist
-          const newProducts = data.products.filter((p: any) => !existingIds.has(p.id));
+          const newProducts = data.products.filter(
+            (p: any) => !existingIds.has(p.id),
+          );
 
           // Log if duplicates were found (helps debug backend pagination issues)
           const duplicateCount = data.products.length - newProducts.length;
           if (duplicateCount > 0) {
-            console.warn(`Filtered out ${duplicateCount} duplicate products from page ${nextPage}`);
+            console.warn(
+              `Filtered out ${duplicateCount} duplicate products from page ${nextPage}`,
+            );
           }
 
           // Only append truly new products
@@ -182,7 +199,11 @@ const ProductListScreen = () => {
 
   useEffect(() => {
     // Only run initial filter setup once from URL query params
-    if (!loading && products.length > 0 && !initialFilterSetupComplete.current) {
+    if (
+      !loading &&
+      products.length > 0 &&
+      !initialFilterSetupComplete.current
+    ) {
       if (query && typeof query === 'string') {
         if (query.toLowerCase() === 'productlist') {
           setSelectedCategory('all');
@@ -229,16 +250,19 @@ const ProductListScreen = () => {
   const filteredAndSortedProducts = useMemo(() => {
     // Filter products
     const filtered = products.filter((item) => {
+      if (item.status !== 'publish') {
+        return false;
+      }
       // Search filter
       const matchSearch =
         searchQuery === '' ||
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.categories.some((cat: any) =>
-          cat.name.toLowerCase().includes(searchQuery.toLowerCase())
+          cat.name.toLowerCase().includes(searchQuery.toLowerCase()),
         ) ||
         (item.brands &&
           item.brands.some((brand: any) =>
-            brand.name.toLowerCase().includes(searchQuery.toLowerCase())
+            brand.name.toLowerCase().includes(searchQuery.toLowerCase()),
           ));
 
       if (!matchSearch) {
@@ -282,7 +306,14 @@ const ProductListScreen = () => {
     }
 
     return sorted;
-  }, [products, searchQuery, featuredFilter, selectedCategory, selectedBrand, sortBy]);
+  }, [
+    products,
+    searchQuery,
+    featuredFilter,
+    selectedCategory,
+    selectedBrand,
+    sortBy,
+  ]);
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
@@ -300,14 +331,30 @@ const ProductListScreen = () => {
         numColumns={2}
         contentContainerStyle={styles.gridContainer}
         renderItem={() => (
-          <Card variant="default" style={styles.gridItemContainer}>
-            <Shimmer width="100%" height={160} borderRadius={theme.borderRadius.sm} />
+          <Card variant='default' style={styles.gridItemContainer}>
+            <Shimmer
+              width='100%'
+              height={160}
+              borderRadius={theme.borderRadius.sm}
+            />
             <View style={{ height: theme.spacing.sm }} />
-            <Shimmer width="100%" height={16} borderRadius={theme.borderRadius.sm} />
+            <Shimmer
+              width='100%'
+              height={16}
+              borderRadius={theme.borderRadius.sm}
+            />
             <View style={{ height: theme.spacing.xs }} />
-            <Shimmer width="60%" height={16} borderRadius={theme.borderRadius.sm} />
+            <Shimmer
+              width='60%'
+              height={16}
+              borderRadius={theme.borderRadius.sm}
+            />
             <View style={{ height: theme.spacing.xs }} />
-            <Shimmer width="40%" height={18} borderRadius={theme.borderRadius.sm} />
+            <Shimmer
+              width='40%'
+              height={18}
+              borderRadius={theme.borderRadius.sm}
+            />
           </Card>
         )}
       />
@@ -318,8 +365,8 @@ const ProductListScreen = () => {
     return (
       <View style={styles.emptyContainer}>
         <EmptyState
-          icon="search-outline"
-          title="No Results Found"
+          icon='search-outline'
+          title='No Results Found'
           message={`We couldn't find any products matching "${query}". Try a different search term.`}
         />
       </View>
@@ -330,7 +377,7 @@ const ProductListScreen = () => {
     const data = item.meta_data[0];
     const indications =
       data.value.filter(
-        (content: { id: string }) => content.id === 'indication',
+        (content: { id: string }) => content.id === 'indications',
       )[0]?.content || '';
     const sideEffects =
       data.value.filter(
@@ -404,7 +451,7 @@ const ProductListScreen = () => {
 
   const renderGridItem = ({ item }: any) => (
     <TouchableCard
-      variant="elevated"
+      variant='elevated'
       style={styles.gridItemContainer}
       onPress={() => imageHandler(item)}
       accessibilityLabel={`View ${item.name}`}
@@ -418,20 +465,34 @@ const ProductListScreen = () => {
         />
         {item.featured && (
           <View style={styles.featuredBadge}>
-            <Ionicons name="star" size={12} color={theme.colors.primary.light} />
-            <Typography variant="tiny" style={styles.featuredText}>Featured</Typography>
+            <Ionicons
+              name='star'
+              size={12}
+              color={theme.colors.primary.light}
+            />
+            <Typography variant='tiny' style={styles.featuredText}>
+              Featured
+            </Typography>
           </View>
         )}
       </View>
       <View style={styles.productInfo}>
-        <Typography variant="caption" style={styles.title} numberOfLines={2}>
+        <Typography variant='caption' style={styles.title} numberOfLines={2}>
           {item.name}
         </Typography>
-        <Typography variant="caption" color="secondary" style={styles.titleCategory}>
+        <Typography
+          variant='caption'
+          color='secondary'
+          style={styles.titleCategory}
+        >
           {item.categories?.[0]?.name || 'No Category'}
         </Typography>
         <View style={styles.priceRow}>
-          <Typography variant="bodyBold" color="primary" style={styles.priceText}>
+          <Typography
+            variant='bodyBold'
+            color='primary'
+            style={styles.priceText}
+          >
             ₹{item.price}
           </Typography>
         </View>
@@ -441,7 +502,7 @@ const ProductListScreen = () => {
 
   const renderListItem = ({ item }: any) => (
     <TouchableCard
-      variant="elevated"
+      variant='elevated'
       style={styles.listItemContainer}
       onPress={() => imageHandler(item)}
       accessibilityLabel={`View ${item.name}`}
@@ -454,20 +515,28 @@ const ProductListScreen = () => {
       />
       <View style={styles.listContent}>
         <View style={styles.listHeader}>
-          <Typography variant="bodyBold" style={styles.listTitle} numberOfLines={2}>
+          <Typography
+            variant='bodyBold'
+            style={styles.listTitle}
+            numberOfLines={2}
+          >
             {item.name}
           </Typography>
           {item.featured && (
             <View style={styles.featuredBadge}>
-              <Ionicons name="star" size={12} color={theme.colors.primary.light} />
+              <Ionicons
+                name='star'
+                size={12}
+                color={theme.colors.primary.light}
+              />
             </View>
           )}
         </View>
-        <Typography variant="small" color="secondary">
+        <Typography variant='small' color='secondary'>
           {item.categories?.[0]?.name || 'No Category'}
         </Typography>
         <View style={styles.listFooter}>
-          <Typography variant="h4" color="primary" style={styles.listPrice}>
+          <Typography variant='h4' color='primary' style={styles.listPrice}>
             ₹{item.price}
           </Typography>
         </View>
@@ -480,28 +549,32 @@ const ProductListScreen = () => {
       <View style={styles.searchContainer}>
         <View style={styles.searchInputWrapper}>
           <Ionicons
-            name="search"
+            name='search'
             size={20}
             color={theme.colors.text.tertiary}
             style={styles.searchIcon}
           />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search products, categories, brands..."
+            placeholder='Search products, categories, brands...'
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholderTextColor={theme.colors.text.tertiary}
-            accessibilityLabel="Search products"
-            accessibilityHint="Type to search for products by name, category, or brand"
+            accessibilityLabel='Search products'
+            accessibilityHint='Type to search for products by name, category, or brand'
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity
               onPress={() => setSearchQuery('')}
               style={styles.clearButton}
-              accessibilityRole="button"
-              accessibilityLabel="Clear search"
+              accessibilityRole='button'
+              accessibilityLabel='Clear search'
             >
-              <Ionicons name="close-circle" size={20} color={theme.colors.text.tertiary} />
+              <Ionicons
+                name='close-circle'
+                size={20}
+                color={theme.colors.text.tertiary}
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -509,7 +582,7 @@ const ProductListScreen = () => {
 
       {/* Header with controls */}
       <View style={styles.headerContainer}>
-        <Typography variant="h4" style={styles.headerText}>
+        <Typography variant='h4' style={styles.headerText}>
           {filteredAndSortedProducts.length} Products
         </Typography>
         <View style={styles.headerControls}>
@@ -517,17 +590,21 @@ const ProductListScreen = () => {
           <TouchableOpacity
             onPress={() => setShowSortMenu(!showSortMenu)}
             style={styles.controlButton}
-            accessibilityRole="button"
-            accessibilityLabel="Sort products"
+            accessibilityRole='button'
+            accessibilityLabel='Sort products'
           >
-            <Ionicons name="swap-vertical" size={20} color={theme.colors.primary.main} />
+            <Ionicons
+              name='swap-vertical'
+              size={20}
+              color={theme.colors.primary.main}
+            />
           </TouchableOpacity>
 
           {/* View Toggle */}
           <TouchableOpacity
             onPress={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
             style={styles.controlButton}
-            accessibilityRole="button"
+            accessibilityRole='button'
             accessibilityLabel={`Switch to ${viewMode === 'grid' ? 'list' : 'grid'} view`}
           >
             <Ionicons
@@ -541,17 +618,21 @@ const ProductListScreen = () => {
           <TouchableOpacity
             onPress={toggleFilters}
             style={styles.controlButton}
-            accessibilityRole="button"
-            accessibilityLabel="Toggle filters"
+            accessibilityRole='button'
+            accessibilityLabel='Toggle filters'
           >
             <Ionicons
-              name={showCategoryDropdown || showBrandDropdown ? 'close' : 'filter-outline'}
+              name={
+                showCategoryDropdown || showBrandDropdown
+                  ? 'close'
+                  : 'filter-outline'
+              }
               size={20}
               color={theme.colors.primary.main}
             />
             {activeFiltersCount > 0 && (
               <View style={styles.filterBadge}>
-                <Typography variant="tiny" style={styles.filterBadgeText}>
+                <Typography variant='tiny' style={styles.filterBadgeText}>
                   {activeFiltersCount}
                 </Typography>
               </View>
@@ -582,13 +663,21 @@ const ProductListScreen = () => {
               ]}
             >
               <Typography
-                variant="body"
-                style={sortBy === option.value ? styles.sortOptionTextSelected : styles.sortOptionText}
+                variant='body'
+                style={
+                  sortBy === option.value
+                    ? styles.sortOptionTextSelected
+                    : styles.sortOptionText
+                }
               >
                 {option.label}
               </Typography>
               {sortBy === option.value && (
-                <Ionicons name="checkmark" size={20} color={theme.colors.primary.main} />
+                <Ionicons
+                  name='checkmark'
+                  size={20}
+                  color={theme.colors.primary.main}
+                />
               )}
             </TouchableOpacity>
           ))}
@@ -598,48 +687,67 @@ const ProductListScreen = () => {
       {/* Active Filters Chips */}
       {activeFiltersCount > 0 && (
         <View style={styles.activeFiltersContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterChips}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterChips}
+          >
             {selectedCategory !== 'all' && (
               <View style={styles.filterChip}>
-                <Typography variant="small" style={styles.filterChipText}>
+                <Typography variant='small' style={styles.filterChipText}>
                   {selectedCategory}
                 </Typography>
                 <TouchableOpacity
                   onPress={() => clearFilter('category')}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Ionicons name="close" size={16} color={theme.colors.text.primary} />
+                  <Ionicons
+                    name='close'
+                    size={16}
+                    color={theme.colors.text.primary}
+                  />
                 </TouchableOpacity>
               </View>
             )}
             {selectedBrand !== 'all' && (
               <View style={styles.filterChip}>
-                <Typography variant="small" style={styles.filterChipText}>
+                <Typography variant='small' style={styles.filterChipText}>
                   {selectedBrand}
                 </Typography>
                 <TouchableOpacity
                   onPress={() => clearFilter('brand')}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Ionicons name="close" size={16} color={theme.colors.text.primary} />
+                  <Ionicons
+                    name='close'
+                    size={16}
+                    color={theme.colors.text.primary}
+                  />
                 </TouchableOpacity>
               </View>
             )}
             {featuredFilter && (
               <View style={styles.filterChip}>
-                <Typography variant="small" style={styles.filterChipText}>
+                <Typography variant='small' style={styles.filterChipText}>
                   Featured
                 </Typography>
                 <TouchableOpacity
                   onPress={() => clearFilter('featured')}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Ionicons name="close" size={16} color={theme.colors.text.primary} />
+                  <Ionicons
+                    name='close'
+                    size={16}
+                    color={theme.colors.text.primary}
+                  />
                 </TouchableOpacity>
               </View>
             )}
-            <TouchableOpacity onPress={clearAllFilters} style={styles.clearAllChip}>
-              <Typography variant="small" style={styles.clearAllText}>
+            <TouchableOpacity
+              onPress={clearAllFilters}
+              style={styles.clearAllChip}
+            >
+              <Typography variant='small' style={styles.clearAllText}>
                 Clear All
               </Typography>
             </TouchableOpacity>
@@ -658,15 +766,15 @@ const ProductListScreen = () => {
                 setShowBrandDropdown(false);
               }}
               style={styles.dropdownHeader}
-              accessibilityRole="button"
-              accessibilityLabel="Category filter"
+              accessibilityRole='button'
+              accessibilityLabel='Category filter'
               accessibilityState={{ expanded: showCategoryDropdown }}
             >
-              <Typography variant="bodyBold" style={styles.dropdownLabel}>
+              <Typography variant='bodyBold' style={styles.dropdownLabel}>
                 Category
               </Typography>
               <View style={styles.dropdownSelectedRow}>
-                <Typography variant="small" style={styles.dropdownSelected}>
+                <Typography variant='small' style={styles.dropdownSelected}>
                   {selectedCategory === 'all' ? 'All' : selectedCategory}
                 </Typography>
                 <Ionicons
@@ -688,19 +796,25 @@ const ProductListScreen = () => {
                         styles.dropdownItem,
                         selectedCategory === cat && styles.dropdownItemSelected,
                       ]}
-                      accessibilityRole="button"
+                      accessibilityRole='button'
                       accessibilityLabel={`Select ${cat === 'all' ? 'all products' : cat} category`}
-                      accessibilityState={{ selected: selectedCategory === cat }}
+                      accessibilityState={{
+                        selected: selectedCategory === cat,
+                      }}
                     >
                       <Typography
-                        variant="body"
-                        style={selectedCategory === cat ? styles.dropdownItemTextSelected : styles.dropdownItemText}
+                        variant='body'
+                        style={
+                          selectedCategory === cat
+                            ? styles.dropdownItemTextSelected
+                            : styles.dropdownItemText
+                        }
                       >
                         {cat === 'all' ? 'All Products' : cat}
                       </Typography>
                       {selectedCategory === cat && (
                         <Ionicons
-                          name="checkmark"
+                          name='checkmark'
                           size={20}
                           color={theme.colors.primary.main}
                         />
@@ -720,15 +834,15 @@ const ProductListScreen = () => {
                 setShowCategoryDropdown(false);
               }}
               style={styles.dropdownHeader}
-              accessibilityRole="button"
-              accessibilityLabel="Brand filter"
+              accessibilityRole='button'
+              accessibilityLabel='Brand filter'
               accessibilityState={{ expanded: showBrandDropdown }}
             >
-              <Typography variant="bodyBold" style={styles.dropdownLabel}>
+              <Typography variant='bodyBold' style={styles.dropdownLabel}>
                 Brand
               </Typography>
               <View style={styles.dropdownSelectedRow}>
-                <Typography variant="small" style={styles.dropdownSelected}>
+                <Typography variant='small' style={styles.dropdownSelected}>
                   {selectedBrand === 'all' ? 'All' : selectedBrand}
                 </Typography>
                 <Ionicons
@@ -750,19 +864,23 @@ const ProductListScreen = () => {
                         styles.dropdownItem,
                         selectedBrand === brand && styles.dropdownItemSelected,
                       ]}
-                      accessibilityRole="button"
+                      accessibilityRole='button'
                       accessibilityLabel={`Select ${brand === 'all' ? 'all brands' : brand} brand`}
                       accessibilityState={{ selected: selectedBrand === brand }}
                     >
                       <Typography
-                        variant="body"
-                        style={selectedBrand === brand ? styles.dropdownItemTextSelected : styles.dropdownItemText}
+                        variant='body'
+                        style={
+                          selectedBrand === brand
+                            ? styles.dropdownItemTextSelected
+                            : styles.dropdownItemText
+                        }
                       >
                         {brand === 'all' ? 'All Brands' : brand}
                       </Typography>
                       {selectedBrand === brand && (
                         <Ionicons
-                          name="checkmark"
+                          name='checkmark'
                           size={20}
                           color={theme.colors.primary.main}
                         />
@@ -782,7 +900,9 @@ const ProductListScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         key={viewMode} // Force re-render when view mode changes
         numColumns={viewMode === 'grid' ? 2 : 1}
-        contentContainerStyle={viewMode === 'grid' ? styles.gridContainer : styles.listContainerStyle}
+        contentContainerStyle={
+          viewMode === 'grid' ? styles.gridContainer : styles.listContainerStyle
+        }
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -796,20 +916,37 @@ const ProductListScreen = () => {
         ListFooterComponent={
           loadingMore && !allProductsLoaded ? (
             <View style={styles.loadingFooter}>
-              <Shimmer width={150} height={20} borderRadius={theme.borderRadius.sm} />
-              <Typography variant="small" color="secondary" style={styles.loadingText}>
+              <Shimmer
+                width={150}
+                height={20}
+                borderRadius={theme.borderRadius.sm}
+              />
+              <Typography
+                variant='small'
+                color='secondary'
+                style={styles.loadingText}
+              >
                 Loading more products...
               </Typography>
             </View>
           ) : allProductsLoaded ? (
             <View style={styles.loadingFooter}>
-              <Typography variant="small" color="secondary" style={styles.loadingText}>
-                Showing {filteredAndSortedProducts.length} of {products.length} products
+              <Typography
+                variant='small'
+                color='secondary'
+                style={styles.loadingText}
+              >
+                Showing {filteredAndSortedProducts.length} of {products.length}{' '}
+                products
               </Typography>
             </View>
           ) : hasMore === false && products.length > 0 ? (
             <View style={styles.loadingFooter}>
-              <Typography variant="small" color="secondary" style={styles.loadingText}>
+              <Typography
+                variant='small'
+                color='secondary'
+                style={styles.loadingText}
+              >
                 All products loaded
               </Typography>
             </View>
@@ -817,14 +954,16 @@ const ProductListScreen = () => {
         }
         ListEmptyComponent={
           <EmptyState
-            icon="search-outline"
-            title="No Products Found"
+            icon='search-outline'
+            title='No Products Found'
             message={
               searchQuery
                 ? `No products match "${searchQuery}". Try a different search term.`
-                : selectedCategory !== 'all' || selectedBrand !== 'all' || featuredFilter
-                ? "We couldn't find any products matching your filters. Try clearing some filters to see more results."
-                : "No products available at the moment. Please check back later!"
+                : selectedCategory !== 'all' ||
+                    selectedBrand !== 'all' ||
+                    featuredFilter
+                  ? "We couldn't find any products matching your filters. Try clearing some filters to see more results."
+                  : 'No products available at the moment. Please check back later!'
             }
           />
         }

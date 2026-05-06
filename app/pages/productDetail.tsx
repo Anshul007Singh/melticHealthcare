@@ -83,18 +83,22 @@ export default function ProductDetailScreen() {
     typeof sideEffects === 'string'
       ? sideEffects.replace(/<[^>]+>/g, '')
       : Array.isArray(sideEffects)
-      ? sideEffects
-          .map((s) => (typeof s === 'string' ? s.replace(/<[^>]+>/g, '') : ''))
-          .join(', ')
-      : '';
+        ? sideEffects
+            .map((s) =>
+              typeof s === 'string' ? s.replace(/<[^>]+>/g, '') : '',
+            )
+            .join(', ')
+        : '';
   const indicationsText =
     typeof indications === 'string'
       ? indications.replace(/<[^>]+>/g, '')
       : Array.isArray(indications)
-      ? indications
-          .map((s) => (typeof s === 'string' ? s.replace(/<[^>]+>/g, '') : ''))
-          .join(', ')
-      : '';
+        ? indications
+            .map((s) =>
+              typeof s === 'string' ? s.replace(/<[^>]+>/g, '') : '',
+            )
+            .join(', ')
+        : '';
   const handleAddToCart = () => {
     const item = {
       id: id as string,
@@ -114,11 +118,11 @@ export default function ProductDetailScreen() {
       <View style={{ flex: 1 }}>
         <View style={styles.pdfHeader}>
           <Button
-            variant="secondary"
+            variant='secondary'
             onPress={() => setShowPDF(false)}
             style={{ margin: theme.spacing.sm }}
-            accessibilityLabel="Close PDF viewer"
-            accessibilityHint="Double tap to return to product details"
+            accessibilityLabel='Close PDF viewer'
+            accessibilityHint='Double tap to return to product details'
           >
             Close PDF
           </Button>
@@ -133,7 +137,7 @@ export default function ProductDetailScreen() {
           startInLoadingState
           renderError={() => (
             <Typography
-              variant="body"
+              variant='body'
               style={{ textAlign: 'center', marginTop: theme.spacing.xl }}
             >
               Failed to load PDF.
@@ -159,28 +163,28 @@ export default function ProductDetailScreen() {
             }}
             style={styles.productImage}
             accessibilityLabel={`${title} product image`}
-            accessibilityRole="image"
+            accessibilityRole='image'
           />
         </View>
 
         <View style={styles.infoContainer}>
           <H3 style={styles.productTitle}>{title || 'Product Name'}</H3>
-          <Typography variant="small" style={styles.productSubTitle}>
+          <Typography variant='small' style={styles.productSubTitle}>
             {category ? `Category: ${category}` : 'Category: Not specified'}
           </Typography>
         </View>
         <View style={styles.priceRow}>
-          <Typography variant="h4" style={styles.priceText}>
+          <Typography variant='h4' style={styles.priceText}>
             MRP - ₹{price}
           </Typography>
         </View>
-        <Typography variant="small" style={styles.composition}>
-          <Typography variant="smallBold">Composition: </Typography>
+        <Typography variant='small' style={styles.composition}>
+          <Typography variant='smallBold'>Composition: </Typography>
           {descriptionData.composition}
         </Typography>
 
-        <Typography variant="small" style={styles.minOrder}>
-          <Typography variant="smallBold">Packaging: </Typography>
+        <Typography variant='small' style={styles.minOrder}>
+          <Typography variant='smallBold'>Packaging: </Typography>
           {descriptionData.type}
         </Typography>
         <View style={styles.divider} />
@@ -188,9 +192,9 @@ export default function ProductDetailScreen() {
         <View style={styles.iconsRow}>
           <TouchableOpacity
             onPress={() => setShowPDF(true)}
-            accessibilityRole="button"
-            accessibilityLabel="View product composition PDF"
-            accessibilityHint="Double tap to open PDF in full screen"
+            accessibilityRole='button'
+            accessibilityLabel='View product composition PDF'
+            accessibilityHint='Double tap to open PDF in full screen'
           >
             <Image
               source={require('../../assets/images/adobe.png')}
@@ -208,21 +212,27 @@ export default function ProductDetailScreen() {
 
         <View>
           <Accordion
-            title="Description"
-            accessibilityLabel="Product description"
-            accessibilityHint="Double tap to expand or collapse product description"
+            title='Description'
+            accessibilityLabel='Product description'
+            accessibilityHint='Double tap to expand or collapse product description'
           >
-            <ScrollView style={styles.accordionContent}>
-              <Typography variant="small">{descriptionText.name}</Typography>
+            <ScrollView
+              style={styles.accordionContent}
+              nestedScrollEnabled={true}
+            >
+              <Typography variant='small'>{descriptionText.name}</Typography>
             </ScrollView>
           </Accordion>
           <Accordion
-            title="Side Effects"
-            accessibilityLabel="Product side effects"
-            accessibilityHint="Double tap to expand or collapse side effects information"
+            title='Side Effects'
+            accessibilityLabel='Product side effects'
+            accessibilityHint='Double tap to expand or collapse side effects information'
           >
-            <ScrollView style={styles.accordionContent}>
-              <Typography variant="small">
+            <ScrollView
+              style={styles.accordionContent}
+              nestedScrollEnabled={true}
+            >
+              <Typography variant='small'>
                 {sideEffectsText === ''
                   ? 'No side effect available.'
                   : sideEffectsText}
@@ -230,12 +240,15 @@ export default function ProductDetailScreen() {
             </ScrollView>
           </Accordion>
           <Accordion
-            title="Indications"
-            accessibilityLabel="Product indications"
-            accessibilityHint="Double tap to expand or collapse indications information"
+            title='Indications'
+            accessibilityLabel='Product indications'
+            accessibilityHint='Double tap to expand or collapse indications information'
           >
-            <ScrollView style={styles.accordionContentLast}>
-              <Typography variant="small">
+            <ScrollView
+              style={styles.accordionContentLast}
+              nestedScrollEnabled={true}
+            >
+              <Typography variant='small'>
                 {indicationsText === ''
                   ? 'No indications available.'
                   : indicationsText}
@@ -247,19 +260,19 @@ export default function ProductDetailScreen() {
 
       <View style={styles.floatingBtnContainer}>
         <Button
-          variant="primary"
-          size="large"
+          variant='primary'
+          size='large'
           style={styles.floatingBtn}
           onPress={() => handleAddToCart()}
           accessibilityLabel={`Add ${title} to cart for ${price} rupees`}
-          accessibilityHint="Double tap to add this product to your shopping cart"
+          accessibilityHint='Double tap to add this product to your shopping cart'
         >
           Add to Cart
         </Button>
       </View>
       {showRibbon && (
         <View style={styles.ribbon}>
-          <Typography variant="body" style={styles.ribbonText}>
+          <Typography variant='body' style={styles.ribbonText}>
             Item added to cart
           </Typography>
         </View>
@@ -357,16 +370,16 @@ const styles = StyleSheet.create({
     bottom: 90,
     left: 0,
     right: 0,
-    backgroundColor: theme.colors.semantic.success,  // Changed from #93f3a7ff for better contrast (5.2:1 ratio)
+    backgroundColor: theme.colors.semantic.success, // Changed from #93f3a7ff for better contrast (5.2:1 ratio)
     padding: theme.spacing.sm,
     alignItems: 'center',
     borderRadius: theme.borderRadius.sm,
     marginHorizontal: theme.spacing.lg,
   },
   ribbonText: {
-    color: theme.colors.background.primary,  // Changed from #fff to use theme color
+    color: theme.colors.background.primary, // Changed from #fff to use theme color
     ...theme.typography.body,
-    fontWeight: '600',  // Override typography fontWeight
+    fontWeight: '600', // Override typography fontWeight
   },
   divider: {
     height: 1,
@@ -374,11 +387,11 @@ const styles = StyleSheet.create({
     marginVertical: theme.spacing.sm,
   },
   accordionContent: {
-    maxHeight: 200,
+    height: 200,
     paddingVertical: theme.spacing.md,
   },
   accordionContentLast: {
-    maxHeight: 200,
+    height: 200,
     paddingVertical: theme.spacing.md,
   },
 });
