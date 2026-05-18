@@ -7,7 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from 'react-native';
 
 import { Button, Input, Typography } from '@/components/ui';
@@ -28,7 +28,7 @@ export default function LoginScreen({
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const [loading, setLoading] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>(
@@ -42,6 +42,8 @@ export default function LoginScreen({
   };
 
   const handleLogin = async () => {
+    if (loading) return;
+
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -56,6 +58,8 @@ export default function LoginScreen({
     }
 
     try {
+      setLoading(true);
+
       await loginUser(email, password, login);
 
       showSnackbar('Login successful!', 'success');
@@ -64,10 +68,20 @@ export default function LoginScreen({
         onLoginSuccess();
       }, 1500);
     } catch (error: any) {
-      showSnackbar(
-        error.message || 'Invalid credentials. Please try again.',
-        'error',
-      );
+      if (error?.response?.status === 403) {
+        showSnackbar('Invalid email or password.', 'error');
+      } else if (error?.response?.status === 404) {
+        showSnackbar('User account not found.', 'error');
+      } else if (error?.message?.includes('Network')) {
+        showSnackbar('Please check your internet connection.', 'error');
+      } else {
+        showSnackbar(
+          'Unable to login right now. Please try again later.',
+          'error',
+        );
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,12 +98,19 @@ export default function LoginScreen({
             keyboardShouldPersistTaps='handled'
             showsVerticalScrollIndicator={false}
           >
-            <Image source={require('../../assets/images/favicon.png')} style={styles.logoimage}
-             />
-            <Typography variant="h1" color="primary" center style={styles.title}>
+            <Image
+              source={require('../../assets/images/favicon.png')}
+              style={styles.logoimage}
+            />
+            <Typography
+              variant='h1'
+              color='primary'
+              center
+              style={styles.title}
+            >
               Welcome to Meltic Group
             </Typography>
-            <Typography variant="body" color="secondary" style={styles.label}>
+            <Typography variant='body' color='secondary' style={styles.label}>
               Email
             </Typography>
             <Input
@@ -99,11 +120,11 @@ export default function LoginScreen({
               onChangeText={setEmail}
               keyboardType='email-address'
               returnKeyType='next'
-              accessibilityLabel="Email address"
-              accessibilityHint="Enter your email address"
+              accessibilityLabel='Email address'
+              accessibilityHint='Enter your email address'
             />
 
-            <Typography variant="body" color="secondary" style={styles.label}>
+            <Typography variant='body' color='secondary' style={styles.label}>
               Password
             </Typography>
             <Input
@@ -113,26 +134,33 @@ export default function LoginScreen({
               onChangeText={setPassword}
               secureTextEntry
               returnKeyType='done'
-              accessibilityLabel="Password"
-              accessibilityHint="Enter your password"
+              accessibilityLabel='Password'
+              accessibilityHint='Enter your password'
             />
 
             <Button
-              variant="primary"
+              variant='primary'
               onPress={handleLogin}
               style={styles.loginButton}
-              accessibilityLabel="Login button">
-              Login
+              accessibilityLabel='Login button'
+              disabled={loading}
+            >
+              {loading ? 'Logging in...' : 'Login'}
             </Button>
 
             <TouchableOpacity
               onPress={onGoToRegister}
-              accessibilityRole="button"
-              accessibilityLabel="Go to registration"
+              accessibilityRole='button'
+              accessibilityLabel='Go to registration'
             >
-              <Typography variant="small" color="secondary" center style={styles.registerText}>
+              <Typography
+                variant='small'
+                color='secondary'
+                center
+                style={styles.registerText}
+              >
                 Don't have an account?{' '}
-                <Typography variant="smallBold" color="link">
+                <Typography variant='smallBold' color='link'>
                   Register
                 </Typography>
               </Typography>

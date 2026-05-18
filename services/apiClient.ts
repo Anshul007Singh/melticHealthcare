@@ -52,7 +52,7 @@ function createTimeoutPromise(ms: number): Promise<never> {
  * Sleep for specified milliseconds (used for retry delay)
  */
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -60,7 +60,10 @@ function sleep(ms: number): Promise<void> {
  */
 function classifyError(error: any): ApiError {
   // Network error (no internet connection)
-  if (error.message === 'Network request failed' || error.message?.includes('Failed to fetch')) {
+  if (
+    error.message === 'Network request failed' ||
+    error.message?.includes('Failed to fetch')
+  ) {
     return {
       type: ErrorType.NETWORK_ERROR,
       message: 'No internet connection. Please check your network.',
@@ -103,8 +106,14 @@ function classifyError(error: any): ApiError {
 /**
  * Build URL with auth parameters
  */
-function buildUrl(endpoint: string, params: Record<string, any> = {}, includeAuth: boolean = true): string {
-  const url = new URL(endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`);
+function buildUrl(
+  endpoint: string,
+  params: Record<string, any> = {},
+  includeAuth: boolean = true,
+): string {
+  const url = new URL(
+    endpoint.startsWith('http') ? endpoint : `${API_BASE}${endpoint}`,
+  );
 
   // Add auth params if needed
   if (includeAuth) {
@@ -128,7 +137,7 @@ function buildUrl(endpoint: string, params: Record<string, any> = {}, includeAut
 async function makeRequest(
   endpoint: string,
   options: RequestInit = {},
-  config: ApiClientConfig = {}
+  config: ApiClientConfig = {},
 ): Promise<any> {
   const {
     timeout = TIMEOUT,
@@ -188,14 +197,15 @@ async function makeRequest(
         };
         throw error;
       }
-
     } catch (error: any) {
       lastError = classifyError(error);
 
       // Don't retry on certain errors
       if (
         lastError.type === ErrorType.PARSE_ERROR ||
-        (lastError.statusCode && lastError.statusCode >= 400 && lastError.statusCode < 500)
+        (lastError.statusCode &&
+          lastError.statusCode >= 400 &&
+          lastError.statusCode < 500)
       ) {
         // Client errors (4xx) and parse errors should not be retried
         break;
@@ -222,7 +232,11 @@ export const apiClient = {
   /**
    * GET request
    */
-  async get(endpoint: string, params: Record<string, any> = {}, config: ApiClientConfig = {}): Promise<any> {
+  async get(
+    endpoint: string,
+    params: Record<string, any> = {},
+    config: ApiClientConfig = {},
+  ): Promise<any> {
     const url = buildUrl(endpoint, params, config.includeAuth ?? true);
     return makeRequest(url, { method: 'GET' }, config);
   },
@@ -230,28 +244,36 @@ export const apiClient = {
   /**
    * POST request
    */
-  async post(endpoint: string, body: any = {}, config: ApiClientConfig = {}): Promise<any> {
+  async post(
+    endpoint: string,
+    body: any = {},
+    config: ApiClientConfig = {},
+  ): Promise<any> {
     return makeRequest(
       endpoint,
       {
         method: 'POST',
         body: JSON.stringify(body),
       },
-      config
+      config,
     );
   },
 
   /**
    * PUT request
    */
-  async put(endpoint: string, body: any = {}, config: ApiClientConfig = {}): Promise<any> {
+  async put(
+    endpoint: string,
+    body: any = {},
+    config: ApiClientConfig = {},
+  ): Promise<any> {
     return makeRequest(
       endpoint,
       {
         method: 'PUT',
         body: JSON.stringify(body),
       },
-      config
+      config,
     );
   },
 
