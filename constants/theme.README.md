@@ -52,86 +52,86 @@ import { theme } from '@/constants/theme';
 
 ```tsx
 // Primary Brand Colors
-theme.colors.primary.main       // #0060AA
-theme.colors.primary.light      // #F5FAFD
-theme.colors.primary.lighter    // #C4E0F5
-theme.colors.primary.dark       // #004A87
-theme.colors.primary.contrast   // #FFFFFF
+theme.colors.primary.main; // #0060AA
+theme.colors.primary.light; // #F5FAFD
+theme.colors.primary.lighter; // #C4E0F5
+theme.colors.primary.dark; // #004A87
+theme.colors.primary.contrast; // #FFFFFF
 
 // Semantic Colors
-theme.colors.semantic.success   // #28A745
-theme.colors.semantic.error     // #FF4C4C
-theme.colors.semantic.warning   // #FFC107
-theme.colors.semantic.info      // #17A2B8
+theme.colors.semantic.success; // #28A745
+theme.colors.semantic.error; // #FF4C4C
+theme.colors.semantic.warning; // #FFC107
+theme.colors.semantic.info; // #17A2B8
 
 // Neutral Colors
-theme.colors.neutral.white      // #FFFFFF
-theme.colors.neutral.gray50     // #F9F9F9
-theme.colors.neutral.gray100    // #F2F2F2
-theme.colors.neutral.gray300    // #CCCCCC
-theme.colors.neutral.gray900    // #1A1A1A
+theme.colors.neutral.white; // #FFFFFF
+theme.colors.neutral.gray50; // #F9F9F9
+theme.colors.neutral.gray100; // #F2F2F2
+theme.colors.neutral.gray300; // #CCCCCC
+theme.colors.neutral.gray900; // #1A1A1A
 
 // Text Colors
-theme.colors.text.primary       // #1A1A1A
-theme.colors.text.secondary     // #555555
-theme.colors.text.tertiary      // #999999
-theme.colors.text.inverse       // #FFFFFF
-theme.colors.text.link          // #0060AA
+theme.colors.text.primary; // #1A1A1A
+theme.colors.text.secondary; // #555555
+theme.colors.text.tertiary; // #999999
+theme.colors.text.inverse; // #FFFFFF
+theme.colors.text.link; // #0060AA
 ```
 
 ### Typography
 
 ```tsx
 // Typography Variants
-theme.typography.h1             // { fontSize: 24, fontWeight: '700', lineHeight: 32 }
-theme.typography.h2             // { fontSize: 22, fontWeight: '700', lineHeight: 30 }
-theme.typography.h3             // { fontSize: 20, fontWeight: '700', lineHeight: 28 }
-theme.typography.h4             // { fontSize: 18, fontWeight: '600', lineHeight: 24 }
-theme.typography.body           // { fontSize: 16, fontWeight: '400', lineHeight: 22 }
-theme.typography.bodyBold       // { fontSize: 16, fontWeight: '600', lineHeight: 22 }
-theme.typography.small          // { fontSize: 14, fontWeight: '400', lineHeight: 20 }
-theme.typography.caption        // { fontSize: 13, fontWeight: '400', lineHeight: 18 }
-theme.typography.tiny           // { fontSize: 10, fontWeight: '400', lineHeight: 14 }
+theme.typography.h1; // { fontSize: 24, fontWeight: '700', lineHeight: 32 }
+theme.typography.h2; // { fontSize: 22, fontWeight: '700', lineHeight: 30 }
+theme.typography.h3; // { fontSize: 20, fontWeight: '700', lineHeight: 28 }
+theme.typography.h4; // { fontSize: 18, fontWeight: '600', lineHeight: 24 }
+theme.typography.body; // { fontSize: 16, fontWeight: '400', lineHeight: 22 }
+theme.typography.bodyBold; // { fontSize: 16, fontWeight: '600', lineHeight: 22 }
+theme.typography.small; // { fontSize: 14, fontWeight: '400', lineHeight: 20 }
+theme.typography.caption; // { fontSize: 13, fontWeight: '400', lineHeight: 18 }
+theme.typography.tiny; // { fontSize: 10, fontWeight: '400', lineHeight: 14 }
 ```
 
 ### Spacing (8px Grid)
 
 ```tsx
-theme.spacing.xs      // 4px
-theme.spacing.sm      // 8px
-theme.spacing.md      // 12px
-theme.spacing.lg      // 16px
-theme.spacing.xl      // 20px
-theme.spacing.xxl     // 24px
-theme.spacing.xxxl    // 32px
+theme.spacing.xs; // 4px
+theme.spacing.sm; // 8px
+theme.spacing.md; // 12px
+theme.spacing.lg; // 16px
+theme.spacing.xl; // 20px
+theme.spacing.xxl; // 24px
+theme.spacing.xxxl; // 32px
 ```
 
 ### Border Radius
 
 ```tsx
-theme.borderRadius.sm     // 6px
-theme.borderRadius.md     // 10px
-theme.borderRadius.lg     // 12px
-theme.borderRadius.xl     // 16px
-theme.borderRadius.round  // 999px (fully rounded)
+theme.borderRadius.sm; // 6px
+theme.borderRadius.md; // 10px
+theme.borderRadius.lg; // 12px
+theme.borderRadius.xl; // 16px
+theme.borderRadius.round; // 999px (fully rounded)
 ```
 
 ### Shadows
 
 ```tsx
-theme.shadows.sm    // Subtle shadow
-theme.shadows.md    // Medium shadow
-theme.shadows.lg    // Large shadow
-theme.shadows.xl    // Extra large shadow
+theme.shadows.sm; // Subtle shadow
+theme.shadows.md; // Medium shadow
+theme.shadows.lg; // Large shadow
+theme.shadows.xl; // Extra large shadow
 ```
 
 ### Layout Constants
 
 ```tsx
-theme.layout.screenPadding       // 16
-theme.layout.cardMargin          // 12
-theme.layout.headerHeight        // 60
-theme.layout.minTouchTarget      // 44 (iOS/Android minimum)
+theme.layout.screenPadding; // 16
+theme.layout.cardMargin; // 12
+theme.layout.headerHeight; // 60
+theme.layout.minTouchTarget; // 44 (iOS/Android minimum)
 ```
 
 ---
@@ -177,6 +177,7 @@ import { Button } from '@/components/ui';
 ```
 
 **Props:**
+
 - `variant`: 'primary' | 'secondary' | 'success' | 'danger' | 'outline' | 'text'
 - `size`: 'small' | 'medium' | 'large'
 - `loading`: boolean
@@ -319,6 +320,7 @@ import { Typography, H1, H2, H3, H4, Body, Caption } from '@/components/ui';
 ```
 
 **Color Options:**
+
 - `primary`, `secondary`, `tertiary`, `inverse`, `link`, `success`, `error`, `warning`
 
 ### Shimmer
@@ -345,6 +347,7 @@ import { Shimmer, ShimmerGroup } from '@/components/ui';
 ### Styling with Theme
 
 **Before:**
+
 ```tsx
 const styles = StyleSheet.create({
   container: {
@@ -361,6 +364,7 @@ const styles = StyleSheet.create({
 ```
 
 **After:**
+
 ```tsx
 import { theme } from '@/constants/theme';
 
@@ -380,6 +384,7 @@ const styles = StyleSheet.create({
 ### Replace Custom Buttons
 
 **Before:**
+
 ```tsx
 <TouchableOpacity
   style={{
@@ -397,8 +402,9 @@ const styles = StyleSheet.create({
 ```
 
 **After:**
+
 ```tsx
-<Button variant="success" onPress={handleCheckout} fullWidth>
+<Button variant='success' onPress={handleCheckout} fullWidth>
   Checkout
 </Button>
 ```
@@ -406,6 +412,7 @@ const styles = StyleSheet.create({
 ### Replace Custom Cards
 
 **Before:**
+
 ```tsx
 <View
   style={{
@@ -415,22 +422,22 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   }}
 >
-  <Text style={{ fontSize: 16, fontWeight: '600' }}>
-    {item.name}
-  </Text>
+  <Text style={{ fontSize: 16, fontWeight: '600' }}>{item.name}</Text>
 </View>
 ```
 
 **After:**
+
 ```tsx
-<Card variant="bordered" style={{ marginBottom: theme.spacing.md }}>
-  <Typography variant="bodyBold">{item.name}</Typography>
+<Card variant='bordered' style={{ marginBottom: theme.spacing.md }}>
+  <Typography variant='bodyBold'>{item.name}</Typography>
 </Card>
 ```
 
 ### Replace Custom Shimmer
 
 **Before:**
+
 ```tsx
 <View style={styles.shimmerCard}>
   <View style={styles.shimmerImageWrapper}>
@@ -442,9 +449,10 @@ const styles = StyleSheet.create({
 ```
 
 **After:**
+
 ```tsx
-<Card variant="default" style={styles.shimmerCard}>
-  <Shimmer width="100%" height={120} borderRadius={theme.borderRadius.sm} />
+<Card variant='default' style={styles.shimmerCard}>
+  <Shimmer width='100%' height={120} borderRadius={theme.borderRadius.sm} />
 </Card>
 ```
 
@@ -455,30 +463,33 @@ const styles = StyleSheet.create({
 All components include:
 
 ### Minimum Touch Targets
+
 ```tsx
 // All interactive elements have minimum 44x44px touch area
 const styles = StyleSheet.create({
   button: {
-    minWidth: theme.layout.minTouchTarget,   // 44
-    minHeight: theme.layout.minTouchTarget,  // 44
+    minWidth: theme.layout.minTouchTarget, // 44
+    minHeight: theme.layout.minTouchTarget, // 44
   },
 });
 ```
 
 ### Screen Reader Support
+
 ```tsx
 // Components include proper accessibility labels
 <Button
-  variant="primary"
+  variant='primary'
   onPress={handlePress}
-  accessibilityLabel="Submit form"
-  accessibilityHint="Submits the registration form"
+  accessibilityLabel='Submit form'
+  accessibilityHint='Submits the registration form'
 >
   Submit
 </Button>
 ```
 
 ### Color Contrast
+
 ```tsx
 // All text/background combinations meet WCAG AA (4.5:1 minimum)
 // Primary text on white: 14.5:1 ✅
@@ -487,6 +498,7 @@ const styles = StyleSheet.create({
 ```
 
 ### Focus Indicators
+
 ```tsx
 // Keyboard navigation shows clear focus states
 const styles = StyleSheet.create({
@@ -504,14 +516,23 @@ const styles = StyleSheet.create({
 ### Step 1: Import Theme
 
 Add to your component:
+
 ```tsx
 import { theme } from '@/constants/theme';
-import { Button, Card, Typography, Input, Badge, Shimmer } from '@/components/ui';
+import {
+  Button,
+  Card,
+  Typography,
+  Input,
+  Badge,
+  Shimmer,
+} from '@/components/ui';
 ```
 
 ### Step 2: Replace Hardcoded Values
 
 Find and replace:
+
 - `'#0060AA'` → `theme.colors.primary.main`
 - `'#ffffff'` → `theme.colors.background.primary`
 - `fontSize: 16` → `theme.typography.body.fontSize`
@@ -530,10 +551,11 @@ Find and replace:
 ### Step 4: Add Accessibility
 
 Ensure all interactive elements have:
+
 ```tsx
-accessibilityRole="button"
-accessibilityLabel="Descriptive label"
-accessibilityHint="What happens when pressed"
+accessibilityRole = 'button';
+accessibilityLabel = 'Descriptive label';
+accessibilityHint = 'What happens when pressed';
 ```
 
 ### Step 5: Update StyleSheet
@@ -559,58 +581,69 @@ const styles = StyleSheet.create({
 ### Common Patterns
 
 #### Header with Cart Badge
+
 ```tsx
 <View style={styles.header}>
-  <Ionicons name="cart-outline" size={28} color={theme.colors.primary.contrast} />
-  <Badge count={cartCount} variant="error" />
+  <Ionicons
+    name='cart-outline'
+    size={28}
+    color={theme.colors.primary.contrast}
+  />
+  <Badge count={cartCount} variant='error' />
 </View>
 ```
 
 #### Form Section
+
 ```tsx
-<Card variant="bordered">
+<Card variant='bordered'>
   <H4>Personal Information</H4>
+  <Input label='Full Name' value={name} onChangeText={setName} required />
   <Input
-    label="Full Name"
-    value={name}
-    onChangeText={setName}
-    required
-  />
-  <Input
-    label="Email"
+    label='Email'
     value={email}
     onChangeText={setEmail}
     error={emailError}
-    keyboardType="email-address"
+    keyboardType='email-address'
   />
-  <Button variant="primary" onPress={handleSubmit} fullWidth>
+  <Button variant='primary' onPress={handleSubmit} fullWidth>
     Submit
   </Button>
 </Card>
 ```
 
 #### Product Card
+
 ```tsx
 <TouchableCard
-  variant="elevated"
+  variant='elevated'
   onPress={() => navigateToProduct(item.id)}
   accessibilityLabel={`View ${item.name}`}
 >
   <Image source={{ uri: item.image }} style={styles.image} />
-  <Typography variant="caption" numberOfLines={2}>
+  <Typography variant='caption' numberOfLines={2}>
     {item.name}
   </Typography>
-  <Typography variant="smallBold" color="primary">
+  <Typography variant='smallBold' color='primary'>
     ₹ {item.price}
   </Typography>
 </TouchableCard>
 ```
 
 #### Empty State
+
 ```tsx
 <View style={styles.emptyContainer}>
-  <Ionicons name="cart-outline" size={150} color={theme.colors.neutral.gray300} />
-  <Typography variant="body" color="tertiary" style={{ marginTop: theme.spacing.md }}>
+  <Ionicons
+    name='cart-outline'
+    size={150}
+    color={theme.colors.neutral.gray300}
+  />
+  <Typography
+    variant='body'
+    color='tertiary'
+    style={{ marginTop: theme.spacing.md }}
+  >
     Your cart is empty
   </Typography>
 </View>
@@ -621,6 +654,7 @@ const styles = StyleSheet.create({
 ## Support
 
 For questions or issues:
+
 - Review this documentation
 - Check `/Users/akanksharaopaul/.claude/plans/quirky-jumping-tiger.md` for implementation plan
 - Look at updated files for examples:
@@ -631,6 +665,6 @@ For questions or issues:
 
 ---
 
-**Version:** 1.0.0
+**Version:** 1.0.1
 **Last Updated:** January 2026
 **Maintained By:** Meltic Healthcare Development Team
