@@ -24,11 +24,6 @@ const data = [
     description: 'This is the second slide',
     image: 'banner2',
   },
-  {
-    title: 'Third Slide',
-    description: 'This is the third slide',
-    image: 'banner3',
-  },
 ];
 
 const FooterCarousel = () => {
