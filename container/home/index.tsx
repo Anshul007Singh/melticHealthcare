@@ -3,6 +3,7 @@ import Carousel from '@/components/home/carousel';
 import PremiumProducts from '@/components/home/categories';
 import Divsions from '@/components/home/division/divsion';
 import HighQualityProducts from '@/components/home/featureProducts';
+import FooterCarousel from '@/components/home/footerCarousel';
 import VisualAid from '@/components/home/visualAid';
 import { SearchBar, SearchModal } from '@/components/search';
 import { theme } from '@/constants/theme';
@@ -40,6 +41,7 @@ const Home = () => {
           <HighQualityProducts />
 
           <Divsions />
+          <FooterCarousel />
         </ScrollView>
 
         <SearchModal

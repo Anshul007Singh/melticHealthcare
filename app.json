@@ -20,6 +20,7 @@
       }
     },
     "android": {
+      "versionCode": 2,
       "intentFilters": [
         {
           "action": "VIEW",

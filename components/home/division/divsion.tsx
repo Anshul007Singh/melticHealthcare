@@ -13,7 +13,6 @@ import {
   View,
 } from 'react-native';
 
-
 const LOGO_SIZE = Dimensions.get('window').width * 0.25;
 
 /* ---------------------------------------------------
@@ -27,7 +26,6 @@ const BRAND_ORDER = [
   'melvet-animal-health',
   'mivika-wellness', // optional (future brand)
 ];
-
 
 /* ---------------------------------------------------
    MAIN COMPONENT
@@ -68,6 +66,7 @@ const OurDivisions = () => {
   }, []);
 
   const onClickHandler = (item: any) => {
+    console.log(item);
     router.push({
       pathname: '../productlist',
       params: { query: item.slug },
@@ -78,7 +77,7 @@ const OurDivisions = () => {
     <TouchableOpacity
       style={styles.logoContainer}
       onPress={() => onClickHandler(item)}
-      accessibilityRole="button"
+      accessibilityRole='button'
       accessibilityLabel={`${item.name} division`}
     >
       <Image
@@ -104,10 +103,10 @@ const OurDivisions = () => {
         <H3>Our Divisions</H3>
         <TouchableOpacity
           onPress={onViewAllHandler}
-          accessibilityRole="button"
-          accessibilityLabel="View all divisions"
+          accessibilityRole='button'
+          accessibilityLabel='View all divisions'
         >
-          <Typography variant="smallBold" color="link">
+          <Typography variant='smallBold' color='link'>
             View All
           </Typography>
         </TouchableOpacity>
@@ -137,23 +136,12 @@ const OurDivisions = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingLeft: theme.spacing.lg, paddingVertical: theme.spacing.md, }}
+          contentContainerStyle={{
+            paddingLeft: theme.spacing.lg,
+            paddingVertical: theme.spacing.md,
+          }}
         />
       )}
-
-      {/* Banner Image */}
-      <Image
-        source={require('../../../assets/images/home_offer_image_section.png')}
-        style={{
-          width: bannerWidth,
-          height: bannerHeight,
-          borderRadius: theme.borderRadius.xl,
-          marginHorizontal: theme.spacing.lg,
-          marginTop: theme.spacing.xl,
-        }}
-        resizeMode="cover"
-        accessibilityLabel="Promotional offer banner"
-      />
     </View>
   );
 };
