@@ -26,7 +26,7 @@ const data = [
   },
 ];
 
-const FooterCarousel = () => {
+const Home = () => {
   const { width: screenWidth } = useWindowDimensions();
   const imageHeight = (screenWidth * 9) / 16; // 16:9 ratio
 
@@ -141,4 +141,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FooterCarousel;
+export default Home;

@@ -29,6 +29,22 @@ type SortOption =
   | 'name-desc';
 type ViewMode = 'grid' | 'list';
 
+// Simple {name, slug} pair used for categories/brands so we can match
+// incoming route params (which are slugs) against the correct field,
+// while still filtering/displaying by the human-readable name.
+type Taxonomy = { name: string; slug: string };
+
+const ALL: Taxonomy = { name: 'all', slug: 'all' };
+
+// Normalizes a string for comparison: lowercase, spaces/underscores -> hyphens.
+// This lets "Pain Relief" and "pain-relief" be treated as equal even when
+// the product-level taxonomy data only gives us a name and no real slug.
+const normalize = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[\s_]+/g, '-');
+
 const ProductListScreen = () => {
   const params = useLocalSearchParams();
   const query = (params.query || params.productlist) as string | undefined;
@@ -53,12 +69,49 @@ const ProductListScreen = () => {
   const [hasMore, setHasMore] = useState(true);
   const [allProductsLoaded, setAllProductsLoaded] = useState(false);
 
+  // Full taxonomy lists fetched directly from the API (not derived from
+  // whichever products happen to be loaded), so all brands/categories show
+  // up in the filter even before loadAllProducts() has run.
+  const [categories, setCategories] = useState<Taxonomy[]>([ALL]);
+  const [brands, setBrands] = useState<Taxonomy[]>([ALL]);
+
   const router = useRouter();
 
   // Ref to prevent race conditions in pagination
   const loadingRef = useRef(false);
   // Ref to track if initial filter setup from URL is complete
   const initialFilterSetupComplete = useRef(false);
+
+  const loadTaxonomies = async () => {
+    try {
+      const [categoryData, brandData] = await Promise.all([
+        fetchProducts('categories'),
+        fetchProducts('brands'),
+      ]);
+
+      if (Array.isArray(categoryData)) {
+        setCategories([
+          ALL,
+          ...categoryData.map((cat: any) => ({
+            name: cat.name,
+            slug: cat.slug ?? cat.name,
+          })),
+        ]);
+      }
+
+      if (Array.isArray(brandData)) {
+        setBrands([
+          ALL,
+          ...brandData.map((brand: any) => ({
+            name: brand.name,
+            slug: brand.slug ?? brand.name,
+          })),
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching categories/brands:', error);
+    }
+  };
 
   const loadAllProducts = async () => {
     setLoading(true);
@@ -181,21 +234,10 @@ const ProductListScreen = () => {
 
   useEffect(() => {
     loadProducts();
+    loadTaxonomies();
   }, []);
 
-  const categories = useMemo(() => {
-    const all = products.flatMap((item) =>
-      item.categories.map((cat: any) => cat.name),
-    );
-    return ['all', ...new Set(all)];
-  }, [products]);
-
-  const brands = useMemo(() => {
-    const all = products.flatMap((item) =>
-      item.brands ? item.brands.map((brand: any) => brand.name) : [],
-    );
-    return ['all', ...new Set(all)];
-  }, [products]);
+  // (categories/brands are now fetched directly via loadTaxonomies(), see above)
 
   useEffect(() => {
     // Only run initial filter setup once from URL query params
@@ -217,19 +259,28 @@ const ProductListScreen = () => {
           setNoMatch(false);
         } else {
           setFeaturedFilter(false);
+
+          // Match against slug first (route params are slugs), then
+          // fall back to name. normalize() makes "pain-relief" equal to
+          // "Pain Relief" even when product-level data lacks a real slug.
+          const normalizedQuery = normalize(query);
           const matchedCategory = categories.find(
-            (cat) => cat.toLowerCase() === query.toLowerCase(),
+            (cat) =>
+              normalize(cat.slug) === normalizedQuery ||
+              normalize(cat.name) === normalizedQuery,
           );
           const matchedBrand = brands.find(
-            (brand) => brand.toLowerCase() === query.toLowerCase(),
+            (brand) =>
+              normalize(brand.slug) === normalizedQuery ||
+              normalize(brand.name) === normalizedQuery,
           );
 
           if (matchedCategory) {
-            setSelectedCategory(matchedCategory);
+            setSelectedCategory(matchedCategory.name);
             setSelectedBrand('all');
             setNoMatch(false);
           } else if (matchedBrand) {
-            setSelectedBrand(matchedBrand);
+            setSelectedBrand(matchedBrand.name);
             setSelectedCategory('all');
             setNoMatch(false);
           } else {
@@ -245,6 +296,7 @@ const ProductListScreen = () => {
   // Reset the flag when query param changes (new navigation)
   useEffect(() => {
     initialFilterSetupComplete.current = false;
+    setNoMatch(false);
   }, [query]);
 
   const filteredAndSortedProducts = useMemo(() => {
@@ -790,29 +842,30 @@ const ProductListScreen = () => {
                 <ScrollView style={styles.dropdownScroll} nestedScrollEnabled>
                   {categories.map((cat) => (
                     <TouchableOpacity
-                      key={cat}
-                      onPress={() => handleCategorySelect(cat)}
+                      key={cat.slug}
+                      onPress={() => handleCategorySelect(cat.name)}
                       style={[
                         styles.dropdownItem,
-                        selectedCategory === cat && styles.dropdownItemSelected,
+                        selectedCategory === cat.name &&
+                          styles.dropdownItemSelected,
                       ]}
                       accessibilityRole='button'
-                      accessibilityLabel={`Select ${cat === 'all' ? 'all products' : cat} category`}
+                      accessibilityLabel={`Select ${cat.name === 'all' ? 'all products' : cat.name} category`}
                       accessibilityState={{
-                        selected: selectedCategory === cat,
+                        selected: selectedCategory === cat.name,
                       }}
                     >
                       <Typography
                         variant='body'
                         style={
-                          selectedCategory === cat
+                          selectedCategory === cat.name
                             ? styles.dropdownItemTextSelected
                             : styles.dropdownItemText
                         }
                       >
-                        {cat === 'all' ? 'All Products' : cat}
+                        {cat.name === 'all' ? 'All Products' : cat.name}
                       </Typography>
-                      {selectedCategory === cat && (
+                      {selectedCategory === cat.name && (
                         <Ionicons
                           name='checkmark'
                           size={20}
@@ -858,27 +911,30 @@ const ProductListScreen = () => {
                 <ScrollView style={styles.dropdownScroll} nestedScrollEnabled>
                   {brands.map((brand) => (
                     <TouchableOpacity
-                      key={brand}
-                      onPress={() => handleBrandSelect(brand)}
+                      key={brand.slug}
+                      onPress={() => handleBrandSelect(brand.name)}
                       style={[
                         styles.dropdownItem,
-                        selectedBrand === brand && styles.dropdownItemSelected,
+                        selectedBrand === brand.name &&
+                          styles.dropdownItemSelected,
                       ]}
                       accessibilityRole='button'
-                      accessibilityLabel={`Select ${brand === 'all' ? 'all brands' : brand} brand`}
-                      accessibilityState={{ selected: selectedBrand === brand }}
+                      accessibilityLabel={`Select ${brand.name === 'all' ? 'all brands' : brand.name} brand`}
+                      accessibilityState={{
+                        selected: selectedBrand === brand.name,
+                      }}
                     >
                       <Typography
                         variant='body'
                         style={
-                          selectedBrand === brand
+                          selectedBrand === brand.name
                             ? styles.dropdownItemTextSelected
                             : styles.dropdownItemText
                         }
                       >
-                        {brand === 'all' ? 'All Brands' : brand}
+                        {brand.name === 'all' ? 'All Brands' : brand.name}
                       </Typography>
-                      {selectedBrand === brand && (
+                      {selectedBrand === brand.name && (
                         <Ionicons
                           name='checkmark'
                           size={20}

@@ -9,8 +9,8 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-  useWindowDimensions,
   View,
+  useWindowDimensions,
 } from 'react-native';
 
 const LOGO_SIZE = Dimensions.get('window').width * 0.25;
@@ -65,18 +65,17 @@ const OurDivisions = () => {
     loadBrands();
   }, []);
 
-  const onClickHandler = (item: any) => {
-    console.log(item);
+  const onClickHandler = (slug: string) => {
     router.push({
       pathname: '../productlist',
-      params: { query: item.slug },
+      params: { query: slug },
     });
   };
 
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
       style={styles.logoContainer}
-      onPress={() => onClickHandler(item)}
+      onPress={() => onClickHandler(item.slug)}
       accessibilityRole='button'
       accessibilityLabel={`${item.name} division`}
     >
