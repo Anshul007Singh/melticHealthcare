@@ -271,7 +271,7 @@ export default function CartScreen() {
             renderItem={renderItem}
             contentContainerStyle={styles.listContainer}
           />
-
+          {/* 
           <Card variant='bordered' style={styles.summaryCard}>
             <View style={styles.summaryRow}>
               <Typography variant='small' color='secondary'>
@@ -298,7 +298,7 @@ export default function CartScreen() {
               <Typography variant='bodyBold'>Total</Typography>
               <Typography variant='bodyBold'>₹ {total.toFixed(2)}</Typography>
             </View>
-          </Card>
+          </Card> */}
 
           <Button
             variant='primary'

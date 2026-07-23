@@ -191,16 +191,16 @@ export default function KYCForm() {
     return panRegex.test(pan) ? '' : 'Invalid PAN number';
   };
 
-  const isFormValid =
-    companyName &&
-    !errors.pinCode &&
-    !errors.panNumber &&
-    !errors.aadhaarNumber &&
-    pinCode.length === 6 &&
-    panNumber.length === 10 &&
-    aadhaarNumber.length === 12 &&
-    (drugLicense === 'No' || (license20B && license21B)) &&
-    (gstAvailable === 'No' || gstNumber);
+  // const isFormValid =
+  //   companyName &&
+  //   !errors.pinCode &&
+  //   !errors.panNumber &&
+  //   !errors.aadhaarNumber &&
+  //   pinCode.length === 6 &&
+  //   panNumber.length === 10 &&
+  //   aadhaarNumber.length === 12 &&
+  //   (drugLicense === 'No' || (license20B && license21B)) &&
+  //   (gstAvailable === 'No' || gstNumber);
 
   return (
     <KeyboardAvoidingView
@@ -219,7 +219,6 @@ export default function KYCForm() {
               placeholder='Company / Firm Name'
               value={companyName}
               onChangeText={setCompanyName}
-              required
               accessibilityLabel='Company or firm name'
               accessibilityHint='Enter your registered business name'
             />
@@ -235,7 +234,6 @@ export default function KYCForm() {
                 setErrors((e) => ({ ...e, pinCode: validatePinCode(numeric) }));
               }}
               error={errors.pinCode}
-              required
               accessibilityLabel='Pin code'
               accessibilityHint='Enter 6-digit pin code'
             />
@@ -269,7 +267,6 @@ export default function KYCForm() {
                   placeholder='20B License No'
                   value={license20B}
                   onChangeText={setLicense20B}
-                  required
                   accessibilityLabel='License 20B number'
                   accessibilityHint='Enter your 20B license number'
                 />
@@ -291,7 +288,6 @@ export default function KYCForm() {
                   placeholder='21B License No'
                   value={license21B}
                   onChangeText={setLicense21B}
-                  required
                   accessibilityLabel='License 21B number'
                   accessibilityHint='Enter your 21B license number'
                 />
@@ -338,7 +334,6 @@ export default function KYCForm() {
                   placeholder='GST Number'
                   value={gstNumber}
                   onChangeText={setGstNumber}
-                  required
                   accessibilityLabel='GST number'
                   accessibilityHint='Enter your GST registration number'
                 />
@@ -371,7 +366,6 @@ export default function KYCForm() {
                 }));
               }}
               error={errors.aadhaarNumber}
-              required
               accessibilityLabel='Aadhaar number'
               accessibilityHint='Enter your 12-digit Aadhaar number'
             />
@@ -424,7 +418,6 @@ export default function KYCForm() {
                 }));
               }}
               error={errors.panNumber}
-              required
               accessibilityLabel='PAN card number'
               accessibilityHint='Enter your 10-character PAN number'
             />
@@ -470,7 +463,7 @@ export default function KYCForm() {
               variant='success'
               size='large'
               onPress={submitKYC}
-              disabled={!isFormValid}
+              // disabled={!isFormValid}
               loading={loading}
               accessibilityLabel='Submit KYC details'
               fullWidth

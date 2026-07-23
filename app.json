@@ -2,7 +2,7 @@
   "expo": {
     "name": "Meltic",
     "slug": "meltic",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon.png",
     "scheme": "meltic",
@@ -20,7 +20,7 @@
       }
     },
     "android": {
-      "versionCode": 2,
+      "versionCode": 3,
       "intentFilters": [
         {
           "action": "VIEW",

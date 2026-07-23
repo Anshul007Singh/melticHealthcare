@@ -57,7 +57,9 @@ export default function MainLayout() {
       </Pressable>
     ),
     headerTitleAlign: 'center',
-    headerTitle: () => <Text style={styles.brandName}>Meltic Group</Text>,
+    headerTitle: () => (
+      <Text style={styles.brandName}>Meltic Group of Companies</Text>
+    ),
     headerRight: () => (
       <Pressable
         onPress={goToCart}

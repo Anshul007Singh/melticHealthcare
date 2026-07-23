@@ -82,7 +82,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         onFocus={onFocus}
         onBlur={onBlur}
         placeholder={placeholder}
-        placeholderTextColor={theme.colors.neutral.gray50}
+        placeholderTextColor={theme.colors.neutral.gray900}
         style={styles.input}
         autoFocus={autoFocus}
         editable={editable}
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   searchIcon: {
     marginRight: theme.spacing.sm,
     fontSize: 20,
-    color: theme.colors.primary.contrast,
+    color: theme.colors.primary.dark,
   },
   input: {
     flex: 1,

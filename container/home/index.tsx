@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background.primary,
   },
   search: {
-    backgroundColor: theme.colors.primary.main,
+    backgroundColor: theme.colors.primary.light,
   },
   scrollContent: {
     paddingBottom: theme.spacing.huge,
