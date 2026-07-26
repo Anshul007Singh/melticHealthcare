@@ -4,14 +4,14 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  useWindowDimensions,
   View,
+  useWindowDimensions,
 } from 'react-native';
 
 const imageMap: { [key: string]: any } = {
-  banner1: require('../../assets/images/banner.png'),
-  banner2: require('../../assets/images/banner2.png'),
-  banner3: require('../../assets/images/banner3.png'),
+  banner1: require('../../assets/images/banner-1.jpeg'),
+  banner2: require('../../assets/images/banner-2.jpeg'),
+  banner3: require('../../assets/images/banner-3.jpeg'),
 };
 
 const data = [
@@ -22,7 +22,7 @@ const data = [
 
 const Home = () => {
   const { width: screenWidth } = useWindowDimensions();
-  const imageHeight = screenWidth * 9 / 16; // 16:9 ratio
+  const imageHeight = screenWidth * 9 / 21; // 21:9 ratio
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);

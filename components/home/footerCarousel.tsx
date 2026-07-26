@@ -4,8 +4,8 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  useWindowDimensions,
   View,
+  useWindowDimensions,
 } from 'react-native';
 
 const imageMap: { [key: string]: any } = {
@@ -28,7 +28,7 @@ const data = [
 
 const Home = () => {
   const { width: screenWidth } = useWindowDimensions();
-  const imageHeight = (screenWidth * 9) / 16; // 16:9 ratio
+  const imageHeight = (screenWidth * 9) / 22; // 22:9 ratio
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -121,6 +121,7 @@ const Home = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.background.primary,
+    marginTop:20,
   },
   paginationContainer: {
     flexDirection: 'row',
