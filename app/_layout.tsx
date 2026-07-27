@@ -9,6 +9,7 @@ import LoginScreen from './screens/loginScreen';
 import SignUpScreen from './screens/signUpScreen';
 import SplashScreen from './screens/splashscreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NotificationProvider } from '@/context/notificationContext';
 
 export default function App() {
   return (
@@ -66,7 +67,9 @@ function AppContent() {
   return (
     <SafeAreaProvider style={styles.rootContainer}>
       <CartProvider>
-        <MainLayout />
+        <NotificationProvider>
+          <MainLayout />
+        </NotificationProvider>
       </CartProvider>
     </SafeAreaProvider>
   );

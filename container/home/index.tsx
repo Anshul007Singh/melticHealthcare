@@ -9,10 +9,14 @@ import { SearchBar, SearchModal } from '@/components/search';
 import { theme } from '@/constants/theme';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useNotifications } from '@/context/notificationContext';
+import { Text } from 'react-native';
 
 const Home = () => {
   const [searchModalVisible, setSearchModalVisible] = useState(false);
-
+  const { unreadCount } = useNotifications();
   const handleSearchFocus = () => {
     setSearchModalVisible(true);
   };
@@ -43,7 +47,20 @@ const Home = () => {
           <Divsions />
           <FooterCarousel />
         </ScrollView>
+        {unreadCount > 0 && (
+          <Pressable
+            style={styles.notificationButton}
+            onPress={() => router.push('/pages/notification')}
+          >
+            <MaterialCommunityIcons name='bell' size={28} color='#fff' />
 
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </Text>
+            </View>
+          </Pressable>
+        )}
         <SearchModal
           visible={searchModalVisible}
           onClose={() => setSearchModalVisible(false)}
@@ -63,6 +80,40 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: theme.spacing.huge,
+  },
+  notificationButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 30,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: theme.colors.primary.main,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+  },
+
+  badge: {
+    position: 'absolute',
+    top: -3,
+    right: -3,
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#FF3B30',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+  },
+
+  badgeText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '700',
   },
 });
 

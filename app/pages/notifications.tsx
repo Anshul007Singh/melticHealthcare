@@ -178,9 +178,9 @@ const styles = StyleSheet.create({
     color: theme.colors.text.primary,
   },
 
-  headerRow: {
-    flexDirection: 'column',
-  },
+  // headerRow: {
+  //   flexDirection: 'column',
+  // },
   content: {
     flex: 1,
   },
