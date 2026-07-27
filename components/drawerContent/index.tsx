@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import * as Updates from 'expo-updates';
-
+import { useNotifications } from '@/context/notificationContext';
 import {
   View,
   StyleSheet,
@@ -19,6 +19,7 @@ import { useAuth } from '@/context/authContext';
 import { theme } from '@/constants/theme';
 
 export default function CustomDrawerContent(props: any) {
+  const { unreadCount, markAllAsRead } = useNotifications();
   const [userInfo, setUserInfo] = useState<any>(null);
   const { logout } = useAuth();
   useEffect(() => {
@@ -28,7 +29,8 @@ export default function CustomDrawerContent(props: any) {
     };
     loadUserInfo();
   }, []);
-  const notificationHandler = () => {
+  const notificationHandler = async () => {
+    await markAllAsRead();
     router.push('/pages/notifications');
   };
 
@@ -72,7 +74,11 @@ export default function CustomDrawerContent(props: any) {
       contentContainerStyle={styles.scrollContent}
     >
       <View style={styles.profileSection}>
-        <Ionicons name='person-circle-outline' size={48} color={theme.colors.primary.main} />
+        <Ionicons
+          name='person-circle-outline'
+          size={48}
+          color={theme.colors.primary.main}
+        />
         <View style={styles.profileText}>
           <Text style={styles.profileName}>
             {userInfo?.name ?? 'Unknown User'}
@@ -93,7 +99,11 @@ export default function CustomDrawerContent(props: any) {
         onPress={myAccountHandler}
       />
       {userInfo?.kyc === false && (
-        <MenuItem icon='pricetag-outline' label='KYC Details' href='/pages/kycDetails' />
+        <MenuItem
+          icon='pricetag-outline'
+          label='KYC Details'
+          href='/pages/kycDetails'
+        />
       )}
 
       <MenuItem
@@ -101,6 +111,7 @@ export default function CustomDrawerContent(props: any) {
         label='Notification'
         href='/notifications'
         onPress={notificationHandler}
+        badgeCount={unreadCount}
       />
       <MenuItem
         icon='cube-outline'
@@ -139,11 +150,13 @@ function MenuItem({
   label,
   href,
   onPress,
+  badgeCount = 0,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
   href: any;
   onPress?: () => void;
+  badgeCount?: number;
 }) {
   const router = useRouter();
 
@@ -159,6 +172,11 @@ function MenuItem({
     <TouchableOpacity style={styles.menuItem} onPress={handlePress}>
       <Ionicons name={icon} size={22} color={theme.colors.primary.main} />
       <Text style={styles.menuText}>{label}</Text>
+      {badgeCount > 0 && (
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{badgeCount}</Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 }
@@ -218,6 +236,31 @@ const styles = StyleSheet.create({
   footerSeparator: {
     color: theme.colors.primary.main,
     ...theme.typography.small,
+  },
+  iconContainer: {
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -19,
+    minWidth: 18,
+    height: 20,
+    borderRadius: 9,
+    backgroundColor: '#FF3B30',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+
+  badgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
   },
 });
 function reloadApp() {

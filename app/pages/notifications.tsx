@@ -3,6 +3,7 @@ import { theme } from '@/constants/theme';
 import { fetchProducts } from '@/data/productList';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
+import { clearBadgeCount } from '@/utils/notificationStorage';
 import {
   FlatList,
   Image,
@@ -32,6 +33,14 @@ const NotificationScreen = () => {
     loadNotifications(days);
   }, [days]);
 
+  useEffect(() => {
+    const clear = async () => {
+      await clearBadgeCount();
+    };
+
+    clear();
+  }, []);
+
   const loadNotifications = async (range: number) => {
     const products = await fetchProducts();
     const fromDate = Date.now() - range * 24 * 60 * 60 * 1000;
@@ -51,7 +60,7 @@ const NotificationScreen = () => {
   };
 
   const onPressNotification = (item: NotificationType) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== item.id));
+    // setNotifications((prev) => prev.filter((n) => n.id !== item.id));
     const p = item.product;
 
     router.push({

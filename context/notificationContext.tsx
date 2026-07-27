@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { fetchProducts } from '@/data/productList';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const LAST_READ_KEY = 'lastNotificationReadTime';
 
 type NotificationItem = {
   id: string;
@@ -12,6 +14,7 @@ type NotificationContextType = {
   unreadCount: number;
   loadNotifications: () => Promise<void>;
   markAsRead: (id: string) => void;
+  markAllAsRead: () => Promise<void>;
 };
 
 const NotificationContext = createContext<NotificationContextType>(
@@ -24,6 +27,13 @@ export const NotificationProvider = ({
   children: React.ReactNode;
 }) => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const markAllAsRead = async () => {
+    await AsyncStorage.setItem(LAST_READ_KEY, Date.now().toString());
+
+    setUnreadCount(0);
+  };
 
   const loadNotifications = async () => {
     const products = await fetchProducts();
@@ -39,7 +49,16 @@ export const NotificationProvider = ({
       }))
       .sort((a: any, b: any) => b.timestamp - a.timestamp);
 
+    const lastRead = await AsyncStorage.getItem(LAST_READ_KEY);
+
+    const lastReadTime = lastRead ? Number(lastRead) : 0;
+
+    const unread = list.filter(
+      (item: { timestamp: number }) => item.timestamp > lastReadTime,
+    );
+
     setNotifications(list);
+    setUnreadCount(unread.length);
   };
 
   const markAsRead = (id: string) => {
@@ -58,9 +77,10 @@ export const NotificationProvider = ({
     <NotificationContext.Provider
       value={{
         notifications,
-        unreadCount: notifications.length,
+        unreadCount,
         loadNotifications,
         markAsRead,
+        markAllAsRead,
       }}
     >
       {children}

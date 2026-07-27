@@ -13,10 +13,21 @@ import { router } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNotifications } from '@/context/notificationContext';
 import { Text } from 'react-native';
+import { useEffect } from 'react';
+import { getBadgeCount, saveBadgeCount } from '@/utils/notificationStorage';
 
 const Home = () => {
   const [searchModalVisible, setSearchModalVisible] = useState(false);
-  const { unreadCount } = useNotifications();
+  const [badgeCount, setBadgeCount] = useState(0);
+  const { unreadCount, markAllAsRead } = useNotifications();
+  useEffect(() => {
+    const loadBadge = async () => {
+      const count = await getBadgeCount();
+      setBadgeCount(count);
+    };
+
+    loadBadge();
+  }, []);
   const handleSearchFocus = () => {
     setSearchModalVisible(true);
   };
@@ -47,16 +58,19 @@ const Home = () => {
           <Divsions />
           <FooterCarousel />
         </ScrollView>
-        {unreadCount > 0 && (
+        {badgeCount > 0 && (
           <Pressable
             style={styles.notificationButton}
-            onPress={() => router.push('/pages/notification')}
+            onPress={() => {
+              markAllAsRead();
+              router.push('/pages/notifications');
+            }}
           >
             <MaterialCommunityIcons name='bell' size={28} color='#fff' />
 
             <View style={styles.badge}>
               <Text style={styles.badgeText}>
-                {unreadCount > 99 ? '99+' : unreadCount}
+                {badgeCount > 99 ? '99+' : badgeCount}
               </Text>
             </View>
           </Pressable>
