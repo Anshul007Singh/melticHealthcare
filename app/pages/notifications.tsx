@@ -3,7 +3,6 @@ import { theme } from '@/constants/theme';
 import { fetchProducts } from '@/data/productList';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { clearBadgeCount } from '@/utils/notificationStorage';
 import {
   FlatList,
   Image,
@@ -32,14 +31,6 @@ const NotificationScreen = () => {
   useEffect(() => {
     loadNotifications(days);
   }, [days]);
-
-  useEffect(() => {
-    const clear = async () => {
-      await clearBadgeCount();
-    };
-
-    clear();
-  }, []);
 
   const loadNotifications = async (range: number) => {
     const products = await fetchProducts();
