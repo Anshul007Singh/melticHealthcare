@@ -1,8 +1,8 @@
 import Card from '@/components/ui/Card';
 import { theme } from '@/constants/theme';
-import { fetchProducts } from '@/data/productList';
+import { useNotifications } from '@/context/notificationContext';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -11,47 +11,36 @@ import {
   Text,
   View,
 } from 'react-native';
-
-type NotificationType = {
-  id: string;
-  product: any;
-  title: string;
-  message: string;
-  date: string;
-  timestamp: number;
-};
+import { useFocusEffect } from '@react-navigation/native';
 
 const DAYS_7 = 7;
 const DAYS_30 = 30;
 
 const NotificationScreen = () => {
-  const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [days, setDays] = useState(DAYS_7);
 
-  useEffect(() => {
-    loadNotifications(days);
-  }, [days]);
+  const { notifications, markAllAsRead, loadNotifications } =
+    useNotifications();
 
-  const loadNotifications = async (range: number) => {
-    const products = await fetchProducts();
-    const fromDate = Date.now() - range * 24 * 60 * 60 * 1000;
-    const list: NotificationType[] = products
-      .filter((p: any) => new Date(p.date_created).getTime() >= fromDate)
-      .map((p: any) => ({
-        id: `product-${p.id}`,
-        product: p,
-        title: p.name,
-        date: new Date(p.date_created).toDateString(),
-        timestamp: new Date(p.date_created).getTime(),
-      }))
-      .sort(
-        (a: NotificationType, b: NotificationType) => b.timestamp - a.timestamp,
-      );
-    setNotifications(list);
-  };
+  // Refresh notifications whenever this screen becomes active
+  useFocusEffect(
+    useCallback(() => {
+      const init = async () => {
+        await loadNotifications();
+        await markAllAsRead();
+      };
 
-  const onPressNotification = (item: NotificationType) => {
-    // setNotifications((prev) => prev.filter((n) => n.id !== item.id));
+      init();
+    }, []),
+  );
+  // Filter notifications by selected range (7 or 30 days)
+  const filteredNotifications = useMemo(() => {
+    const fromDate = Date.now() - days * 24 * 60 * 60 * 1000;
+
+    return notifications.filter((item) => item.timestamp >= fromDate);
+  }, [notifications, days]);
+
+  const onPressNotification = (item: any) => {
     const p = item.product;
 
     router.push({
@@ -71,7 +60,7 @@ const NotificationScreen = () => {
     });
   };
 
-  const renderItem = ({ item }: { item: NotificationType }) => {
+  const renderItem = ({ item }: { item: any }) => {
     const image = item.product?.images?.[0]?.src;
 
     return (
@@ -87,22 +76,20 @@ const NotificationScreen = () => {
             )}
           </View>
 
-          {/* Text */}
           <View style={styles.content}>
             <View style={styles.headerRow}>
               <Text style={styles.title} numberOfLines={1}>
-                {item.title}
+                {item.product?.name || 'New Product'}
               </Text>
-              <Text style={styles.date}>{item.date}</Text>
+              <Text style={styles.date}>
+                {new Date(item.timestamp).toDateString()}
+              </Text>
             </View>
 
             <Text style={styles.message} numberOfLines={2}>
-              {item.message}
+              A new product has been added to the catalog.
             </Text>
           </View>
-
-          {/* Unread Dot */}
-          <View style={styles.unreadDot} />
         </Card>
       </Pressable>
     );
@@ -111,7 +98,7 @@ const NotificationScreen = () => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={notifications}
+        data={filteredNotifications}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={
@@ -178,9 +165,6 @@ const styles = StyleSheet.create({
     color: theme.colors.text.primary,
   },
 
-  // headerRow: {
-  //   flexDirection: 'column',
-  // },
   content: {
     flex: 1,
   },
@@ -200,20 +184,13 @@ const styles = StyleSheet.create({
   date: {
     ...theme.typography.caption,
     color: theme.colors.text.secondary,
+    marginTop: theme.spacing.xs,
   },
 
   message: {
     marginTop: theme.spacing.xs,
     ...theme.typography.small,
     color: theme.colors.text.secondary,
-  },
-
-  unreadDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: theme.colors.semantic.info,
-    marginLeft: theme.spacing.sm,
   },
 
   emptyText: {

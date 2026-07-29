@@ -29,8 +29,18 @@ export const NotificationProvider = ({
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // const markAllAsRead = async () => {
+  //   await AsyncStorage.setItem(LAST_READ_KEY, Date.now().toString());
+
+  //   setUnreadCount(0);
+  // };
   const markAllAsRead = async () => {
-    await AsyncStorage.setItem(LAST_READ_KEY, Date.now().toString());
+    if (notifications.length > 0) {
+      await AsyncStorage.setItem(
+        LAST_READ_KEY,
+        notifications[0].timestamp.toString(),
+      );
+    }
 
     setUnreadCount(0);
   };
