@@ -19,7 +19,7 @@ const DAYS_30 = 30;
 const NotificationScreen = () => {
   const [days, setDays] = useState(DAYS_7);
 
-  const { notifications, markAllAsRead, loadNotifications } =
+  const { notifications, markAllAsRead, markAsRead, loadNotifications } =
     useNotifications();
 
   // Refresh notifications whenever this screen becomes active
@@ -42,8 +42,8 @@ const NotificationScreen = () => {
 
   const onPressNotification = (item: any) => {
     const p = item.product;
-
-    router.push({
+    markAsRead(item.id);
+    router.replace({
       pathname: '/pages/productDetail',
       params: {
         id: p.id,
@@ -90,6 +90,7 @@ const NotificationScreen = () => {
               A new product has been added to the catalog.
             </Text>
           </View>
+          {!item.isRead && <View style={styles.unreadDot} />}
         </Card>
       </Pressable>
     );
@@ -128,6 +129,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background.secondary,
     padding: theme.spacing.md,
+  },
+  unreadDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: theme.colors.semantic.info,
+    marginLeft: theme.spacing.sm,
   },
 
   card: {

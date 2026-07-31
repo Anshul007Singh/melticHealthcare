@@ -2,11 +2,13 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { fetchProducts } from '@/data/productList';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const LAST_READ_KEY = 'lastNotificationReadTime';
+const READ_NOTIFICATION_IDS_KEY = 'readNotificationIds';
 
 type NotificationItem = {
   id: string;
   product: any;
   timestamp: number;
+  isRead: boolean;
 };
 
 type NotificationContextType = {
@@ -46,33 +48,56 @@ export const NotificationProvider = ({
   };
 
   const loadNotifications = async () => {
+    const value = await AsyncStorage.getItem(READ_NOTIFICATION_IDS_KEY);
+
+    const readIds = value ? JSON.parse(value) : [];
     const products = await fetchProducts();
 
     const fromDate = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
     const list = products
       .filter((p: any) => new Date(p.date_created).getTime() >= fromDate)
-      .map((p: any) => ({
-        id: `product-${p.id}`,
-        product: p,
-        timestamp: new Date(p.date_created).getTime(),
-      }))
+      .map((p: any) => {
+        const timestamp = new Date(p.date_created).getTime();
+
+        return {
+          id: `product-${p.id}`,
+          product: p,
+          timestamp,
+          isRead: readIds.includes(`product-${p.id}`),
+        };
+      })
       .sort((a: any, b: any) => b.timestamp - a.timestamp);
 
     const lastRead = await AsyncStorage.getItem(LAST_READ_KEY);
 
     const lastReadTime = lastRead ? Number(lastRead) : 0;
-
     const unread = list.filter(
       (item: { timestamp: number }) => item.timestamp > lastReadTime,
     );
 
-    setNotifications(list);
     setUnreadCount(unread.length);
+    setNotifications(list);
+    setUnreadCount(list.filter((item: { isRead: any }) => !item.isRead).length);
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  const markAsRead = async (id: string) => {
+    const value = await AsyncStorage.getItem(READ_NOTIFICATION_IDS_KEY);
+
+    const readIds = value ? JSON.parse(value) : [];
+
+    if (!readIds.includes(id)) {
+      readIds.push(id);
+
+      await AsyncStorage.setItem(
+        READ_NOTIFICATION_IDS_KEY,
+        JSON.stringify(readIds),
+      );
+    }
+
+    setNotifications((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, isRead: true } : item)),
+    );
   };
 
   useEffect(() => {

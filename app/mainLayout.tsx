@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   },
   brandName: {
     color: theme.colors.text.inverse,
-    ...theme.typography.h2,
+    ...theme.typography.h3,
     fontStyle: 'italic',
     // textAlign: 'center',
   },
